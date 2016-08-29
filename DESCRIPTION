@@ -1,0 +1,32 @@
+Package: haplot
+Type: Package
+Title: short read variant visualizer
+Version: 0.1.0
+Authors@R: person("Thomas", "Ng", email = "tngthomasng@gmail.com", role = c("aut", "cre"))
+Description: This package generates haplotype summary drawn from alignment
+    and variant files, specifically from SAM and VCF files. Supported by R's shiny
+    package, this dynamic generated graphical app serves the purpose of quality
+    assessment of haplotype in various levels from individual basis to locus
+    basis and to other labels. This app is also equipped with simple control panel
+    allowing you to identify and remove any poor quality read.
+Depends:
+    R (>= 3.1.2)
+License: GPL-3
+LazyData: TRUE
+Imports:
+    DT (>= 0.1),
+    dplyr (>= 0.4.3),
+    ggplot2 (>= 2.1.0),
+    grid (>= 3.1.2),
+    gtools (>= 3.5.0),
+    magrittr (>= 1.5),
+    scales (>= 0.4.0),
+    shiny (>= 0.13.2),
+    shinyBS (>= 0.61),
+    tidyr (>= 0.4.1),
+URL: https://github.com/ngthomas/callBayes
+BugReports: https://github.com/ngthomas/callBayes/issues
+RoxygenNote: 5.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
