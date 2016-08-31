@@ -1,8 +1,30 @@
 # haplot   
 
-The goal of `haplot` is to generate visual summary of microhaplotype found in short read alignments.
+`haplot` generates visual summaries of microhaplotypes found in short read alignments.
 
-The process of using `haplot` is quick and straight-forward. It takes two function calls to extract, process and display haplotype, of which can be completed within minutes. `haplot` is suitable for carrying quick assesement and quality control of haplotype generated from library runs. Plot summaries include read depth, fraction of calleable haplotype, Hardy-Weinberg equilibrium plot, and more.   
+This software exists as a an R package `haplot` that includes within it the code to set up and 
+establish an Rstudio/Shiny server to visualize and manipulate the data.  There are two key steps in 
+the `haplot` worflow:
+
+1. The first step is to summarize alignment and variation data into a single data frame that is 
+easily operated upon.  This is done using the function `haplot::runHaplot`.  You must supply a 
+VCF file that includes variants that you are interested in extracting, and as many SAM files 
+(one for each individual) that you want to extract read informtion from at each of the variants. 
+The functio `haplot::runHaplot` makes a call
+to PERL to parse the CIGAR strings in the SAM files to extract the variant information at each read
+and store this information inta a data frame which gets saved with the installed Shiny app (see below)
+for later use.  Depending on the size of the data set, this can take a few minutes.  
+
+2. The second step is to run the haPLOType Shiny app to visualize the sequence information, call genotypes using
+simple read-depth based filtering criteria, and curate the loci. haPLOType is is suitable for carrying quick assesement
+and quality control of haplotype generated from library runs. Plot summaries include read depth, fraction of callable haplotype, Hardy-Weinberg
+equilibrium plots, and more. 
+
+
+See the **Example Data** section to learn about how to run each of these steps on the example data that are provided
+with the package.  
+
+   
 
 ### Installation
 
@@ -11,7 +33,7 @@ You will need [devtools](https://github.com/hadley/devtools) to install `haplot`
 Once you have `devtools` available in R, you can get `haplot` by this command:
 ```r
 # sudo R
-devtools::install_github("ngthomas/callBayes/haplot")
+devtools::install_github("eriqande/haplot/")
 
 haplot::mvHaplotype("~/bin/haPLOType") #provide a directory path to host haPLOType app
 ```
