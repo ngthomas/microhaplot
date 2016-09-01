@@ -26,18 +26,34 @@ with the package.
 
    
 
-### Installation
+### Installation and Quick Start
 
-You will need [devtools](https://github.com/hadley/devtools) to install `haplot`. You can get `devtools` by `install.packages("devtools")`.
+You can either clone the repository and build the `haplot` package yourself, or, more easily, you can
+install it using  [devtools](https://github.com/hadley/devtools). You can get `devtools` by `install.packages("devtools")`.
 
-Once you have `devtools` available in R, you can get `haplot` by this command:
+Once you have `devtools` available in R, you can get `haplot` this way:
 ```r
 # sudo R
-devtools::install_github("eriqande/haplot/")
+devtools::install_github("eriqande/haplot", ref = "erics-haplot-updates")
+```
+That is currently set to get it from Eric Anderson's updated fork.  Everything will eventually get merged
+in.
 
-haplot::mvHaplotype("~/bin/haPLOType") #provide a directory path to host haPLOType app
+Once you have installed the `haplot` R package with devtools there you need to use the `haplot::mvHaplotype`
+to establish the haPLOType Shiny App in a convenient location on your system. The following line
+createst the directory `Shiny` in my home directory and then within that it creates the 
+directory `haPLOType` and fills it with the Shiny app as well as the example data that go 
+along with that.  
+
+```r
+haplot::mvHaplotype("~/Shiny") # provide a directory path to host the haPLOType app
 ```
 
+Now, having done that, we can launch haPLOType on the example data:
+```r
+app.path <- "~/Shiny/haPLOType"
+runHaplotype(app.path)
+```
 
 ### Quick Guide to use Haplot
 
