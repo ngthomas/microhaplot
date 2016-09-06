@@ -237,12 +237,31 @@ it is worthwhile to look at one group at a time.
 
 The expected number of different genotypes is shown by the oulines of circles and the observed number by the
 filled, colored circles.  Green are homozygotes, orange are heterozygotes, and it should be relatively 
-self-explanatory.  There is not a scale, but if you click in the center of any of genotypes with 
+self-explanatory.  There is not a scale, but if you click in the center of any of the genotypes with 
 observed (non-zero) counts, you will be told (in the upper left of the figure) what the expected and
-observed numbers were for that genotype.  These plots are not meant to provide a stringest test
+observed numbers were for that genotype.  These plots are not meant to provide a stringent test
 of departures from Hardy-Weinberg equilibrium, but do allow the user to diagnose loci that are 
 grotesquely far out of Hardy-Weinberg equilibrium.
 
 Below the haplotype frequencies and HW conformance plots you will find a simple bubble plot 
-expressing haplotype frequencies in the different groups.  
+expressing haplotype frequencies in the different groups.  In the case of the example data there
+are only two different groups and they have very similar allele frequencies.  This plot becomes more
+useful when one is comparing allele frequencies across many different groups.
+
+Finally, you may need to scroll down to see the final figure in this display.  It is a reprentation of the 
+haplotype sequences, their frequencies, and the positions of the variants within them along each amplicon.
+
+## Output of data
+
+We have already witnessed how to use the *Output* panel to look at the raw data.  It is also possible to 
+download filtered, unfiltered, and processed data from this view using the "Download Data" button.  That
+seems to be working fine, except for the reported individual haplotypes.
+
+## Locus annotation
+
+The program can be used to annotate differrent loci (and assign filtering criteria to them). This 
+annotation can be done using the "+locus annotation" interaction tabset, and the results saved 
+by downloading the locus annotation data from the *Outputs* panel.
+
+
 
