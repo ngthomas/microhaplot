@@ -33,7 +33,6 @@ install it using  [devtools](https://github.com/hadley/devtools). You can get `d
 
 Once you have `devtools` available in R, you can get `haplot` this way:
 ```r
-# sudo R
 devtools::install_github("eriqande/haplot", ref = "erics-haplot-updates", build_vignettes = TRUE)
 ```
 That is currently set to get it from Eric Anderson's updated fork.  Everything will eventually get merged
@@ -56,13 +55,14 @@ vignette("haPLOType-walkthrough")
 
 Now, having done that, we can launch haPLOType on the example data:
 ```r
+library(haplot)
 app.path <- "~/Shiny/haPLOType"
 runHaplotype(app.path)
 ```
 
 ### Quick Guide to use Haplot to parse SAM files, etc.
 
-This tutorial is incomplete...
+This tutorial is incomplete. It is coming soon.  But we need to get some good example files back.
 
 
 To upload your alignment files to shiny App `haPLOType`, you will need to generate a tab-separate **label** file with 3 info columns: path to SAM file name, individual ID, and group label (in this particular order). 
