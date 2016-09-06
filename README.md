@@ -9,15 +9,15 @@ the `haplot` worflow:
 1. The first step is to summarize alignment and variation data into a single data frame that is 
 easily operated upon.  This is done using the function `haplot::runHaplot`.  You must supply a 
 VCF file that includes variants that you are interested in extracting, and as many SAM files 
-(one for each individual) that you want to extract read informtion from at each of the variants. 
-The functio `haplot::runHaplot` makes a call
+(one for each individual) that you want to extract read information from at each of the variants. 
+The function `haplot::runHaplot` makes a call
 to PERL to parse the CIGAR strings in the SAM files to extract the variant information at each read
-and store this information inta a data frame which gets saved with the installed Shiny app (see below)
+and store this information into a data frame which gets saved with the installed Shiny app (see below)
 for later use.  Depending on the size of the data set, this can take a few minutes.  
 
 2. The second step is to run the haPLOType Shiny app to visualize the sequence information, call genotypes using
-simple read-depth based filtering criteria, and curate the loci. haPLOType is is suitable for carrying quick assesement
-and quality control of haplotype generated from library runs. Plot summaries include read depth, fraction of callable haplotype, Hardy-Weinberg
+simple read-depth based filtering criteria, and curate the loci. haPLOType is suitable for quick assesement
+and quality control of haplotype generated from library runs. Plot summaries include read depth, fraction of callable haplotypes, Hardy-Weinberg
 equilibrium plots, and more. 
 
 
@@ -34,19 +34,24 @@ install it using  [devtools](https://github.com/hadley/devtools). You can get `d
 Once you have `devtools` available in R, you can get `haplot` this way:
 ```r
 # sudo R
-devtools::install_github("eriqande/haplot", ref = "erics-haplot-updates")
+devtools::install_github("eriqande/haplot", ref = "erics-haplot-updates", build_vignettes = TRUE)
 ```
 That is currently set to get it from Eric Anderson's updated fork.  Everything will eventually get merged
 in.
 
 Once you have installed the `haplot` R package with devtools there you need to use the `haplot::mvHaplotype`
 to establish the haPLOType Shiny App in a convenient location on your system. The following line
-createst the directory `Shiny` in my home directory and then within that it creates the 
+creates the directory `Shiny` in my home directory and then within that it creates the 
 directory `haPLOType` and fills it with the Shiny app as well as the example data that go 
 along with that.  
 
 ```r
 haplot::mvHaplotype("~/Shiny") # provide a directory path to host the haPLOType app
+```
+To start familiarizing yourself with haPLOType using the provided example data.  We recommend
+going through our first vignette.  Call it up with:
+```r
+vignette("haPLOType-walkthrough")
 ```
 
 Now, having done that, we can launch haPLOType on the example data:
@@ -55,7 +60,10 @@ app.path <- "~/Shiny/haPLOType"
 runHaplotype(app.path)
 ```
 
-### Quick Guide to use Haplot
+### Quick Guide to use Haplot to parse SAM files, etc.
+
+This tutorial is incomplete...
+
 
 To upload your alignment files to shiny App `haPLOType`, you will need to generate a tab-separate **label** file with 3 info columns: path to SAM file name, individual ID, and group label (in this particular order). 
 
