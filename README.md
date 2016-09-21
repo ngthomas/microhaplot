@@ -4,14 +4,14 @@ The goal of `haplot` is to generate visual summary of microhaplotype found in sh
 
 The process of using `haplot` is quick and straight-forward. It takes two function calls to extract, process and display haplotype, of which can be completed within minutes. `haplot` is suitable for carrying quick assesement and quality control of haplotype generated from library runs. Plot summaries include read depth, fraction of calleable haplotype, Hardy-Weinberg equilibrium plot, and more.   
 
-### Installation
+### Instruction on installing this R package
 
-You will need [devtools](https://github.com/hadley/devtools) to install `haplot`. You can get `devtools` by `install.packages("devtools")`.
+You will first need [devtools](https://github.com/hadley/devtools) to install `haplot`. If you don't have `devtools`, you can get it by `install.packages("devtools")`.
 
-Once you have `devtools` available in R, you can get `haplot` by this command:
+Once `devtools` is available in R, you can install `haplot` by `install_github` function:
 ```r
 # sudo R
-devtools::install_github("ngthomas/callBayes/haplot")
+devtools::install_github("ngthomas/haplot")
 
 haplot::mvHaplotype("~/bin/haPLOType") #provide a directory path to host haPLOType app
 ```
