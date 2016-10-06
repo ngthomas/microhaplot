@@ -20,6 +20,12 @@ shinyServer(function(input, output, session) {
   rds.file <- setdiff(rds.file, c(pos.rds.file,annotate.rds.file))
   haplo.sum <- NULL
 
+  for (rdsFile in rds.file){
+    colnames.file <- colnames(rdsFile)
+    "group" %in% colnames.file
+
+  }
+
 
   if (length(rds.file) > 0) {
     select.file.tem <- dirFiles[rds.file[1]]
@@ -34,7 +40,7 @@ shinyServer(function(input, output, session) {
         is.null(input$selectDB) || !file.exists(input$selectDB))
       return()
     #cat(file=stderr(), "select DB_", input$selectDB, "_----\n")
-    readRDS(input$selectDB)  %>% mutate(id = as.character(id))
+    readRDS(input$selectDB)  %>% ungroup() %>% mutate(id = as.character(id))
   })
 
   extract.pos.file <- reactive({
@@ -50,13 +56,17 @@ shinyServer(function(input, output, session) {
     annotate.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_annotate.rds")
     if (!file.exists(annotate.file)) {
       annotateTab$tbl <- data.frame(locus = panelParam$locus.label,
+                                    ave.entropy = c("NA",rep(0, panelParam$n.locus)),
                                     min.rd = rep(0, panelParam$n.locus+1),
                                     min.ar = rep(0, panelParam$n.locus+1),
                                     status = c("NA",rep("Accept", panelParam$n.locus)),
                                     comment = rep("", panelParam$n.locus+1),
                                     stringsAsFactors = F)
+
+
       return()
     }
+
 
     annotateTab$tbl <- readRDS(annotate.file)
   })
@@ -78,6 +88,29 @@ shinyServer(function(input, output, session) {
                       "minAR",
                       value=annotateTab$tbl$min.ar[match.indx])
     return()
+  })
+
+  Update.ave.entropy <- reactive ({
+    haplo.filter <- Filter.haplo.by.RDnAR()
+    if (is.null(haplo.filter))
+      return ()
+
+    entropy.tbl <- haplo.filter %>%
+      filter(locus !="ALL", rank <= 2) %>%
+      group_by(locus, group, haplo) %>% summarise(n=n()) %>%
+      ungroup() %>%
+      group_by(locus, group) %>%
+      mutate(f = n/n()) %>%
+      ungroup() %>% group_by(locus, haplo) %>%
+      mutate(shan.entropy = f/sum(f)*log(sum(f)/f, base=2)) %>%
+      ungroup() %>% group_by(locus) %>%
+      summarise(ave.entropy.tem = round(mean(shan.entropy) ,3))
+
+    annotateTab$tbl <- left_join(annotateTab$tbl, entropy.tbl, by="locus") %>%
+      mutate(ave.entropy = ifelse(is.na(ave.entropy.tem), ave.entropy,
+                                  ave.entropy.tem)) %>%
+      select(-ave.entropy.tem)
+
   })
 
   ranges <- reactiveValues(y = NULL, x = NULL)
@@ -178,12 +211,12 @@ shinyServer(function(input, output, session) {
     indivPg$i <- panelParam$indiv.label.bare[1:end.indx]
     ranges$y <- c(0, length(indivPg$i) + 1)
 
+    extract.annotate.file()
+    update.annotate.field()
+
     Filter.haplo.sum()
     srhapPg$makePlot <- FALSE
     extract.pos.file()
-
-    extract.annotate.file()
-    update.annotate.field()
     #cat(file=stderr(), "--", colnames(annotateTab$tbl) %>% unlist, "\n")
 
   }, priority = -3)
@@ -307,6 +340,7 @@ shinyServer(function(input, output, session) {
         "1"
       })
       updateNumericInput(session, "locusPage", value = 1, max = 1)
+
       updateCheckboxGroupInput(session,
                                "filterOpts",
                                choices=list("keeps only top two haplotypes (per indiv)"=1))
@@ -327,17 +361,16 @@ shinyServer(function(input, output, session) {
                                "filterOpts",
                                choices=list("keeps only top two haplotypes (per indiv)"=1,
                                             "relies only on locus-specific param."=2,
-                                            "serves as minimal baseline"=3))
+                                            "serves as the minimal baseline"=3))
 
       addPopover(session, "filterOpts","Options",
-                 content=paste0("<p>By default, the observed microhaplotypes must pass the current selected filter criteria</p>",
+                 content=paste0("<p>By default, the observed microhaplotypes must meet the current selected filter criteria</p>",
                                 "<p></p>",
-                                "<p><b>relies only on locus-specific param.</b>: this option disregards the current filter values",
-                                "but, instead, relies on single-locus specific value in
-                                replace of the current selection of min. read depth and allelic ratio</p>",
+                                "<p><b>relies only on locus-specific param.</b>: this option disregards the present selection of min. read depth and allelic ratio. ",
+                                "Instead, the filtering process uses parameters defined at a single-locus level</p>",
                                 "<p></p>",
-                                "<p><b>serves as minimal baseline</b>:all loci must pass the current filter values and
-                                each of their own locus-specific filter value</p> "),
+                                "<p><b>serves as the minimal baseline</b>:all loci must pass the current selected filter values and
+                                 locus-specific filter value</p> "),
                  placement="bottom",
                  trigger="hover")
 
@@ -367,6 +400,11 @@ shinyServer(function(input, output, session) {
       createAlert(session, "cutoffhapAlert", "cuthapLocusAlert", title = "choose single locus for more detail",
                                                content = "choose a locus to view the breakdown by microhaplotype", append = FALSE)
     }
+
+    match.indx <- which(annotateTab$tbl$locus == input$selectLocus)
+    updateNumericInput(session, "coverageMin", value=annotateTab$tbl$min.rd[match.indx])
+    updateSliderInput(session, "minAlleleRatio", value=annotateTab$tbl$min.ar[match.indx])
+
     Filter.haplo.sum()
     #srhapPg$makePlot <- FALSE
   })
@@ -715,20 +753,48 @@ shinyServer(function(input, output, session) {
     haplo.filter
   })
 
-
-  Filter.haplo.sum <- reactive({
+  Filter.haplo.by.RDnAR <- reactive({
     haplo.sum <- Min.filter.haplo()
 
     if (is.null(haplo.sum))
       return ()
 
-    haplo.filter <- haplo.sum %>%
-      filter(depth >= filterParam$minRD,
-             allele.balance >= filterParam$minAR)
+    haplo.join.ar <- left_join(haplo.sum,
+              annotateTab$tbl,
+              by="locus")
+
+    if ("3" %in% input$filterOpts)
+      haplo.join.ar <- haplo.join.ar %>% mutate(min.rd = ifelse(filterParam$minRD>min.rd,
+                                                                filterParam$minRD,
+                                                                min.rd),
+                                                min.ar= ifelse(filterParam$minAR>min.ar,
+                                                               filterParam$minAR,
+                                                               min.ar))
+
+    if (! "2" %in% input$filterOpts)
+      haplo.join.ar <- haplo.join.ar %>%
+      mutate(min.rd = filterParam$minRD,
+             min.ar = filterParam$minAR)
+
+    haplo.join.ar <- haplo.join.ar %>% filter(depth >= min.rd,
+                                                allele.balance >= min.ar)
 
     if ("1" %in% input$filterOpts)
-      haplo.filter <- haplo.filter %>% filter(rank <= 2)
+      haplo.join.ar <- haplo.join.ar %>% filter(rank <= 2)
 
+
+    haplo.join.ar
+  })
+
+
+  Filter.haplo.sum <- reactive({
+
+    haplo.filter <- Filter.haplo.by.RDnAR()
+
+    if (is.null(haplo.filter))
+      return ()
+
+    Update.ave.entropy()
     groupPg$width <- dim(haplo.filter)[1]
     hapPg$width <- haplo.filter %>% filter(rank <= 2) %>% select(haplo) %>% unique %>% unlist %>% length
 
@@ -923,8 +989,13 @@ shinyServer(function(input, output, session) {
         frac.calleable %>% filter(locus == input$selectLocus)
     }
 
+    frac.calleable <- frac.calleable %>% ungroup() %>% mutate(label.x = ifelse(f>0.5, f-0.3, f+0.3))
+
+    #cat(file=stderr(), "checking", frac.calleable %>% filter(abs(f-0.5)<0.1) %>% select(f, label.x) %>% unlist(), "_----\n")
+
     ggplot(frac.calleable, aes(x = f, y = locus, color = f)) +
       geom_point() +
+      geom_text(data=frac.calleable, aes(y=locus, x=label.x, label=round(f,2)), color="black")+
       xlab("fraction of indiv with\n calleable haplotype") +
       ylab("") +
       scale_color_continuous(guide = FALSE) + #"fraction")+
@@ -938,7 +1009,9 @@ shinyServer(function(input, output, session) {
       ) +
       ylim(locusPg$l) +
       coord_cartesian(ylim = rangesH$y) +
-      xlim(c(0, 1))
+      #xlim(c(0, 1))
+      scale_x_continuous(limits=c(0,1), breaks=seq(0,1,0.2))
+
   }, height = function()
     ifelse(groupPg$width == 0, 0,
            max(
@@ -1024,18 +1097,7 @@ shinyServer(function(input, output, session) {
         is.null(input$selectDB) || is.null(locusPg$l))
       return ()
 
-    haplo.sum <- update.Haplo.file()
-
-    haplo.filter <- haplo.sum %>%
-      filter(depth >= filterParam$minRD,
-             allele.balance >= filterParam$minAR)
-
-    if ("1" %in% input$filterOpts)
-      haplo.filter <- haplo.filter %>% filter(rank <= 2)
-
-    if (input$selectLocus != "ALL")
-      haplo.filter <-
-      haplo.filter %>% filter(locus == input$selectLocus)
+    haplo.filter <- Filter.haplo.sum()
 
     if (dim(haplo.filter)[1] == 0)
       return ()
@@ -1186,9 +1248,12 @@ shinyServer(function(input, output, session) {
     #if (input$selectIndiv != "ALL") {
     #  haplo.filter <- haplo.filter %>% filter(id == input$selectIndiv)
     #}
+    haplo.filter <- haplo.filter %>% ungroup() %>% mutate(label.x = ifelse(f>0.5, f-0.3, f+0.3))
+
 
     ggplot(haplo.filter, aes(x = f, y = id, color = f)) +
       geom_point() +
+      geom_text(data=haplo.filter, aes(y=id, x=label.x, label=round(f,2)), color="black")+
       xlab("fraction of calleable\n haplotypes") +
       ylab("") +
       scale_color_continuous(guide = FALSE) + #"fraction")+
@@ -1203,7 +1268,9 @@ shinyServer(function(input, output, session) {
       #plot.margin = unit(c(0, 0, 0, 0), "mm"))+
       ylim(indivPg$i) +
       coord_cartesian(ylim = ranges$y) +
-      xlim(c(0, 1))
+      #xlim(c(0, 1))
+      scale_x_continuous(limits=c(0,1), breaks=seq(0,1,0.2))
+
   }, height = function()
     ifelse(groupPg$width == 0, 0,
            max(
