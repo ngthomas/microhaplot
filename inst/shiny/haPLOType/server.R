@@ -2289,14 +2289,14 @@ shinyServer(function(input, output, session) {
           left_join(haplo.all.tbl,
                     haplo.freq,
                     by = c("locus", "haplotype.1", "haplotype.2"))
-        haplo.isAccept <-
-          data.frame(
-            locus = panelParam$locus.label.bare,
-            is.reject = panelParam$is.reject,
-            stringsAsFactors = FALSE
-          )
-        haplo.all <-
-          left_join(haplo.all, haplo.isAccept, by = c("locus"))
+        # haplo.isAccept <-
+        #   data.frame(
+        #     locus = panelParam$locus.label.bare,
+        #     is.reject = panelParam$is.reject,
+        #     stringsAsFactors = FALSE
+        #   )
+        # haplo.all <-
+        #   left_join(haplo.all, haplo.isAccept, by = c("locus"))
         write.csv(haplo.all, file)
       }
       if (isolate(input$selectTbl) ==  "observed variants (unfiltered)") {
