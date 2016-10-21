@@ -259,22 +259,22 @@ shinyServer(function(input, output, session) {
     updateSelectInput(session, "selectIndiv", selected = label)
   })
 
-  observeEvent(input$groupBack, {
-    indx <- isolate(which(panelParam$group.label == input$selectGroup))
-    label <-
-      ifelse(indx > 1, panelParam$group.label[indx - 1], panelParam$group.label[indx])
-    updateSelectInput(session, "selectGroup", selected = label)
-  })
-  observeEvent(input$groupFor, {
-    indx <- isolate(which(panelParam$group.label == input$selectGroup))
-    label <-
-      ifelse(
-        indx < length(panelParam$group.label),
-        panelParam$group.label[indx + 1],
-        panelParam$group.label[indx]
-      )
-    updateSelectInput(session, "selectGroup", selected = label)
-  })
+  # observeEvent(input$groupBack, {
+  #   indx <- isolate(which(panelParam$group.label == input$selectGroup))
+  #   label <-
+  #     ifelse(indx > 1, panelParam$group.label[indx - 1], panelParam$group.label[indx])
+  #   updateSelectInput(session, "selectGroup", selected = label)
+  # })
+  # observeEvent(input$groupFor, {
+  #   indx <- isolate(which(panelParam$group.label == input$selectGroup))
+  #   label <-
+  #     ifelse(
+  #       indx < length(panelParam$group.label),
+  #       panelParam$group.label[indx + 1],
+  #       panelParam$group.label[indx]
+  #     )
+  #   updateSelectInput(session, "selectGroup", selected = label)
+  # })
 
 
   # reacting to the filter update button
@@ -292,10 +292,10 @@ shinyServer(function(input, output, session) {
   })
 
   observeEvent(input$selectGroup, {
-    if (is.null(haplo.sum) ||
-        input$selectDB == "" || is.null(input$selectDB))
+    if (input$selectDB == "" || is.null(input$selectDB))
       return()
-    indx <-
+
+        indx <-
       isolate(which(panelParam$group.label.bare == input$selectGroup))
     haplo.sum <- update.Haplo.file()
     if (input$selectGroup != "ALL")
@@ -306,6 +306,7 @@ shinyServer(function(input, output, session) {
     indiv.sorted <- sort(unique(haplo.sum$id))
     panelParam$indiv.label.tbl <-
       data.frame(id = indiv.sorted, stringsAsFactors = F) %>% tbl_df()
+
     panelParam$indiv.label <- c("ALL", indiv.sorted)
     panelParam$indiv.label.bare <- indiv.sorted
     updateSelectInput(session,
@@ -323,6 +324,7 @@ shinyServer(function(input, output, session) {
 
 
   observeEvent(input$selectLocus, {
+
     indx <-
       isolate(which(panelParam$locus.label.bare == input$selectLocus))
 
@@ -1118,6 +1120,7 @@ shinyServer(function(input, output, session) {
     #if (input$selectIndiv != "ALL") {
     #  haplo.filter <- haplo.filter %>% filter(id == input$selectIndiv)
     #}
+
 
     ggplot(data = haplo.filter, aes(
       x = depth.ratio,
