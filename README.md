@@ -1,23 +1,70 @@
 # haplot   
 
-The goal of `haplot` is to generate visual summary of microhaplotype found in short read alignments.
+`haplot` generates visual summaries of microhaplotypes found in short read alignments.
 
-The process of using `haplot` is quick and straight-forward. It takes two function calls to extract, process and display haplotype, of which can be completed within minutes. `haplot` is suitable for carrying quick assesement and quality control of haplotype generated from library runs. Plot summaries include read depth, fraction of calleable haplotype, Hardy-Weinberg equilibrium plot, and more.   
+This software exists as a an R package `haplot` that includes within it the code to set up and 
+establish an Rstudio/Shiny server to visualize and manipulate the data.  There are two key steps in 
+the `haplot` worflow:
 
-### Instruction on installing this R package
+1. The first step is to summarize alignment and variation data into a single data frame that is 
+easily operated upon.  This is done using the function `haplot::runHaplot`.  You must supply a 
+VCF file that includes variants that you are interested in extracting, and as many SAM files 
+(one for each individual) that you want to extract read information from at each of the variants. 
+The function `haplot::runHaplot` makes a call
+to PERL to parse the CIGAR strings in the SAM files to extract the variant information at each read
+and store this information into a data frame which gets saved with the installed Shiny app (see below)
+for later use.  Depending on the size of the data set, this can take a few minutes.  
 
-You will first need [devtools](https://github.com/hadley/devtools) to install `haplot`. If you don't have `devtools`, you can get it by `install.packages("devtools")`.
+2. The second step is to run the haPLOType Shiny app to visualize the sequence information, call genotypes using
+simple read-depth based filtering criteria, and curate the loci. haPLOType is suitable for quick assesement
+and quality control of haplotype generated from library runs. Plot summaries include read depth, fraction of callable haplotypes, Hardy-Weinberg
+equilibrium plots, and more. 
 
-Once `devtools` is available in R, you can install `haplot` by `install_github` function:
+
+See the **Example Data** section to learn about how to run each of these steps on the example data that are provided
+with the package.  
+
+   
+
+### Installation and Quick Start
+
+You can either clone the repository and build the `haplot` package yourself, or, more easily, you can
+install it using  [devtools](https://github.com/hadley/devtools). You can get `devtools` by `install.packages("devtools")`.
+
+Once you have `devtools` available in R, you can get `haplot` this way:
 ```r
-# sudo R
-devtools::install_github("ngthomas/haplot")
+devtools::install_github("eriqande/haplot", ref = "erics-haplot-updates", build_vignettes = TRUE)
+devtools::install_github("ngthomas/haplotr", build_vignettes = TRUE)
+```
+That is currently set to get it from Eric Anderson's updated fork.  Everything will eventually get merged
+in.
 
-haplot::mvHaplotype("~/bin/haPLOType") #provide a directory path to host haPLOType app
+Once you have installed the `haplot` R package with devtools there you need to use the `haplot::mvHaplotype`
+to establish the haPLOType Shiny App in a convenient location on your system. The following line
+creates the directory `Shiny` in my home directory and then within that it creates the 
+directory `haPLOType` and fills it with the Shiny app as well as the example data that go 
+along with that.  
+
+```r
+haplot::mvHaplotype("~/Shiny") # provide a directory path to host the haPLOType app
+```
+To start familiarizing yourself with haPLOType using the provided example data.  We recommend
+going through our first vignette.  Call it up with:
+```r
+vignette("haPLOType-walkthrough")
 ```
 
+Now, having done that, we can launch haPLOType on the example data:
+```r
+library(haplot)
+app.path <- "~/Shiny/haPLOType"
+runHaplotype(app.path)
+```
 
-### Quick Guide to use Haplot
+### Quick Guide to use Haplot to parse SAM files, etc.
+
+This tutorial is incomplete. It is coming soon.  But we need to get some good example files back.
+
 
 To upload your alignment files to shiny App `haPLOType`, you will need to generate a tab-separate **label** file with 3 info columns: path to SAM file name, individual ID, and group label (in this particular order). 
 
