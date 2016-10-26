@@ -1,0 +1,264 @@
+---
+title: "An Introduction to haPLOType"
+author: "Thomas Ng and Eric C. Anderson"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{haPLOT introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This vignette concerns itself with an overview of haPLOT and on 
+preparation of data for input into haPLOT.  To learn about how to use
+the graphical features of haPLOT, once your data have been read into haPLOT, see the 
+`haPLOT walkthrough` vignette.
+
+## How does haPLOT work?
+
+haPLOT is a tool that makes it easy to extract, visualize, and interpret short-read haplotypes---or 
+"microhaplotypes" in the parlance of some---from aligned sequences.
+Before we go further, it will be good to step back and confirm what it is we are calling a short-read haplotype, or 
+a "microhaplotype" within the context of haPLOT.  To define a microhaplotype
+in haPLOT you need first to define a series of positions that a read might align to.  Then, haPLOT can analyze
+the reads aligning at those positions, and extracts the sequence of the reads at those positions.  For example,
+let's say that we know SNPs occur at positions 19, 27, 68, and 101 of a particular reference sequence that we have
+aligned our reads to.  If a read aligns there and shows an `A` at position 19, a `G` at position 27, a `C` at position
+68, and another `C` at position 101, then we say the microhaplotype on that read is `AGCC`.  haPLOT is a tool that
+
+1. automates the extraction of these haplotypes from aligned data (typically amplicon sequencing data)
+2. provides useful filtering and visualizing capabilities for understanding your microhaplotype data and 
+for calling genotypes at microhaplotypes.  
+
+To understand what is involved in getting your data into haPLOT, it will be useful
+to have a brief introduction to what haPLOT does and how it operates.  We will start 
+by listing the things that haPLOT is **not**.
+
+- haPLOT **is not a SNP-caller or variant detector**.  It is not the job of haPLOT to determine if a variant might exist in some location
+or not.  You have to tell it the positions where it will find variants.  haPLOT just extracts the bases sequenced on
+different reads at those positions.
+- haPLOT **is not an alignment program**.  haPLOT does not do alignments.  You have to provide aligned data to it.  From the
+aligned data, haPLOT can extract the bases sequenced at the desired locations. 
+- haPLOT **is not a haplotype phasing program**. There is no special algorithm going on in haPLOT to try to assemble haplotypes (across
+reads, for example.) It merely uses the simple fact that a single sequencing read will come from a single chromosome.  So, if you have 
+can read the bases present at 4 variant positions along a 150-bp read, you know that those 4 bases constitute a haplotype.   
+- haPLOT **is not a de-novo assembly algorithm**.  There is no assembly going on here at all!
+
+
+
+## What kind of data can I use with haPLOT?
+
+haPLOT is designed to work with short read sequencing data in which 
+there is a relatively small number of places that sequencing reads will start from.
+It is emphatically not geared to whole-genome shotgun sequencing data in which 
+you expect each read to start from a different starting place.  We use haPLOT 
+primarily with amplicon sequencing data in which a few hundred fragments (of about 100 bp each)
+are amplified by PCR in a few hundred individuals.  The DNA from different individuals is
+bar-coded so that it may be demultiplexed later, and then these amplified fragments are 
+sequenced (usually to fairly high read depth) on an Illumina platform. 
+
+Though we use haPLOT for amplicon sequencing, it might also be useful for 
+analyzing haplotype data from experiments that sequence captured or baited fragments,
+(e.g., baited DD-Rad, RAPTURE, myBaits, ExonCapture, etc.), and might even be applicable to
+standard ddRAD or RAD-PE experiments, however, as the number of loci increases and average 
+read depths per individual-locus combination decreases, the unevenness of coverage can become a 
+bigger problem, (and we have more reservations about allelic dropout/null alleles when using digestion-based
+protocols (ddRAD, Rapture, etc.) than we do with amplicon sequencing).
+
+
+## Why did we write haPLOT?
+
+We tried to use existing tools to give us what we needed for our amplicon-based microhaplotypes.
+
+- We were hopeful that [STACKS](http://catchenlab.life.illinois.edu/stacks/) would provide us useful microhaplotypes.  What we found
+was that the presence of indels caused STACKS to fail, and even if it didn't we
+never found a reliable way to export inferred read haplotypes. (We could see what looked like
+haplotypes in the SQL-based viewer, but couldn't figure out how to get at those in an exported fashion!)
+- We spent countless months trying to get [freebayes](https://github.com/ekg/freebayes) 
+to properly call microhaplotypes.  Despite being an excellent variant detector, however, when presented
+with situations that were clearly simple microhaplotypes, `freebayes` would fail to call them, or would
+return results in a very difficult to manage "multinucleotide polymorphism" in the VCF.  
+- We thought that [GATK's Unified Haplotype Caller](https://software.broadinstitute.org/gatk/gatkdocs/org_broadinstitute_gatk_tools_walkers_haplotypecaller_HaplotypeCaller.php)
+might deliver us from the bioinformatic hell 
+we were experiencing, but alas, with the super-high read depths at some of the fragments in our amplicon 
+sequencing data, GATK was brought to its kneees and didn't offer a viable solution. It appears that
+the HaplotypeCaller is trying to solve a much harder problem than just extracting short-read haplotypes.
+
+After a few months of this, we realized that there is no software tailored for the relatively
+straightforward task of extracting and analyzing microhaplotypes.  The other software programs have all 
+been designed for different purposes, and, as a consequence, while they work great for
+identifying variants or performing de-novo assemblies, one might not expect them 
+to work for the specialized task of extracting and analyzing microhaplotypes.  
+
+
+## How, specifically, should I prepare my data?
+
+The starting point for haPLOT requires:
+
+1.  An indexed, BAM file of reads aligned to the reference sequences for each amplicon.
+2. A VCF file whose contents define the positions in each reference sequence from which
+you want to extract variants into microhaplotypes.  Note that the *individuals* that appear
+in the VCF file need not be the same ones whose reads appear in the assemblies.  The VCF
+is merely used as a way of defining positions to extract.
+
+
+We describe here the workflow that we use to get these two necessary files from the
+short-read amplicon sequencing data that come off our Illumina Mi-seq.  This workflow can
+be tweaked and tailored for your own data.  Each step is described in one of the following
+subsections.
+
+### Starting state
+Out description starts at the point where we have copied all of our fastq.gz files from the sequencer
+into a directory called `rawdata`. Next to that directory we have made two more directories,
+`flash` and `map`, 
+in which we will be creating files and doing work.  We have named all the Illumina
+files so that a directory
+listing of `rawdata` looks like this:
+```{sh dir-list, eval = FALSE}
+/rawdata/--% ll | head
+total 3517864
+drwxrwxr-x 2 biopipe biopipe  122880 Aug 18 11:57 ./
+drwxrwxr-x 5 biopipe biopipe    4096 Aug 18 11:31 ../
+-rw-r--r-- 1 biopipe biopipe  672293 Aug 18 11:53 satro_S100_L001_I1_001.fastq.gz
+-rw-r--r-- 1 biopipe biopipe  725385 Aug 18 11:53 satro_S100_L001_I2_001.fastq.gz
+-rw-r--r-- 1 biopipe biopipe 4656145 Aug 18 11:53 satro_S100_L001_R1_001.fastq.gz
+-rw-r--r-- 1 biopipe biopipe 4749637 Aug 18 11:53 satro_S100_L001_R2_001.fastq.gz
+-rw-r--r-- 1 biopipe biopipe  635863 Aug 18 11:53 satro_S101_L001_I1_001.fastq.gz
+-rw-r--r-- 1 biopipe biopipe  711534 Aug 18 11:53 satro_S101_L001_I2_001.fastq.gz
+-rw-r--r-- 1 biopipe biopipe 4410826 Aug 18 11:53 satro_S101_L001_R1_001.fastq.gz
+```
+In this case, there are 384 such sets of files.  The number after the capital 
+S in the filename gives the ID number of each individual fish.
+
+### Flashing the reads together
+Our data are paired end reads of fragments that are short enough that the primary reads
+and the paired-end reads overlap.  Rather than treat them as two separate reads,
+we combine them together into a single read using [flash](https://ccb.jhu.edu/software/FLASH/).
+Here is the command we use to cycle over all the files and flash them, run from the `flash` directory
+which is at the same level as the `rawdata` directory.  (Note that the `/flash/--%` in the following code
+fragment is just the command prompt---it tells you which directory we are in...)
+```{sh flash, eval = FALSE}
+/flash/--% for i in {1..384}; do flash -m 10 -M 100 -z --output-prefix=S${i} ../rawdata/satro_S${i}_L001_R1_001.fastq.gz ../rawdata/satro_S${i}_L001_R2_001.fastq.gz; done
+```
+The output that `flash` spits out to stdout looks like this:
+```{sh flash-output, eval = FALSE}
+[FLASH] Starting FLASH v1.2.11
+[FLASH] Fast Length Adjustment of SHort reads
+[FLASH]
+[FLASH] Input files:
+[FLASH]     ../rawdata/satro_S1_L001_R1_001.fastq.gz
+[FLASH]     ../rawdata/satro_S1_L001_R2_001.fastq.gz
+[FLASH]
+[FLASH] Output files:
+[FLASH]     ./S1.extendedFrags.fastq.gz
+[FLASH]     ./S1.notCombined_1.fastq.gz
+[FLASH]     ./S1.notCombined_2.fastq.gz
+[FLASH]     ./S1.hist
+[FLASH]     ./S1.histogram
+[FLASH]
+[FLASH] Parameters:
+[FLASH]     Min overlap:           10
+[FLASH]     Max overlap:           100
+[FLASH]     Max mismatch density:  0.250000
+[FLASH]     Allow "outie" pairs:   false
+[FLASH]     Cap mismatch quals:    false
+[FLASH]     Combiner threads:      12
+[FLASH]     Input format:          FASTQ, phred_offset=33
+[FLASH]     Output format:         FASTQ, phred_offset=33, gzip
+[FLASH]
+```
+This has created a series of files named like `S${i}.extendedFrags.fastq.gz` in which the `${i}` is replaced by 
+a number between 1 and 384.  These files are gzipped fastq files that hold the flashed reads.
+
+### Mapping/Aligning the Reads
+
+The reference sequences we will use to align to are in a fasta file called `gtseq15_loci.fasta`.  We put that in the `map` directory
+and then commence mapping the flashed reads as follows:
+```{sh mapping, eval=FALSE}
+# index the reference. Output will be prefixed with "gtseq15_loci"
+/map/--% bwa index -p gtseq15_loci -a is gtseq15_loci.fasta
+
+# here is what comes by on stdout 
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.00 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.5a-r405
+[main] CMD: bwa index -p gtseq15_loci -a is gtseq15_loci.fasta
+[main] Real time: 0.061 sec; CPU: 0.007 sec
+
+
+# map reads. for each input file, the output is named satro_flashed_s${i}_aln.sam
+# Note the -R to insert appropriate read group header lines
+/map/--% for i in {1..384}; do bwa mem -aM -v 3 -t 10 -R "@RG\tID:s${i}\tLB:amplicon\tPL:ILLUMINA\tSM:satro${i}" ./gtseq15_loci ../flash/S${i}.extendedFrags.fastq.gz  > ./satro_flashed_s${i}_aln.sam; done
+
+
+# convert the SAMs to BAMs 
+/map/--% for i in {1..384}; do samtools view -bhS satro_flashed_s${i}_aln.sam > satro_flashed_s${i}.bam; done
+
+
+# Sort the BAMs
+/map/--% for i in {1..384}; do samtools sort satro_flashed_s${i}.bam -o satro_flashed_s${i}_sorted.bam; done
+
+
+# Index the BAMs
+/map/--% for i in {1..384}; do samtools index satro_flashed_s${i}_sorted.bam; done
+
+
+# Make a text-file list of the BAMs
+/map/--% ls -1 *sorted.bam > bamlist.txt
+
+
+# generate idx stats and put them in a directory called gtseq17_idx
+/map/--% mkdir gtseq17_idx
+/map/--% for i in {1..384}; do samtools idxstats satro_flashed_s${i}_sorted.bam > ./gtseq17_idx/s${i}_idxstats.txt; done
+
+
+```
+
+
+### Variant detection
+
+We are now set up to detect variants using freebayes.  We show how we do that here,
+but emphasize that if you have already chosen a set of variants that form your
+microhaplotypes, you could just specify those with a pre-existing VCF file.  You *don't* 
+need to do new variant detection if you don't want to.  (Of course, if it doesn't
+take too long, you may as well do variant detection with every individual you have
+sequenced at the amplicons, so as to get as many variants as possible.)
+
+```{sh freebayes, eval=FALSE}
+# index fasta reference file
+/map/--% samtools faidx gtseq15_loci.fasta
+ 
+ 
+# call variants, instructing freebayes to NOT return MNPs or other complex variants
+nohup freebayes-parallel <(fasta_generate_regions.py gtseq15_loci.fasta.fai 150) 10 -f gtseq15_loci.fasta -L bamlist.txt --haplotype-length 0 -kwVa --no-mnps --no-complex > satro384_noMNP_noComplex_noPriors.vcf
+
+```
+
+### runHaplot
+
+After the above is done, the file `satro384_noMNP_noComplex_noPriors.vcf` can be filtered, if desired, to make 
+sure that everything in it is a solid SNP.  Then that file is used with the function
+`runHaplot` to extract haplotypes from the aligned reads in the `map` directory.  
+If you run R and set the working directory to `map`, then this is what that   
+looks like (if you have installed the haPLOType Shiny app into `~/Shiny/haPLOType`).
+```{r runHaplot, eval=FALSE}
+ 
+library(haplot)
+
+run.label <- "satrovirens_8_17_16"
+sam.path <- "./"
+label.path <- "label.txt"
+vcf.path <- "satro384_noMNP_noComplex_noPriors.vcf"
+app.path <- "~/Shiny/haPLOType"
+
+haplo.read.tbl <- runHaplot(run.label = run.label,
+           sam.path=sam.path,
+           label.path=label.path,
+           vcf.path=vcf.path,
+           app.path=app.path)
+```
+
