@@ -24,9 +24,9 @@ shinyUI(
                      tabPanel("> field selection",
                    #bsCollapse(id = "collapseFilter", open = "+ microhaplotype filter:",
                               #bsCollapsePanel("> select group, individuals, loci:",
-                                            
-                                              
-                              
+
+
+
             column(
               12,
               column(
@@ -90,21 +90,21 @@ shinyUI(
                      style = "margin-top:10px;padding:0 0% 0 0%; margin-left: 0px;"),
                      style = "padding-left:0px"
               ),
-              
+
               style = "padding-left:0px"
-              
+
               ),
               #style= "margin-bottom:10px"
               style="background:#F7F7F7; padding-top:8px;padding-bottom:10px"
             ),#,
             #column(12,div(style = "padding:0.5px; background:white; margin-top: 10px; margin-bottom:10px")),
             #style = "primary"),
-            
+
             style="padding-bottom:20px"
                      ),
             #bsCollapse(id = "collapseFilter", open = "+ microhaplotype filter:",
-           #            bsCollapsePanel("+ microhaplotype filter:", 
-                                       tabPanel("+ read criteria", 
+           #            bsCollapsePanel("+ microhaplotype filter:",
+                                       tabPanel("+ read criteria",
             column(
               12,
               column(
@@ -135,7 +135,7 @@ shinyUI(
                 #                       column(1,checkboxInput("filterCheck", label = "", value = FALSE),
                 #                       style="margin-top:10px;"),
                 #                       column(8,textInput("filter", label = "", value = "Enter filter...")),
-                column(10, verticalLayout(actionButton("updateFilter", label = "apply",                                            
+                column(10, verticalLayout(actionButton("updateFilter", label = "apply",
                                                        width="100%",
                                                        style="text-align:center"),
                                           actionButton(
@@ -156,7 +156,7 @@ shinyUI(
               column(
                 4,
                 checkboxGroupInput("filterOpts", label = "", choices=list("keeps only top two haplotypes (per indiv)"=1)),
-                
+
                 style = "margin-top:-13px;"
               ),
               style="background:#F7F7F7; padding-top:10px")#,style = "primary")))
@@ -172,8 +172,8 @@ shinyUI(
                     ),
                     column(5,
                     column(2, "status:",style = "margin-top:23px;font-weight:normal; padding-left:0px"),
-                    column(4, 
-                           selectInput("locusAccept", 
+                    column(4,
+                           selectInput("locusAccept",
                                        "",
                                        choices=c("Accept","Reject","NA"),
                                       selected="NA"),
@@ -185,7 +185,7 @@ shinyUI(
                            offset=1
                     )
                     ),
-                    
+
                     column(2,
                     actionButton(
                       "annotateSave",
@@ -196,7 +196,7 @@ shinyUI(
                     ),
                     offset=0
                     ),
-                    
+
                     column(12,
                     column(1, "Note:", style ="margin-top:5px; padding-left:0px"),
                     column(11,
@@ -208,7 +208,7 @@ shinyUI(
            )
            ))#,
            #column(2, h5(" haPLOT "), style="text-align: right")
-            
+
           ))
     ),
     #hr(),
@@ -235,7 +235,7 @@ shinyUI(
                    offset = 1
                  )
                ))),
-      
+
       # group label panel
       navbarMenu("Summary Info",
                  tabPanel(h5("by Group"),
@@ -254,12 +254,16 @@ shinyUI(
                             #                       "auto")),
                             column(5, plotOutput("fLociByGroupPlot", height =
                                                    "auto"))
-                          )),
-                 
-                 
-                 
-                 
-                 
+                          ),
+                          fluidRow(
+                            div(style = "padding: 40px; border-bottom: 20px solid white; background: white")
+                          )
+                          ),
+
+
+
+
+
                  tabPanel(
                    h5("by Individual"),
                    fluidRow(
@@ -269,7 +273,7 @@ shinyUI(
                        column(9, h5(textOutput("indivSelect")), style =
                                 "margin-left: 0px; color:grey")
                      ),
-                     
+
                      #column(4,  column(3, h5("By Indiv:"), offset=0),
                      #       column(9, h6(textOutput("indivSelect")), style="margin-left: 0px; color:grey")),
                      column(4, column(
@@ -348,9 +352,9 @@ shinyUI(
                    #                         id = "plot1_brush",
                    #                         direction = "y",
                    #                         resetOnNew = TRUE))),
-                   
-                   
-                   
+
+
+
                    column(12, h1("")),
                    br(),
                    fluidRow(
@@ -366,7 +370,7 @@ shinyUI(
                        column(9, h5(textOutput("locusSelect")), style =
                                 "margin-left: 0px; color:grey")
                      ),
-                     
+
                      #            column(5,column(12,
                      #                            column(2,h5("Locus:"),style="margin-top:0%;font-weight:bold"),
                      #                            column(8,selectInput("selectLocus", label ="","ALL",selected = "ALL", width="90%"),
@@ -448,9 +452,9 @@ shinyUI(
                    )
                  )
       ),
-      
+
       navbarMenu("Filter Analysis",
-                 
+
                  # table panel
                  tabPanel(
                    h5("Broad Summary"),
@@ -458,7 +462,7 @@ shinyUI(
                      column(12, plotOutput("RDnARplot", height = "auto"))
                    )
                  ),
-                 
+
                  tabPanel(
                    h5("Distribution Plots"),
                    fluidRow(
@@ -490,24 +494,26 @@ shinyUI(
                      div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
                    )
                  ),
-                 
-      
+
+
       #locus assessement panel
-      
+
       tabPanel(
         h5("Finalized Haplotype"),
         fluidRow(
           bsAlert("hapAlert")
         ),
         fluidRow(
-          column(12, textOutput("hwClicked")),
+          column(6, textOutput("hwClicked"),offset = 6),
           column(6, plotOutput("histHap", height =
                                  "auto")),
           column(6, plotOutput("PairWiseHap", height =
-                                 "auto", 
+                                 "auto",
                                click = "HWplotClick")),
+          column(12, textOutput("hapPlotClicked")),
           column(12, plotOutput("hapByGroupPlot", height =
-                                  "auto")),
+                                  "auto",
+                                click = "hapByGroupPlotClick")),
           column(12, plotOutput("hapSeq", height = "auto"))
         ),
         fluidRow(
@@ -515,7 +521,7 @@ shinyUI(
         )
       )
       ),
-      
+
       tabPanel(
         "Inferential Analysis",
         "SrMicroHap is sensitive only to the changes in \"Locus\" selector tab\n",
@@ -627,38 +633,32 @@ shinyUI(
           column(6, downloadButton('downloadData', 'Download'))
         )),
         style = "border-bottom: 1px double #d9d9d9;  margin-bottom: 40px; padding-top:15px; padding-bottom:20px"),
-        
+
         #style = "border-bottom: 2px dashed #d9d9d9; border-top: 2px dashed #d9d9d9; margin-bottom: 5px; margin-top: 10px; padding-bottom: 15px; padding-top:15px"),
-        
-        
-        
+
+
+
         column(12, DT::dataTableOutput('haploTbl'),
                style = "padding-bottom: 40px; border-bottom: 8px solid white; background: white"),
         fluidRow(
           div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
         )
       ),
-      
+
       tabPanel(
-        "About haPlot",
+        "About",
         column(12,
         column(8,
-               "
-This shiny app, haPlot, generates various summary plots and tables for the purpose of
-microhaplotype quality control and assessment.
-It provides basic control (under read criteria) such as defining minimal read depth and allelic ratio 
-cutoff to remove any reads that might interefere individual's genotype call. 
-Since the usability and quality of each locus vary case by case, haPlot has an annotation system that
-lets you to keep track the performance for each locus",
+               htmlOutput("about"),
                offset=2
-        )),
-        column(12,
-               column(8,
-                      "Contact & Citation:",
-                      offset=2
-               ))
+        ))#,
+        # column(12,
+        #        column(8,
+        #               "Contact & Citation:",
+        #               offset=2
+        #        ))
       ),
-      
+
       position = "fixed-bottom"
     ),
     #tags$style(type="text/css", "navbar-static-top{z-index: -1}")),
@@ -670,6 +670,6 @@ lets you to keep track the performance for each locus",
     #),
     #column(4, DT::dataTableOutput('haploSummary')),
     titlePanel("", windowTitle = "HapPLOType: a view to your haplotypes")
-    
+
   )
 )

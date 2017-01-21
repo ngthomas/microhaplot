@@ -12,6 +12,24 @@ library("reshape2")
 
 
 shinyServer(function(input, output, session) {
+
+
+  output$about <- renderUI({
+    HTML(
+    paste("<strong>Microhaplot</strong> offers a streamline visual environment to assess quality of microhaplotype extracted from short read alignment files.
+          You can find most of the interactive features such as defining critera or adding locus comments at the top panel
+while the bottom panel hosts a wide selection of tables and graphical summaries.",
+          "<br/>",
+          "<i>Summary Info</i>: microhaplotype summaries that are either grouped by group label, individual, or locus. These plots are great
+          for gathering the big picture",
+          "<i>Filter Analysis</i>: this section is useful to fine-tune your criteria at a single locus level",
+          "<i>Inferential Analysis</i>: still in the works",
+          "<i>Output</i>: You can view or download tables of raw or finalized microhaplotypes (in csv format)",
+          "<br/>",
+          "<b>Contact & Citation</b>",
+          sep="<br/>"))
+  })
+
   dirFiles <- list.files()
   rds.file <- grep(".rds", dirFiles)
 
@@ -113,12 +131,16 @@ shinyServer(function(input, output, session) {
 
   })
 
+  # needs better label
   ranges <- reactiveValues(y = NULL, x = NULL)
   rangesH <- reactiveValues(y = NULL)
+
   locusPg <- reactiveValues(l = NULL, width = NULL)
   indivPg <- reactiveValues(i = NULL, width = NULL)
   groupPg <- reactiveValues(g = NULL, width = 1)
-  hapPg <- reactiveValues(width = NULL, HW.exp= NULL, HW.obs= NULL, HW.tbl=NULL)
+  hapPg <- reactiveValues(width = NULL, HW.exp= NULL, HW.obs= NULL, HW.tbl=NULL,
+                          indiv.hap.grp=NULL)
+
   annotateTab <- reactiveValues(tbl=NULL)
   srhapPg <- reactiveValues(
     makePlot = FALSE,
@@ -1554,7 +1576,7 @@ shinyServer(function(input, output, session) {
     ifelse(
       groupPg$width == 0,
       0,
-      ifelse(input$selectGroup == "ALL", 100 * panelParam$n.group, 100)
+      ifelse(input$selectGroup == "ALL", 30 * panelParam$n.group, 100)
     )
   })
 
@@ -1640,7 +1662,7 @@ shinyServer(function(input, output, session) {
     ifelse(
       groupPg$width == 0,
       0,
-      ifelse(input$selectGroup == "ALL", 100 * panelParam$n.group, 100)
+      ifelse(input$selectGroup == "ALL", 30 * panelParam$n.group, 100)
     )
   })
 
@@ -1805,7 +1827,7 @@ shinyServer(function(input, output, session) {
       geom_histogram(binwidth = 0.05)+
       geom_point(data=haplo.match.rep, aes(x=depth, y=0), size=1.2, alpha=0.4)+
       #geom_density(adjust=0.5, color=NA)+
-      facet_grid(haplo~., scales="free_y")+
+      facet_grid(haplo~.)+#, scales="free_y")+
       scale_x_log10("distrib. of read depth")+
       scale_fill_discrete(guide=FALSE,direction=-1)+
       scale_y_continuous("",breaks=NULL)+ #breaks=1
@@ -1853,7 +1875,7 @@ shinyServer(function(input, output, session) {
       geom_point(data=haplo.match.rep, aes(x=allele.balance, y=0), size=1.2, alpha=0.4)+
       #geom_density(adjust=0.1, color=NA)+
 
-      facet_grid(haplo~., scales="free_y")+
+      facet_grid(haplo~.)+#, scales="free_y")+
       scale_x_log10("distrib. of allelic ratio",breaks=c(0.01,0.1,0.5,1))+
       scale_fill_discrete(guide=FALSE, direction=-1)+
       scale_y_continuous("",breaks=NULL)+
@@ -2041,9 +2063,11 @@ shinyServer(function(input, output, session) {
            ifelse(input$selectLocus == "ALL", 0, max(hapPg$width*30, 400)))
   })
 
+
+  # event when h-w plot is being interacted
   output$hwClicked <- renderText({
 
-    nearpoint <- nearPoints(hapPg$HW.tbl, input$HWplotClick, xvar="hap1", yvar="hap2", threshold = 5,
+    nearpoint <- nearPoints(hapPg$HW.tbl, input$HWplotClick, xvar="hap1", yvar="hap2", threshold = 10,
                             maxpoints = 1)
 
     if((!is.null(nearpoint)) && ncol(nearpoint)>0) {
@@ -2051,8 +2075,10 @@ shinyServer(function(input, output, session) {
       hapPg$HW.obs <- nearpoint$n.x
     }
 
-    if (is.null(hapPg$HW.exp) | length(hapPg$HW.exp)==0) return(paste0("Click on a microhaplotype pair at HW-plot for details:"))
-    paste0("For this selected pair, the expected and observed counts are ", round(hapPg$HW.exp,1)," and ", round(hapPg$HW.obs), ", respectively.")
+    if (is.null(hapPg$HW.exp) | length(hapPg$HW.exp)==0) return(paste0("Hardy Weinberg plot: select pair for numerical details"))
+    paste0("Individuals counts  - ",
+           " Observed # : ", ceiling(hapPg$HW.obs),
+           ", Expected # : ",ceiling(hapPg$HW.exp))
   })
 
 
@@ -2148,6 +2174,36 @@ shinyServer(function(input, output, session) {
            ifelse(input$selectLocus == "ALL", 0, max(hapPg$width*30, 400)))
   })
 
+  # event when haplotype by group
+  output$hapPlotClicked <- renderText({
+
+    obs.freq.tbl <-  haplo.summaryTbl() %>%
+      ungroup() %>%
+      group_by(group, locus) %>%
+      mutate(tot.haplo = n()) %>%
+      group_by(group, locus, haplotype.1, haplotype.2) %>%
+      summarise(obs.freq = n() / tot.haplo[1],
+                n.occur = n(),
+                is.homo = (haplotype.1[1] == haplotype.2[1]))
+
+    allelic.freq.tbl <-
+      gather(obs.freq.tbl, whichHap,  hap1, 3:4) %>%
+      group_by(group, locus, hap1) %>%
+      summarise(f = sum(obs.freq / 2),
+                n = sum(ifelse(is.homo, n.occur/2, n.occur)))
+
+    nearpoint <- nearPoints(allelic.freq.tbl, input$hapByGroupPlotClick, xvar="group", yvar="hap1",
+                            threshold = 8,
+                            maxpoints = 1)
+
+    if((!is.null(nearpoint)) && ncol(nearpoint)>0) {
+      hapPg$indiv.hap.grp <- nearpoint$n
+    }
+
+    if (is.null(hapPg$indiv.hap.grp) | length(hapPg$indiv.hap.grp)==0) return(paste0("Click any dot point for detail:"))
+    paste0("# of individuals : ",hapPg$indiv.hap.grp)
+  })
+
   output$hapByGroupPlot <- renderPlot({
     if (is.null(input$selectLocus) ||
         input$selectLocus == "ALL" ||
@@ -2165,12 +2221,15 @@ shinyServer(function(input, output, session) {
       group_by(group, locus) %>%
       mutate(tot.haplo = n()) %>%
       group_by(group, locus, haplotype.1, haplotype.2) %>%
-      summarise(obs.freq = n() / tot.haplo[1])
+      summarise(obs.freq = n() / tot.haplo[1],
+                n.occur = n(),
+                is.homo = (haplotype.1[1] == haplotype.2[1]))
 
     allelic.freq.tbl <-
       gather(obs.freq.tbl, whichHap,  hap1, 3:4) %>%
       group_by(group, locus, hap1) %>%
-      summarise(f = sum(obs.freq / 2))
+      summarise(f = sum(obs.freq / 2),
+                n = sum(ifelse(is.homo, n.occur/2, n.occur)))
 
     ggplot(allelic.freq.tbl, aes(
       x = group,
@@ -2179,6 +2238,8 @@ shinyServer(function(input, output, session) {
       size = f
     )) +
       geom_point() +
+      # geom_text(aes(label=n),
+      #           colour="black", vjust = "bottom", hjust="left", size=3.5)+
       xlab("") +
       ylab("") +
       theme_bw() +
