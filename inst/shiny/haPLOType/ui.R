@@ -268,7 +268,7 @@ shinyUI(
                    h5("by Individual"),
                    fluidRow(
                      column(
-                       3,
+                       4,
                        column(3, h5("Indiv:"), offset = 0),
                        column(9, h5(textOutput("indivSelect")), style =
                                 "margin-left: 0px; color:grey")
@@ -278,9 +278,9 @@ shinyUI(
                      #       column(9, h6(textOutput("indivSelect")), style="margin-left: 0px; color:grey")),
                      column(4, column(
                        12,
-                       column(4, h6("Display:")),
+                       column(3, h6("Show")),
                        column(
-                         5,
+                         6,
                          selectInput(
                            "indivPerDisplay",
                            label = NULL,
@@ -299,11 +299,11 @@ shinyUI(
                        ),
                        column(2, h6("indiv"))
                        )),
-                     column(5, column(
+                     column(4, column(
                        12,
                        column(1, h6("Page:")),
                        column(
-                         4,
+                         5,
                          numericInput(
                            "indivPage",
                            label = NULL,
@@ -365,7 +365,7 @@ shinyUI(
                    h5("by Locus"),
                    fluidRow(
                      column(
-                       3,
+                       4,
                        column(3, h5("Locus:"), offset = 0),
                        column(9, h5(textOutput("locusSelect")), style =
                                 "margin-left: 0px; color:grey")
@@ -382,9 +382,9 @@ shinyUI(
                      #style="padding-right: 0px;padding-left:0px; padding-right: 0px;margin: -3% 0 0 0;")),
                      column(4, column(
                        12,
-                       column(4, h6("Display: ")),
+                       column(3, h6("Show")),
                        column(
-                         5,
+                         6,
                          selectInput(
                            "locusPerDisplay",
                            label = NULL,
@@ -404,11 +404,11 @@ shinyUI(
                        ),
                        column(2, h6("loci"))
                      )),
-                     column(5, column(
+                     column(4, column(
                        12,
                        column(1, h6("Page:")),
                        column(
-                         4,
+                         5,
                          numericInput(
                            "locusPage",
                            label = NULL,
@@ -464,7 +464,7 @@ shinyUI(
                  ),
 
                  tabPanel(
-                   h5("Distribution Plots"),
+                   h5("Criteria Breakdown"),
                    fluidRow(
                      column(5, plotOutput("allReadDepth", height = "auto",
                                           # hover = hoverOpts(
@@ -486,9 +486,13 @@ shinyUI(
                    ),
                    bsAlert("cutoffhapAlert"),
                    fluidRow(
-                     column(2, plotOutput("haplabel", height = "auto")),
-                     column(5, plotOutput("hapReadDepth", height = "auto")),
-                     column(5, plotOutput("hapAllelicRatio", height = "auto"))
+                     column(2, plotOutput("haplabel", height = "auto"),
+                                          style="padding-left:0px; padding-right:0px"
+                            ),
+                     column(5, plotOutput("hapReadDepth", height = "auto",
+                                          click = "hapRDClick")),
+                     column(5, plotOutput("hapAllelicRatio", height = "auto",
+                                          click = "hapARClick"))
                    ),
                    fluidRow(
                      div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
@@ -499,21 +503,34 @@ shinyUI(
       #locus assessement panel
 
       tabPanel(
-        h5("Finalized Haplotype"),
+        h5("Microhap Summaries"),
         fluidRow(
           bsAlert("hapAlert")
         ),
         fluidRow(
-          column(6, textOutput("hwClicked"),offset = 6),
-          column(6, plotOutput("histHap", height =
-                                 "auto")),
+          column(6, htmlOutput("hapFreqClicked")),
+          column(6, htmlOutput("hwClicked")),
+          column(6, plotOutput("hapFreq",
+                               height ="auto",
+                               click = "hapFreqPlotClick",
+                               hover=hoverOpts(id="hapFreqPlotHover",
+                                               delay=300,
+                                               delayType = "throttle")),
+                 style="padding-right:0px"),
           column(6, plotOutput("PairWiseHap", height =
                                  "auto",
-                               click = "HWplotClick")),
-          column(12, textOutput("hapPlotClicked")),
+                               click = "HWplotClick",
+                               hover=hoverOpts(id="HWPlotHover",
+                                               delay=300,
+                                               delayType = "throttle")),
+                 style="padding-left:0px"),
+          column(12, htmlOutput("hapByGroupPlotClicked")),
           column(12, plotOutput("hapByGroupPlot", height =
                                   "auto",
-                                click = "hapByGroupPlotClick")),
+                                click = "hapByGroupPlotClick",
+                                hover=hoverOpts(id="hapByGroupPlotHover",
+                                                delay=300,
+                                                delayType = "throttle"))),
           column(12, plotOutput("hapSeq", height = "auto"))
         ),
         fluidRow(
@@ -611,7 +628,8 @@ shinyUI(
       # table panel
       tabPanel(
         "Output",
-        fluidRow(column(
+        fluidRow(
+          column(
           6,
           column(4, h5("Select Table:"), offset =
                    0),
@@ -630,7 +648,8 @@ shinyUI(
         column(6, column(
           12,
           #column(6, actionButton('updateTable', 'Update')),
-          column(6, downloadButton('downloadData', 'Download'))
+          column(4, downloadButton('downloadData', 'Download'))
+          #column(8, "* tbl is sensitve to field selection")
         )),
         style = "border-bottom: 1px double #d9d9d9;  margin-bottom: 40px; padding-top:15px; padding-bottom:20px"),
 

@@ -16,19 +16,22 @@ shinyServer(function(input, output, session) {
 
   output$about <- renderUI({
     HTML(
-    paste("<strong>Microhaplot</strong> offers a streamline visual environment to assess quality of microhaplotype extracted from short read alignment files.
+      paste("<strong>Microhaplot</strong> offers a streamline visual environment to assess quality of microhaplotype extracted from short read alignment files.
           You can find most of the interactive features such as defining critera or adding locus comments at the top panel
 while the bottom panel hosts a wide selection of tables and graphical summaries.",
-          "<br/>",
-          "<i>Summary Info</i>: microhaplotype summaries that are either grouped by group label, individual, or locus. These plots are great
+            "<br/>",
+            "<i>Summary Info</i>: microhaplotype summaries that are either grouped by group label, individual, or locus. These plots are great
           for gathering the big picture",
-          "<i>Filter Analysis</i>: this section is useful to fine-tune your criteria at a single locus level",
-          "<i>Inferential Analysis</i>: still in the works",
-          "<i>Output</i>: You can view or download tables of raw or finalized microhaplotypes (in csv format)",
-          "<br/>",
-          "<b>Contact & Citation</b>",
-          sep="<br/>"))
+            "<i>Filter Analysis</i>: this section is useful to fine-tune your criteria at a single locus level",
+            "<i>Inferential Analysis</i>: still in the works",
+            "<i>Output</i>: You can view or download tables of raw or finalized microhaplotypes (in csv format)",
+            "<br/>",
+            "<b>Contact & Citation</b>",
+            sep="<br/>"))
   })
+
+  addTooltip(session, "downloadData",
+             "Note: The download table is sensitive to the 'field selection' input")
 
   dirFiles <- list.files()
   rds.file <- grep(".rds", dirFiles)
@@ -105,6 +108,10 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     updateSliderInput(session,
                       "minAR",
                       value=annotateTab$tbl$min.ar[match.indx])
+
+    filterParam$minRD <- annotateTab$tbl$min.rd[match.indx]#input$coverageMin
+    filterParam$minAR <- annotateTab$tbl$min.ar[match.indx]#input$minAlleleRatio
+
     return()
   })
 
@@ -140,6 +147,9 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   groupPg <- reactiveValues(g = NULL, width = 1)
   hapPg <- reactiveValues(width = NULL, HW.exp= NULL, HW.obs= NULL, HW.tbl=NULL,
                           indiv.hap.grp=NULL)
+
+  filterCriteriaPg <- reactiveValues(RD.detail.on =0,
+                                     AR.detail.on =0)
 
   annotateTab <- reactiveValues(tbl=NULL)
   srhapPg <- reactiveValues(
@@ -236,7 +246,10 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     extract.annotate.file()
     update.annotate.field()
 
-    Filter.haplo.sum()
+    Min.filter.haplo()
+    #Filter.haplo.by.RDnAR()
+    #Filter.haplo.sum()
+
     srhapPg$makePlot <- FALSE
     extract.pos.file()
     #cat(file=stderr(), "--", colnames(annotateTab$tbl) %>% unlist, "\n")
@@ -308,16 +321,20 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     }
 
     closeAlert(session, "filterAlert")
+
+    if(input$coverageMin == filterParam$minRD && input$minAlleleRatio == filterParam$minAR)
+      return ()
+
     filterParam$minRD <- input$coverageMin
     filterParam$minAR <- input$minAlleleRatio
-    Filter.haplo.sum()
+    Filter.haplo.by.RDnAR()
   })
 
   observeEvent(input$selectGroup, {
     if (input$selectDB == "" || is.null(input$selectDB))
       return()
 
-        indx <-
+    indx <-
       isolate(which(panelParam$group.label.bare == input$selectGroup))
     haplo.sum <- update.Haplo.file()
     if (input$selectGroup != "ALL")
@@ -340,7 +357,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     indivPg$i <- panelParam$indiv.label.bare[1:end.indx]
     ranges$y <- c(0, length(indivPg$i) + 1)
 
-    Filter.haplo.sum()
+    Min.filter.haplo()
   }, priority = -2)
 
 
@@ -420,16 +437,21 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       rangesH$y <- c(0, end.indx + 1)
 
       createAlert(session, "hapAlert", "hapLocusAlert", title = "No Locus selected",
-                                               content = "choose a locus to view content", append = FALSE)
+                  content = "choose a locus to view content", append = FALSE)
       createAlert(session, "cutoffhapAlert", "cuthapLocusAlert", title = "choose single locus for more detail",
-                                               content = "choose a locus to view the breakdown by microhaplotype", append = FALSE)
+                  content = "choose a locus to view a more detailed breakdown of those filter criteria by microhaplotype", append = FALSE)
     }
 
     match.indx <- which(annotateTab$tbl$locus == input$selectLocus)
     updateNumericInput(session, "coverageMin", value=annotateTab$tbl$min.rd[match.indx])
     updateSliderInput(session, "minAlleleRatio", value=annotateTab$tbl$min.ar[match.indx])
 
-    Filter.haplo.sum()
+    filterParam$minRD <- annotateTab$tbl$min.rd[match.indx]#input$coverageMin
+    filterParam$minAR <- annotateTab$tbl$min.ar[match.indx]#input$minAlleleRatio
+
+    #cat(file=stderr(), "min READ depth:", filterParam$minRD, "\n")
+    #Min.filter.haplo()
+    Filter.haplo.by.RDnAR()
     #srhapPg$makePlot <- FALSE
   })
 
@@ -545,7 +567,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       indivPg$i <- panelParam$indiv.label.bare[1:end.indx]
       ranges$y <- c(0, end.indx + 1)
     }
-    Filter.haplo.sum()
+    Min.filter.haplo()
   })
 
   # observeEvent(input$acceptLocus, {
@@ -784,8 +806,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       return ()
 
     haplo.join.ar <- left_join(haplo.sum,
-              annotateTab$tbl,
-              by="locus")
+                               annotateTab$tbl,
+                               by="locus")
 
     if ("3" %in% input$filterOpts)
       haplo.join.ar <- haplo.join.ar %>% mutate(min.rd = ifelse(filterParam$minRD>min.rd,
@@ -801,7 +823,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
              min.ar = filterParam$minAR)
 
     haplo.join.ar <- haplo.join.ar %>% filter(depth >= min.rd,
-                                                allele.balance >= min.ar)
+                                              allele.balance >= min.ar)
 
     if ("1" %in% input$filterOpts)
       haplo.join.ar <- haplo.join.ar %>% filter(rank <= 2)
@@ -1438,6 +1460,20 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   #   if (!is.null(input$ARplot_hover)) filterParam$hover.minAR = input$ARplot_hover$x
   # })
 
+
+  observeEvent(input$hapRDClick,{
+  if(!is.null(input$hapRDClick)){
+    filterCriteriaPg$RD.detail.on = ifelse(filterCriteriaPg$RD.detail.on, 0, 1)
+  }
+  })
+
+  observeEvent(input$hapARClick,{
+    if(!is.null(input$hapARClick)){
+      filterCriteriaPg$AR.detail.on = ifelse(filterCriteriaPg$AR.detail.on, 0, 1)
+    }
+  })
+
+
   observeEvent(input$ARplot_dblclick, {
     if (!is.null(input$ARplot_dblclick)){
       filterParam$minAR <- round(input$ARplot_dblclick$x,2)
@@ -1681,13 +1717,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.filter <- Min.filter.haplo()
     if(is.null(Min.filter.haplo)) return()
 
-      ggplot(haplo.filter, aes(x=depth))+
+    ggplot(haplo.filter, aes(x=depth))+
       #geom_density()+
-      geom_histogram(binwidth = 0.05)+
+      geom_histogram(binwidth = 0.05, boundary = -0.025)+
       scale_x_log10("distrib. of read depth")+
       scale_y_continuous("", breaks=NULL)+
-        theme_bw()+
-        geom_vline(
+      theme_bw()+
+      geom_vline(
         xintercept = filterParam$minRD,
         linetype = "dashed",
         color = "red"
@@ -1696,16 +1732,16 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
             panel.margin = unit(0, 'mm'),
             panel.border = element_rect(size = 0,colour = "white"),
             #axis.line.x = element_line(color="grey", size = 0.5),
-        plot.margin = unit(c(2, 0, 2, 0), "mm"))
-      # geom_vline(
-      #   xintercept = filterParam$hover.minRD,
-      #   linetype = "dashed",
-      #   color = "blue"
-      # )
+            plot.margin = unit(c(2, 0, 2, 0), "mm"))
+    # geom_vline(
+    #   xintercept = filterParam$hover.minRD,
+    #   linetype = "dashed",
+    #   color = "blue"
+    # )
 
   }, height = 300)
 
-    output$allAllelicRatio <- renderPlot({
+  output$allAllelicRatio <- renderPlot({
 
     if (is.null(input$selectLocus) ||
         is.null(input$selectIndiv) ||
@@ -1717,14 +1753,14 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.filter <- Min.filter.haplo()
     if(is.null(Min.filter.haplo)) return()
 
-      ggplot(haplo.filter, aes(x=allele.balance))+
+    ggplot(haplo.filter, aes(x=allele.balance))+
       #geom_density()+
-      geom_histogram(binwidth = 0.1)+
+      geom_histogram(binwidth = 0.05, boundary = -0.05)+
       scale_x_log10("distrib. of allelic ratio",#limits=c(min(haplo.filter$allele.balance),1),
-                    breaks=c(0.01,0.1,0.5,1))+
+                    breaks=c(0.01,0.1,0.2,0.5,1))+
       scale_y_continuous("",breaks=NULL)+
-        theme_bw()+
-        geom_vline(
+      theme_bw()+
+      geom_vline(
         xintercept = filterParam$minAR,
         linetype = "dashed",
         color = "red"
@@ -1732,57 +1768,57 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       theme(strip.text.y = element_text(angle =360,size=0, margin=margin(0,0,0,0)),
             panel.margin = unit(0, 'mm'),
             panel.border = element_rect(size = 0,colour = "white"),
-        plot.margin = unit(c(2, 0, 2, 1), "mm"))
-      # geom_vline(
-      #   xintercept = filterParam$hover.minAR,
-      #   linetype = "dashed",
-      #   color = "blue"
-      # )
+            plot.margin = unit(c(2, 0, 2, 1), "mm"))
+    # geom_vline(
+    #   xintercept = filterParam$hover.minAR,
+    #   linetype = "dashed",
+    #   color = "blue"
+    # )
   }, height = 300)
 
 
-    output$haplabel <- renderPlot({
+  output$haplabel <- renderPlot({
 
-      if (is.null(input$selectLocus) ||
-          input$selectLocus == "ALL" ||
-          is.null(input$selectIndiv) ||
-          input$selectDB == "" ||
-          is.null(input$selectDB) || is.null(locusPg$l)) {
-        return()
-      }
+    if (is.null(input$selectLocus) ||
+        input$selectLocus == "ALL" ||
+        is.null(input$selectIndiv) ||
+        input$selectDB == "" ||
+        is.null(input$selectDB) || is.null(locusPg$l)) {
+      return()
+    }
 
-      haplo.filter <- Min.filter.haplo()
-      if(is.null(Min.filter.haplo)) return()
+    haplo.filter <- Min.filter.haplo()
+    if(is.null(Min.filter.haplo)) return()
 
-      haplo.rep <- haplo.filter %>% filter(rank <= 2,depth >= filterParam$minRD,
-                                           allele.balance >= filterParam$minAR) %>%
-        select(haplo) %>% unique %>% unlist()
+    haplo.rep <- haplo.filter %>% filter(rank <= 2,depth >= filterParam$minRD,
+                                         allele.balance >= filterParam$minAR) %>%
+      select(haplo) %>% unique %>% unlist()
 
-      if (length(haplo.rep)==0) return()
+    if (length(haplo.rep)==0) return()
 
-      haplo.rep.df <- data.frame(haplo=factor(haplo.rep, level=sort(haplo.rep,decreasing=T)),
-                                 x=0,
-                                 y=0)
+    haplo.rep.df <- data.frame(haplo=factor(haplo.rep, level=sort(haplo.rep,decreasing=T)),
+                               x=0,
+                               y=0)
 
-      ggplot(haplo.rep.df, aes(x,y, fill=haplo))+
-        geom_point(size=0, color="white")+
-        #geom_density(adjust=0.5, color=NA)+
-        facet_grid(haplo~., scales="free_y")+
-        scale_x_continuous("",breaks=NULL,limits=c(0,0.1))+
-        scale_fill_discrete(guide=FALSE,direction=-1)+
-        scale_y_continuous("",breaks=NULL,limits=c(0,0.1))+ #breaks=1
-        theme_bw()+
-        theme(strip.text.y = element_text(angle =360, margin=margin(0,2,0,2)),
-              strip.background  = element_rect(fill="white",size = 0),
-              panel.margin = unit(0, 'mm'),
-              plot.margin = unit(c(2, 0, 6, 0), "mm"),
-              aspect.ratio =1000)
+    ggplot(haplo.rep.df, aes(x,y, fill=haplo))+
+      geom_point(size=0, color="white")+
+      #geom_density(adjust=0.5, color=NA)+
+      facet_grid(haplo~., scales="free_y")+
+      scale_x_continuous("",breaks=NULL,limits=c(0,0.1))+
+      scale_fill_discrete(guide=FALSE,direction=-1)+
+      scale_y_continuous("",breaks=NULL,limits=c(0,0.1))+ #breaks=1
+      theme_bw()+
+      theme(strip.text.y = element_text(angle =360, margin=margin(0,0,0,0)),
+            strip.background  = element_rect(fill="white",size = 0),
+            panel.margin = unit(0, 'mm'),
+            plot.margin = unit(c(2, 0, 6, 0), "mm"),
+            aspect.ratio =1000)
 
-    }, height = function() {
-      ifelse(hapPg$width == 0,
-             0,
-             max(hapPg$width*30, 300))
-    })
+  }, height = function() {
+    ifelse(hapPg$width == 0,
+           0,
+           max(hapPg$width*30, 300))
+  })
 
 
 
@@ -1801,11 +1837,21 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     if(is.null(Min.filter.haplo)) return()
 
     haplo.rep <- haplo.filter %>% filter(rank <= 2,depth >= filterParam$minRD,
-             allele.balance >= filterParam$minAR) %>%
+                                         allele.balance >= filterParam$minAR) %>%
       select(haplo) %>% unique %>% unlist()
 
     haplo.match.rep <- haplo.filter %>% filter(haplo %in% haplo.rep) %>%
-      mutate(haplo=factor(haplo, level=sort(haplo.rep,decreasing=T)))
+      mutate(haplo=factor(haplo, level=sort(haplo.rep,decreasing=T))) %>%
+      group_by(haplo) %>%
+      mutate(n.accept.indiv = sum(depth >=filterParam$minRD),
+             n.reject.indiv = sum(depth < filterParam$minRD)) %>%
+      ungroup() %>%
+      mutate(
+             center.x.accept = mean(depth[depth>=filterParam$minRD]),
+             center.x.reject = mean(depth[depth<filterParam$minRD])) %>%
+      group_by(haplo, id) %>%
+      mutate(is.pass = 1*(depth >=filterParam$minRD))
+
 
     if (nrow(haplo.match.rep)==0) return()
     # ggplot(haplo.match.rep, aes(x=depth, y=haplo, color=haplo))+
@@ -1823,16 +1869,30 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     #   theme(panel.margin = unit(0, 'mm'),
     #     plot.margin = unit(c(2, 0, 2, 0), "mm"))
 
-      ggplot(haplo.match.rep, aes(x=depth, fill=haplo))+
-      geom_histogram(binwidth = 0.05)+
-      geom_point(data=haplo.match.rep, aes(x=depth, y=0), size=1.2, alpha=0.4)+
+
+    g <- ggplot()+
+      geom_histogram(data=haplo.match.rep,
+                     aes(x=depth, fill=factor(is.pass)), binwidth = 0.05, boundary = -0.025)+
+      geom_point(data=haplo.match.rep, aes(x=depth, y=0), size=1.2, alpha=0.4)
+
+    if (filterCriteriaPg$RD.detail.on)
+      g <- g +
+       geom_text(data=haplo.match.rep, aes(
+         label=n.accept.indiv,
+                      x=center.x.accept,
+         y=10), hjust=-1, vjust=-1)+
+      geom_text(data=haplo.match.rep, aes(
+        label=n.reject.indiv,
+        x=center.x.reject,
+        y=10), hjust=-1, vjust =-1)
+
       #geom_density(adjust=0.5, color=NA)+
-      facet_grid(haplo~.)+#, scales="free_y")+
+    g + facet_grid(haplo~.)+#, scales="free_y")+
       scale_x_log10("distrib. of read depth")+
       scale_fill_discrete(guide=FALSE,direction=-1)+
       scale_y_continuous("",breaks=NULL)+ #breaks=1
-        theme_bw()+
-        geom_vline(
+      theme_bw()+
+      geom_vline(
         xintercept = filterParam$minRD,
         linetype = "dashed",
         color = "red"
@@ -1841,7 +1901,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
             panel.margin = unit(0, 'mm'),
             panel.border = element_rect(size = 0,colour = "white"),
             #axis.line.y = element_line(color="grey", size = 1),
-        plot.margin = unit(c(2, 0, 2, 1), "mm"))
+            plot.margin = unit(c(2, 0, 2, 1), "mm"))
 
   }, height = function() {
     ifelse(hapPg$width == 0,
@@ -1862,25 +1922,47 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.filter <- Min.filter.haplo()
 
     haplo.rep <- haplo.filter %>% filter(rank <= 2,depth >= filterParam$minRD,
-             allele.balance >= filterParam$minAR) %>%
+                                         allele.balance >= filterParam$minAR) %>%
       select(haplo) %>% unique %>% unlist()
 
     haplo.match.rep <- haplo.filter %>% filter(haplo %in% haplo.rep) %>%
-      mutate(haplo=factor(haplo, level=sort(haplo.rep,decreasing=T)))
+      mutate(haplo=factor(haplo, level=sort(haplo.rep,decreasing=T))) %>%
+      group_by(haplo) %>%
+      mutate(n.accept.indiv = sum(allele.balance >=filterParam$minAR),
+             n.reject.indiv = sum(allele.balance < filterParam$minAR)) %>%
+      ungroup() %>%
+      mutate(
+        center.x.accept = min(mean(allele.balance[allele.balance>=filterParam$minAR]),
+                              0.9),
+        center.x.reject = min(mean(allele.balance[allele.balance<filterParam$minAR]),0.9))%>%
+      group_by(haplo, id) %>%
+      mutate(is.pass = 1*(allele.balance >=filterParam$minAR))
 
     if (nrow(haplo.match.rep)==0) return()
 
-      ggplot(haplo.match.rep, aes(x=allele.balance, fill=haplo))+
-      geom_histogram(binwidth = 0.1)+
-      geom_point(data=haplo.match.rep, aes(x=allele.balance, y=0), size=1.2, alpha=0.4)+
+    g<- ggplot(haplo.match.rep, aes(x=allele.balance, fill=haplo))+
+      geom_histogram(binwidth = 0.05,boundary = -0.05)+
+      geom_point(data=haplo.match.rep, aes(x=allele.balance, y=0), size=1.2, alpha=0.4)
       #geom_density(adjust=0.1, color=NA)+
 
-      facet_grid(haplo~.)+#, scales="free_y")+
-      scale_x_log10("distrib. of allelic ratio",breaks=c(0.01,0.1,0.5,1))+
+    if (filterCriteriaPg$AR.detail.on)
+      g <- g +
+      geom_text(data=haplo.match.rep, aes(
+        label=n.accept.indiv,
+        x=center.x.accept,
+        y=10), hjust=2, vjust=-1)+
+      geom_text(data=haplo.match.rep, aes(
+        label=n.reject.indiv,
+        x=center.x.reject,
+        y=10), hjust=0, vjust =-1)
+
+
+      g + facet_grid(haplo~.)+#, scales="free_y")+
+      scale_x_log10("distrib. of allelic ratio",breaks=c(0.01,0.1,0.2,0.5,1))+
       scale_fill_discrete(guide=FALSE, direction=-1)+
       scale_y_continuous("",breaks=NULL)+
-        theme_bw()+
-        geom_vline(
+      theme_bw()+
+      geom_vline(
         xintercept = filterParam$minAR,
         linetype = "dashed",
         color = "red"
@@ -1888,7 +1970,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       theme(strip.text.y = element_text(angle =360,size=0, margin=margin(0,0,0,0)),
             panel.border = element_rect(size = 0,colour = "white"),
             panel.margin = unit(0, 'mm'),
-        plot.margin = unit(c(2, 0, 2, 0), "mm"))
+            plot.margin = unit(c(2, 0, 2, 0), "mm"))
 
   }, height = function() {
     ifelse(hapPg$width == 0,
@@ -1976,14 +2058,14 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       scale_color_discrete(guide = FALSE) +
       theme_bw() +
       theme(legend.position = "bottom",panel.border = element_rect(size = 0,colour = "white"),
-                  axis.line.x = element_line(color="black", size = 0.5))
+            axis.line.x = element_line(color="black", size = 0.5))
   }, height = function() {
     ifelse(groupPg$width == 0,
            0,
            ifelse(input$selectLocus == "ALL", 0, max(hapPg$width*20, 400)))
   })
 
-  output$histHap <- renderPlot({
+  MakeHapFreqTable <- reactive({
     if (is.null(input$selectLocus) ||
         input$selectLocus == "ALL" ||
         is.null(input$selectIndiv) ||
@@ -1991,65 +2073,85 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         is.null(input$selectDB) || is.null(locusPg$l))
       return ()
 
-    #     haplo.sum <- update.Haplo.file()
-    #     if(is.null(haplo.sum)) return ()
-    #
-    #     nIndiv <- ifelse(input$selectIndiv == "ALL", panelParam$n.indiv, 1)
-    #
-    #     haplo.filter <- haplo.sum %>%
-    #       filter(depth >= filterParam$minRD, locus == input$selectLocus, allele.balance >= filterParam$minAR)
-    #     if(input$topTwo)
-    #       haplo.filter <- haplo.filter %>% filter(rank <= 2)
-    #     if (input$selectIndiv != "ALL")
-    #       haplo.filter <- haplo.filter %>% filter(id == input$selectIndiv)
-    #     haplo.filter <- haplo.filter %>% group_by(haplo) %>% summarise(f=n()/nIndiv)
     if (is.null(haplo.summaryTbl())) {
-      return()
-    }
-
+    return()
+  }
     obs.freq.tbl <-  haplo.summaryTbl() %>%
       ungroup() %>%
       group_by(locus) %>%
       mutate(tot.haplo = n()) %>%
       group_by(locus, haplotype.1, haplotype.2) %>%
-      summarise(obs.freq = n() / tot.haplo[1])
+      summarise(obs.freq = n() / tot.haplo[1],
+                n.occur = n(),
+                is.homo = (haplotype.1[1] == haplotype.2[1]),
+                tot.read.depth.1=sum(read.depth.1),
+                tot.read.depth.2=sum(read.depth.2))
 
     allelic.freq.tbl <-
       gather(obs.freq.tbl, whichHap,  hap1, 2:3) %>%
       group_by(locus, hap1) %>%
-      summarise(f = sum(obs.freq / 2))
+      summarise(f = sum(obs.freq / 2),
+                n = sum(ifelse(is.homo, n.occur/2, n.occur)),
+                tot.read.depth = sum((whichHap=="haplotype.1")*tot.read.depth.1)+
+                  sum((whichHap=="haplotype.2")*tot.read.depth.2)
+      )
 
     if (nrow(allelic.freq.tbl) == 0)
       return()
 
     all.hap <- unique(allelic.freq.tbl$hap1)
-    allelic.freq.tbl <- allelic.freq.tbl %>% mutate(hap1 = paste0(hap1,
-                                                                  " (",
-                                                                  as.numeric(factor(hap1, levels=all.hap)),
-                                                                  ")"))
-
-    haplo.tot.read.tbl <- update.Haplo.file() %>%
-      filter(
-        depth >= filterParam$minRD,
-        locus == input$selectLocus,
-        allele.balance >= filterParam$minAR
-      ) %>%
-      group_by(haplo) %>%
-      summarise(tot.depth = sum(depth)) %>%
-      filter(haplo %in% all.hap) %>%
-      mutate(hap1 = paste0(haplo,
+    allelic.freq.tbl <- allelic.freq.tbl %>%
+      mutate(hap.label.w.num = paste0(hap1,
                            " (",
-                           as.numeric(factor(haplo, levels=all.hap)),
+                           as.numeric(factor(hap1, levels=all.hap)),
                            ")"))
 
+    })
+
+  # event when haplotype frequency plot is being interacted or clicked
+  output$hapFreqClicked <- renderUI({
+
+    default.msg <- "Haplotype frequency plot"
+    allelic.freq.tbl <- MakeHapFreqTable()
+    if (is.null(allelic.freq.tbl)) {
+      return()
+    }
+
+    nearpoint <- nearPoints(allelic.freq.tbl, input$hapFreqPlotClick, xvar="f", yvar="hap.label.w.num",
+                            threshold = 10,
+                            maxpoints = 1)
+
+    if((!is.null(nearpoint)) && nrow(nearpoint)>0) {
+      return(HTML(paste0(
+        "# of individual(s): <b>",nearpoint$n,
+        "</b>\t,\t",
+        " # of read(s): <b>",nearpoint$tot.read.depth,"</b>")))
+    }
+    else if (!is.null(input$hapFreqPlotHover)) {
+      return(HTML("Click on any haplotype point for stat"))
+      }
+    else{
+      return(default.msg)
+    }
+
+  })
+
+
+  output$hapFreq <- renderPlot({
+
+    allelic.freq.tbl <- MakeHapFreqTable()
+    if (is.null(allelic.freq.tbl)) {
+      return()
+    }
+
     ggplot(allelic.freq.tbl, aes(
-      y = hap1,
+      y = hap.label.w.num,
       x = f,
-      color = factor(hap1)
+      color = factor(hap.label.w.num)
     )) +
       geom_point(size = 4) +
       scale_color_discrete(guide = FALSE) +
-      geom_text(data=haplo.tot.read.tbl, aes(y=hap1, x=1, label=paste0(tot.depth," reads")))+
+      #geom_text(data=haplo.tot.read.tbl, aes(y=hap1, x=1, label=paste0(tot.depth," reads")))+
       xlab("observed freq") +
       ylab("haplotype") +
       scale_x_continuous(limits=c(0,1.1), breaks=c(0,0.3,0.6,0.9))+
@@ -2065,21 +2167,38 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
 
   # event when h-w plot is being interacted
-  output$hwClicked <- renderText({
+  output$hwClicked <- renderUI({
+
+    if (is.null(input$selectLocus) ||
+        input$selectLocus == "ALL" ||
+        is.null(input$selectIndiv) ||
+        input$selectDB == "" ||
+        is.null(input$selectDB) || is.null(locusPg$l))
+      return ()
+
+    if (is.null(hapPg$HW.tbl)) return ()
+
+    default.msg <- "Hardy-Weinberg plot"
 
     nearpoint <- nearPoints(hapPg$HW.tbl, input$HWplotClick, xvar="hap1", yvar="hap2", threshold = 10,
                             maxpoints = 1)
 
-    if((!is.null(nearpoint)) && ncol(nearpoint)>0) {
-      hapPg$HW.exp <- nearpoint$size
-      hapPg$HW.obs <- nearpoint$n.x
+    if((!is.null(nearpoint)) && nrow(nearpoint)>0) {
+      #hapPg$HW.exp <- nearpoint$size
+      #hapPg$HW.obs <- nearpoint$n.x
+      HTML(paste0("Individuals counts  - ",
+             " Observed # : <b>", ceiling(nearpoint$n.x),"</b>",
+             " , Expected # : <b>",ceiling(nearpoint$size),"</b>"))
+
+    }
+    else if (!is.null(input$HWPlotHover)) {
+      return("Click on any microhaplotype pair for stat")
+    }
+    else{
+      return(default.msg)
     }
 
-    if (is.null(hapPg$HW.exp) | length(hapPg$HW.exp)==0) return(paste0("Hardy Weinberg plot: select pair for numerical details"))
-    paste0("Individuals counts  - ",
-           " Observed # : ", ceiling(hapPg$HW.obs),
-           ", Expected # : ",ceiling(hapPg$HW.exp))
-  })
+})
 
 
 
@@ -2129,9 +2248,9 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                                                                         levels=1:length(all.hap)))
 
     freq.hap <- freq.hap %>% ungroup() %>% mutate(hap1 = factor(as.numeric(factor(re.hap1, levels=all.hap)),
-                                                                   levels=1:length(all.hap)),
+                                                                levels=1:length(all.hap)),
                                                   hap2 = factor(as.numeric(factor(re.hap2, levels=all.hap)),
-                                                                   levels=1:length(all.hap)),
+                                                                levels=1:length(all.hap)),
                                                   size = freq * n.hap / 2)
 
 
@@ -2164,10 +2283,10 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       scale_y_discrete(limits=1:length(all.hap))+
       theme_bw()+
       theme(axis.text.y = element_blank(),
-        #axis.ticks.y = element_blank(),
-        #panel.margin = unit(0, 'mm'),
-        panel.border = element_rect(size = 0,colour = "white"),
-        plot.margin = unit(c(2, 0, 2, 0), "mm"))
+            axis.ticks.y = element_blank(),
+            panel.margin = unit(c(0,0,0,0), 'mm'),
+            panel.border = element_rect(size = 0,colour = "white"),
+            plot.margin = unit(c(2, 0, 2, 0), "mm"))
   }, height = function() {
     ifelse(groupPg$width == 0,
            0,
@@ -2175,7 +2294,16 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   })
 
   # event when haplotype by group
-  output$hapPlotClicked <- renderText({
+  output$hapByGroupPlotClicked <- renderUI({
+
+    if (is.null(input$selectLocus) ||
+        input$selectLocus == "ALL" ||
+        is.null(input$selectIndiv) ||
+        input$selectDB == "" ||
+        is.null(input$selectDB) || is.null(locusPg$l))
+      return ()
+
+    if (is.null(haplo.summaryTbl())) return ()
 
     obs.freq.tbl <-  haplo.summaryTbl() %>%
       ungroup() %>%
@@ -2192,16 +2320,22 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       summarise(f = sum(obs.freq / 2),
                 n = sum(ifelse(is.homo, n.occur/2, n.occur)))
 
+    default.msg <- "Variance of haplotype by group"
+
     nearpoint <- nearPoints(allelic.freq.tbl, input$hapByGroupPlotClick, xvar="group", yvar="hap1",
-                            threshold = 8,
+                            threshold = 10,
                             maxpoints = 1)
 
-    if((!is.null(nearpoint)) && ncol(nearpoint)>0) {
-      hapPg$indiv.hap.grp <- nearpoint$n
+    if((!is.null(nearpoint)) && nrow(nearpoint)>0) {
+      return(HTML(paste0("# of individual(s) : <b>",nearpoint$n,"</b>")))
+    }
+    else if (!is.null(input$hapByGroupPlotHover)) {
+      return("Click on any point for counts")
+    }
+    else{
+      return(default.msg)
     }
 
-    if (is.null(hapPg$indiv.hap.grp) | length(hapPg$indiv.hap.grp)==0) return(paste0("Click any dot point for detail:"))
-    paste0("# of individuals : ",hapPg$indiv.hap.grp)
   })
 
   output$hapByGroupPlot <- renderPlot({
@@ -2246,7 +2380,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       scale_color_discrete(guide = FALSE) +
       scale_size_continuous(guide = FALSE)+
       theme(panel.border = element_rect(size = 0,colour = "white"))
-            #axis.line.x = element_line(color="black", size = 0.5))
+    #axis.line.x = element_line(color="black", size = 0.5))
 
   }, height = function() {
     ifelse(groupPg$width == 0,
@@ -2259,7 +2393,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
 
   output$RDnARplot <- renderPlot({
-        if (is.null(input$selectIndiv) ||
+    if (is.null(input$selectIndiv) ||
         input$selectDB == "" ||
         is.null(input$selectDB) || is.null(locusPg$l))
       return ()
@@ -2282,21 +2416,21 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     label.grid <- apply(rd.af.grid, 1, function(i){
       af<-i[1]
       rd<-i[2]
-        hap.sel %>%
-      filter(depth >= rd,
-             allele.balance >= af) %>%
-          group_by(locus) %>%
-          summarise(num.hap = length(unique(haplo)), num.pass.indiv = length(unique(id))) %>%
-          ungroup() %>%
-          summarise(descr = paste0(sum(num.hap),
-                                " hap,\n",
+      hap.sel %>%
+        filter(depth >= rd,
+               allele.balance >= af) %>%
+        group_by(locus) %>%
+        summarise(num.hap = length(unique(haplo)), num.pass.indiv = length(unique(id))) %>%
+        ungroup() %>%
+        summarise(descr = paste0(sum(num.hap),
+                                 " hap,\n",
                                  round(mean(num.pass.indiv,na.rm = T)),
                                  " indiv"
-                                #"(",
+                                 #"(",
                                  #round(mean(num.pass.indiv)*100/panelParam$n.indiv,2),
                                  #"%)"
-                                ))
-      }) %>% bind_rows()
+        ))
+    }) %>% bind_rows()
 
     rd.af.grid.tbl <- cbind(rd.af.grid, label.grid)
     colnames(rd.af.grid.tbl) <- c("af", "rd", "content")
@@ -2391,7 +2525,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
       }
       if (isolate(input$selectTbl) ==  "locus annotation") {
-#        if (is.null(Filter.haplo.sum())) return()
+        #        if (is.null(Filter.haplo.sum())) return()
         write.csv(annotateTab$tbl, file)
       }
 
