@@ -5,7 +5,7 @@
 #' @export
 #' @examples
 #' runHaplotype()
-runHaplotype <- function(path=system.file("shiny", "haPLOType", package = "haplot")) {
+runHaplotype <- function(path=system.file("shiny", "microhaplot", package = "microhaplot")) {
   if (path == "" || !file.exists(path)) {
     #stop("Could not find shiny directory. Try re-installing `mypackage`.", call. = FALSE)
     stop("Could not find shiny directory", call. = FALSE)
@@ -21,7 +21,7 @@ runHaplotype <- function(path=system.file("shiny", "haPLOType", package = "haplo
 #' @examples
 #' runHaplotype()
 mvHaplotype <- function(path) {
-  app.dir <- system.file("shiny", "haPLOType", package = "haplot")
+  app.dir <- system.file("shiny", "microhaplot", package = "microhaplot")
   if (app.dir == "") {
     stop("Could not find shiny directory. Try re-installing `mypackage`.", call. = FALSE)
   }
@@ -38,7 +38,7 @@ mvHaplotype <- function(path) {
 
 #' Extract haplotype from alignment reads.
 #'
-#' The function \code{haplot} extracts haplotype from sequence alignment files through perl script \code{hapture} and returns a summary table of the read depth and read quality associate with haplotype.
+#' The function \code{microhaplot} extracts haplotype from sequence alignment files through perl script \code{hapture} and returns a summary table of the read depth and read quality associate with haplotype.
 #'
 #' @param run.label character vector. Run label to be used to display in haPLOType. Required
 #' @param sam.path string. Directory path folder containing all sequence alignment files (SAM). Required
@@ -57,10 +57,10 @@ mvHaplotype <- function(path) {
 runHaplot <- function(run.label, sam.path, label.path, vcf.path,
   out.path=sam.path,
   add.filter=FALSE,
-  app.path=system.file("shiny", "haPLOType", package = "haplot")){
+  app.path=system.file("shiny", "microhaplot", package = "microhaplot")){
 
   run.label <- gsub(" +","_",run.label)
-  haptureDir <- system.file("perl", "hapture", package = "haplot")
+  haptureDir <- system.file("perl", "hapture", package = "microhaplot")
 
   # Need to check whether all path and files exist
   if(!file.exists(paste0(sam.path))) stop("the path for 'sam.path' - ", sam.path, " does not exist")
@@ -146,7 +146,7 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
     .[,1:2] %>% # grabbing locus name, and pos
     dplyr::group_by(V1) %>%
     dplyr::summarise(pos=paste0(V2, collapse=","))
-  
+
   colnames(vcf.pos.tbl) <- c("locus","pos")
 
   saveRDS(vcf.pos.tbl, paste0(out.path, "/",run.label,"_posinfo.rds"))
