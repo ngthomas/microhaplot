@@ -5,10 +5,10 @@
 #' @export
 #' @examples
 #' runHaplotype()
-runHaplotype <- function(path=system.file("shiny", "haPLOType", package = "microhaplot")) {
+runHaplotype <- function(path=system.file("shiny", "microhaplot", package = "microhaplot")) {
   if (path == "" || !file.exists(path)) {
-    #stop("Could not find shiny directory. Try re-installing `mypackage`.", call. = FALSE)
-    stop("Could not find shiny directory", call. = FALSE)
+    #stop("Could not find Shiny directory. Try re-installing `mypackage`.", call. = FALSE)
+    stop("Could not find Shiny directory", call. = FALSE)
   }
   shiny::runApp(path, display.mode = "normal")
 }
@@ -21,7 +21,7 @@ runHaplotype <- function(path=system.file("shiny", "haPLOType", package = "micro
 #' @examples
 #' runHaplotype()
 mvHaplotype <- function(path) {
-  app.dir <- system.file("shiny", "haPLOType", package = "microhaplot")
+  app.dir <- system.file("shiny", "microhaplot", package = "microhaplot")
   if (app.dir == "") {
     stop("Could not find shiny directory. Try re-installing `mypackage`.", call. = FALSE)
   }
