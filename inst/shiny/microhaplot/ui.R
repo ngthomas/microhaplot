@@ -508,8 +508,9 @@ shinyUI(
           bsAlert("hapAlert")
         ),
         fluidRow(
+          column(12,
           column(6, htmlOutput("hapFreqClicked")),
-          column(6, htmlOutput("hwClicked")),
+          column(6, htmlOutput("hwClicked"))),
           column(6, plotOutput("hapFreq",
                                height ="auto",
                                click = "hapFreqPlotClick",
