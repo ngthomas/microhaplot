@@ -364,9 +364,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
   observeEvent(input$selectLocus, {
 
+    if (input$selectDB == "" || is.null(input$selectDB))
+      return()
+
     indx <-
       isolate(which(panelParam$locus.label.bare == input$selectLocus))
 
+    if(is.null(panelParam$n.locus)) return()
     output$locusSelect <- renderText({
       input$selectLocus
     })
@@ -537,6 +541,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
 
   observeEvent(input$selectIndiv, {
+    if(is.null(panelParam$n.locus)) return()
+
     output$indivSelect <- renderText({
       input$selectIndiv
     })
@@ -1612,7 +1618,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     ifelse(
       groupPg$width == 0,
       0,
-      ifelse(input$selectGroup == "ALL", 30 * panelParam$n.group, 100)
+      ifelse(input$selectGroup == "ALL", 50 * panelParam$n.group, 100)
     )
   })
 
@@ -1698,7 +1704,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     ifelse(
       groupPg$width == 0,
       0,
-      ifelse(input$selectGroup == "ALL", 30 * panelParam$n.group, 100)
+      ifelse(input$selectGroup == "ALL", 50 * panelParam$n.group, 100)
     )
   })
 
@@ -1808,10 +1814,11 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       scale_fill_discrete(guide=FALSE,direction=-1)+
       scale_y_continuous("",breaks=NULL,limits=c(0,0.1))+ #breaks=1
       theme_bw()+
-      theme(strip.text.y = element_text(angle =360, margin=margin(0,0,0,0)),
-            strip.background  = element_rect(fill="white",size = 0),
+      theme(strip.text.y = element_text(angle =360, margin=margin(0,2,0,0)),
+            strip.background  = element_rect(fill="white",size = 0,linetype = "blank"),
+            panel.border=element_rect(fill="white",size = 0,linetype = "blank"),
             panel.margin = unit(0, 'mm'),
-            plot.margin = unit(c(2, 0, 6, 0), "mm"),
+            plot.margin = unit(c(2, 0, 6, -5), "mm"),
             aspect.ratio =1000)
 
   }, height = function() {
