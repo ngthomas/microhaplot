@@ -33,6 +33,20 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   addTooltip(session, "downloadData",
              "Note: The download table is sensitive to the 'field selection' input")
 
+  addPopover(session, "filterOpts","Options",
+             content=paste0("<p>By default, microhaplotypes must pass the selected filter criteria (on the left). ",
+                            "This restriction can be overrided or further refined by choosing these options:",
+                            "</p>",
+                            "<p></p>",
+                            "<p><b>keeps only top two haplotypes</b>: this option keeps only the top two common microhaplotypes of a single individual",
+                            "</p>",
+                            "<p><b>relies only on locus-specific param.</b>: this option disregards the current selection of min. read depth and allelic ratio. ",
+                            "Instead, the filtering process uses parameters previously defined at a single-locus level</p>",
+                            "<p></p>",
+                            "<p><b>serves as the minimal baseline</b>: this option sets the selected critera as the lower bound</p> "),
+             placement="bottom",
+             trigger="hover")
+
   dirFiles <- list.files()
   rds.file <- grep(".rds", dirFiles)
 
@@ -191,6 +205,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     panelParam$tot.indiv <- length(unique(haplo.sum$id))
 
+    if (panelParam$tot.indiv ==0) return()
+
     if (!"group" %in% colnames(haplo.sum))
       haplo.sum <-
       cbind.data.frame("group" = "unlabel",
@@ -200,6 +216,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         "preview_",
         head(haplo.sum, 1) %>% unlist(),
         "_----\n")
+
     panelParam$n.locus <- length(unique(haplo.sum$locus))
     panelParam$n.indiv <- length(unique(haplo.sum$id))
 
@@ -223,13 +240,16 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     panelParam$n.group <- length(group.sorted)
 
     updateSelectInput(session,
-                      "selectLocus",
+                      inputId="selectLocus",
                       selected = "ALL",
                       choices = panelParam$locus.label)
+
+
     updateSelectInput(session,
                       "selectIndiv",
                       selected = "ALL",
                       choices = panelParam$indiv.label)
+
     updateSelectInput(session,
                       "selectGroup",
                       selected = "ALL",
@@ -367,10 +387,10 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     if (input$selectDB == "" || is.null(input$selectDB))
       return()
 
-    indx <-
-      isolate(which(panelParam$locus.label.bare == input$selectLocus))
+    indx <-isolate(which(panelParam$locus.label.bare == input$selectLocus))
 
     if(is.null(panelParam$n.locus)) return()
+
     output$locusSelect <- renderText({
       input$selectLocus
     })
@@ -388,8 +408,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
       updateCheckboxGroupInput(session,
                                "filterOpts",
-                               choices=list("keeps only top two haplotypes (per indiv)"=1))
-      removePopover(session, "filterOpts")
+                               choices=list("keeps only top two haplotypes"=1))
 
       locusPg$l <- input$selectLocus
       rangesH$y <- c(0, 2)
@@ -404,20 +423,9 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     else {
       updateCheckboxGroupInput(session,
                                "filterOpts",
-                               choices=list("keeps only top two haplotypes (per indiv)"=1,
+                               choices=list("keeps only top two haplotypes"=1,
                                             "relies only on locus-specific param."=2,
                                             "serves as the minimal baseline"=3))
-
-      addPopover(session, "filterOpts","Options",
-                 content=paste0("<p>By default, the observed microhaplotypes must meet the current selected filter criteria</p>",
-                                "<p></p>",
-                                "<p><b>relies only on locus-specific param.</b>: this option disregards the present selection of min. read depth and allelic ratio. ",
-                                "Instead, the filtering process uses parameters defined at a single-locus level</p>",
-                                "<p></p>",
-                                "<p><b>serves as the minimal baseline</b>:all loci must pass the current selected filter values and
-                                 locus-specific filter value</p> "),
-                 placement="bottom",
-                 trigger="hover")
 
       # output$locusAcceptStatus <- renderText({
       #   "NA"
