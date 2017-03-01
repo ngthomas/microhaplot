@@ -4,14 +4,13 @@ author: "Thomas Ng and Eric C. Anderson"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{haPLOT walkthrough}
+  %\VignetteIndexEntry{microhaPlot walkthrough}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-`haplot` comes pre-loaded with some wonderful, real example data to get you started learning its functionality.
-This vignette will walk you through a look at the example data and introduce you to many of the features
-of `haPLOType`.
+`microhaplot` comes pre-loaded with some wonderful, real example data to get you started to learn about its functionality.
+This vignette will walk you through a look at the example data and introduce you to many of the features of `haPLOType`.
 
 The data that we will be exploring together are called `fish2_example.rds` and will appear in the Shiny app dropdown menu
 after installation following the README on GitHub (reproduce that here, later).  These data are from a MiSeq run with 
@@ -27,15 +26,26 @@ on the haPLOType viewer that will always stay with you.  From top to bottom they
 1. **The interaction tabsets:**  These are the three tabs that live at the top of the page with the light
 blue background.  Any one of the three: ">field selection", "+read criteria", and "+locus annotation"
 can be selected.  Whichever one is selected determines the content of the panel directly beneath---the
-user input panel.
-1. **The user input panel:** This panel has a light gray background.  If the ">field selection" tabset is
+user input panel, the panel with the light gray background.
+    a. **field Selection tab:** If the "> field selection" tabset is
 selected, then the user input panel will include dropdown boxes that let you choose a group, locus, or
-an individual that you wish to focus on (this choice affects what gets shown in different plots and outputs,
+individual(s) that you wish to focus on (this choice affects what gets shown in different plots and outputs,
 etc.) It also includes "backwards-and-forwards" buttons, "<" and ">", that let you step individually through
 loci (the buttons to the right of "Locus") or through individuals (fish in this case---the buttons to the 
-right of the "Indiv" dropdown box.)  These are very useful when you want to work your way through each 
+right of the "Indiv" dropdown box.) These are very useful when you want to work your way through each 
 locus individually and choose those that do (and do not) appear to be reliabble enough to include in a 
 panel of amplicons.
+    b. **read criteria tab:** In the "+ read criteria" tab, you are given the choice to define the minimal read depth and minimal allelic ratio that microhaplotype reads have to pass through.
+   Minimal Read depth defines the minimal number of reads that are observed for a particular microhaplotype in a single individual's locus. It can only take positive value.
+   The allelic ratio or allelic balance defines as the ratio of observed read depth of a microhaplotype to read depth of the most common microhaplotype. Again, the value is drawn on a single locus at an individual basis.
+   Ideally, for homozygous case, you expect to see the true microhaplotype to have a large read depth and allelic ratio of one. The false noisy microhaplotype will be in the background with low read depth and allelic ratio close to zero.
+   As for heterozygous case, the two true microhaplotypes ideally should have large and similar number of reads which means that their allelic ratio should be one or/and close to one.
+   So once you set up those criteria, you can apply it with the "apply" button. 
+   You can also save this criteria setup if you want to visit it in the future by clicking the "save" button.
+   There are other options that located on the right hand side that gives you more ways to define the critera. Details for each of the options are shown if you hover your pointer over it. 
+    c. **locus annotation:** This tab is for users to keep track of whether a certain locus should be tossed out based on its quality. There is also a small textbox that lets you to put any comment regarding the locus group. Remember to press the save button for submission. All of these annotation information can be retreived under the table selection for "locus annotation" under `Output` tab.
+
+
 1. **The main body panel:** This occupies most of haPLOType's screen real estate.  It is where the actual
 plots, tables, and other results are rendered.  What gets rendered here depends on which main body panel
 has been chosen.  That choice is made using the *main panel choice tabset* described below.
@@ -45,8 +55,8 @@ of the main body panel:
     dropdown menu for "fish2_example.rds".
     b. *Summary Info: * let's you choose plot-summaries that give you a good overview of the characteristics of groups, individuals, or loci.
     c. *Filter Analysis:* let's you explore 1) a tabular summary (the "Broad Summary") of the number of haplotypes observed and 
-    individuals called subject to different levels of filtering. 2) Distribution Plots that show the distribution of read depths
-    and the allelic depth ratios of different haplotypes at individual loci, and 3) "Final Genotype" shows haplotype frequencies,
+    individuals called subject to different levels of filtering. 2) "Criteria Breakdown" shows the distribution of read depths
+    and the allelic depth ratios of different haplotypes at individual loci, and 3) "Microhap Summaries" shows haplotype frequencies,
     and a visual summary of conformance to Hardy-Weinberg proportions of individual loci, and also portrays the position of the 
     variants within the sequence.
     d. *Inferential Analysis: * is a wrapper that integrates with the "Sr.MicroHap" Bayesian haplotype caller which is 
