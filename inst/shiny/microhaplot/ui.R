@@ -36,7 +36,7 @@ shinyUI(
                        offset = 0),
                 column(
                   8,
-                  selectInput("selectGroup", label = "", "ALL", selected = "ALL"),
+                  selectInput("selectGroup", label = "", "", selected = ""),
                   style = "margin-top:-10px;margin-bottom:-10px;"
                 ),
                 # column(
@@ -56,7 +56,7 @@ shinyUI(
                 column(2, "Indiv:", style = "margin-top:21px;font-weight:bold; padding-left:0px"),
                 column(
                   8,
-                  selectInput("selectIndiv", label = "", "ALL", selected = "ALL"),
+                  selectInput("selectIndiv", label = "", "", selected = ""),
                   style = "margin-top:-10px;margin-bottom:-10px;"
                 ),
                 column(1,
@@ -74,7 +74,7 @@ shinyUI(
               column(2, "Locus:", style = "margin-top:22px;font-weight:bold; padding-left:0px"),
                 column(
                   6,
-                  selectInput("selectLocus", label = "", "ALL", selected = "ALL"),
+                  selectInput("selectLocus", label = "", "", selected = "", width = "100%"),
                   style = "margin-top:-10px;margin-bottom:-10px; margin-left: -5%;padding-left:0px"
                 ),
               column(2,
