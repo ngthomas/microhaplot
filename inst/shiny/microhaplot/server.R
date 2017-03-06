@@ -75,13 +75,16 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         is.null(input$selectDB) || !file.exists(input$selectDB))
       return()
     #cat(file=stderr(), "select DB_", input$selectDB, "_----\n")
-    readRDS(input$selectDB)  %>% ungroup() %>% mutate(id = as.character(id))
+    readRDS(input$selectDB)  %>% ungroup() %>% mutate(id = as.character(id),
+                                                      locus =as.character(locus),
+                                                      group=as.character(group))
   })
 
   extract.pos.file <- reactive({
     pos.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_posinfo.rds")
     if (!file.exists(pos.file)) return ()
     readRDS(pos.file)
+
   })
 
   # the format structure for the annotate file: contains locus ID (also contains ALL), min read depth, min allelic ratio,
@@ -90,7 +93,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   extract.annotate.file <- reactive({
     annotate.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_annotate.rds")
     if (!file.exists(annotate.file)) {
-      annotateTab$tbl <- data.frame(locus = panelParam$locus.label,
+      annotateTab$tbl <- data.frame(locus = as.character(panelParam$locus.label),
                                     ave.entropy = c("NA",rep(0, panelParam$n.locus)),
                                     min.rd = rep(0, panelParam$n.locus+1),
                                     min.ar = rep(0, panelParam$n.locus+1),
@@ -98,12 +101,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                                     comment = rep("", panelParam$n.locus+1),
                                     stringsAsFactors = F)
 
-
       return()
     }
 
 
-    annotateTab$tbl <- readRDS(annotate.file)
+    annotateTab$tbl <- readRDS(annotate.file) %>% ungroup() %>% mutate(locus = as.character(locus))
+
+
   })
 
   update.annotate.field <- reactive({
