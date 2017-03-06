@@ -57,7 +57,7 @@ vignette("haPLOType-walkthrough")
 Now, having done that, we can launch haPLOType on the example data:
 ```r
 library(microhaplot)
-app.path <- "~/Shiny/haPLOType"
+app.path <- "~/Shiny/microhaplot"
 runHaplotype(app.path)
 ```
 

@@ -7,7 +7,7 @@ library("tidyr")
 library("DT")
 library("grid")
 library("scales")
-library("haplot")
+library("microhaplot")
 library("reshape2")
 
 
