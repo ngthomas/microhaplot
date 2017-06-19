@@ -1,6 +1,6 @@
 # microhaplot   
 
-`microhaplot` generates visual summaries of microhaplotypes found in short read alignments.
+`microhaplot` generates visual summaries of microhaplotypes found in short read alignments. All you need are alignment SAM files and variant call VCF file.
 
 This software exists as a an R package `microhaplot` that includes within it the code to set up and 
 establish an Rstudio/Shiny server to visualize and manipulate the data.  There are two key steps in 
@@ -25,7 +25,6 @@ See the **Example Data** section to learn about how to run each of these steps o
 with the package.  
 
    
-
 ### Installation and Quick Start
 
 You can either clone the repository and build the `microhaplot` package yourself, or, more easily, you can
@@ -33,13 +32,10 @@ install it using  [devtools](https://github.com/hadley/devtools). You can get `d
 
 Once you have `devtools` available in R, you can get `microhaplot` this way:
 ```r
-devtools::install_github("eriqande/haplot", ref = "erics-haplot-updates", build_vignettes = TRUE)
 devtools::install_github("ngthomas/microhaplot", build_vignettes = TRUE)
 ```
-That is currently set to get it from Eric Anderson's updated fork.  Everything will eventually get merged
-in.
 
-Once you have installed the `mircohaplot` R package with devtools there you need to use the `microhaplot::mvHaplotype`
+Once you have installed the `microhaplot` R package with devtools there you need to use the `microhaplot::mvHaplotype`
 to establish the haPLOType Shiny App in a convenient location on your system. The following line
 creates the directory `Shiny` in my home directory and then within that it creates the 
 directory `haPLOType` and fills it with the Shiny app as well as the example data that go 
@@ -61,52 +57,46 @@ app.path <- "~/Shiny/microhaplot"
 runHaplotype(app.path)
 ```
 
-### Quick Guide to use Haplot to parse SAM files, etc.
+### Quick Guide to use microhaplot to parse out SAM and VCF files
 
-This tutorial is incomplete. It is coming soon.  But we need to get some good example files back.
+This microhaplot package comes with a small customized sample data drawn from an actual run 
+of short read sequencing run on Rockfish species. The sample data
+contains sequences of eight genomic loci for four populations of five individuals each, 
+with a total of twenty individuals. 
 
+First you need to create a tab-separate **label** file with 3 info columns: path to SAM file name, individual ID, and group label (in this particular order). If you do not want assign any group label for the individuals, you can just leave it as "NA". It is recommended that you have all of the SAM files under one directory to make this labeling task easier.
 
-To upload your alignment files to shiny App `haPLOType`, you will need to generate a tab-separate **label** file with 3 info columns: path to SAM file name, individual ID, and group label (in this particular order). 
-
-If you do not want assign any group label for the individuals, you can just leave it as "NA". 
-
-NOTE: It is recommended that you have all of the SAM files under one directory to make this labeling task easier.
-
-An example of the `label` file:
+The `label` file looks like this:
 ```txt
-satro_flashed_s1_aln.sam        s1      black
-satro_flashed_s2_aln.sam        s2      black
-satro_flashed_s3_aln.sam        s3      black
-satro_flashed_s4_aln.sam        s4      black
-satro_flashed_s5_aln.sam        s5      copper
+s6.sam  s6      gopher
+s11.sam s11     copper
+s13.sam s13     kelp
+s14.sam s14     kelp
+s18.sam s18     gopher
 ``` 
-  
-  
-Now you can proceed with running `runHaplot`. You will need to provide:
 
- * a label 
+Once you have the label file in place, you can run `runHaplot`, a R function that generates tables of microhaplotype, by providing the following:
+ * a label to display in haPLOType
  * path to the directory with all SAM files 
  * path to the `label` file you just created
  * path to the VCF file  
   
-  
 ```R
 library(microhaplot)
 
-# ---- edit ---------
-run.label <- "example 1"
-sam.path <- "data/satro_sample"
-label.path <- "data/satro_sample/sample_label.txt"
-vcf.path <- "data/satro_sample/sebastes.vcf"
-app.path <- "~/bin/haPLOType" 
-# -------------------------
+run.label <- "sebastes"
+sam.path <- system.file("extdata","." , package="microhaplot")
+label.path <- system.file("extdata", "label.txt", package = "microhaplot")
+vcf.path <- system.file("extdata", "sebastes.vcf", package = "microhaplot")
+app.path <- "~/Shiny/microhaplot"
+# -or- app.path <- system.file("shiny","microhaplot" , package="microhaplot")
 
-haplo.read.tbl <- runHaplot(run.label = run.label, 
-          sam.path=sam.path,
-          label.path=label.path,
-          vcf.path=vcf.path,
-          app.path=app.path)
-
+haplo.read.tbl <- runHaplot(run.label = run.label,
+           sam.path=sam.path,
+           label.path=label.path,
+           vcf.path=vcf.path,
+           app.path=app.path)
+           
 runHaplotype(app.path)
 ```
 
