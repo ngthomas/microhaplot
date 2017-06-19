@@ -50,7 +50,7 @@ can read the bases present at 4 variant positions along a 150-bp read, you know 
 
 haPLOT is designed to work with short read sequencing data in which 
 there is a relatively small number of places that sequencing reads will start from.
-It is emphatically not geared to whole-genome shotgun sequencing data in which 
+It is emphatically *not* geared to whole-genome shotgun sequencing data in which 
 you expect each read to start from a different starting place.  We use haPLOT 
 primarily with amplicon sequencing data in which a few hundred fragments (of about 100 bp each)
 are amplified by PCR in a few hundred individuals.  The DNA from different individuals is
@@ -99,7 +99,10 @@ The starting point for haPLOT requires:
 2. A VCF file whose contents define the positions in each reference sequence from which
 you want to extract variants into microhaplotypes.  Note that the *individuals* that appear
 in the VCF file need not be the same ones whose reads appear in the assemblies.  The VCF
-is merely used as a way of defining positions to extract.
+is merely used as a way of defining positions to extract. Still, since the content of microhaplotype 
+is based on the variant positions listed in the VCF file, it is crucial for the VCF file
+to only contain highly relieable variant sites.
+
 
 
 We describe here the workflow that we use to get these two necessary files from the
@@ -241,19 +244,21 @@ nohup freebayes-parallel <(fasta_generate_regions.py gtseq15_loci.fasta.fai 150)
 ### runHaplot
 
 After the above is done, the file `satro384_noMNP_noComplex_noPriors.vcf` can be filtered, if desired, to make 
-sure that everything in it is a solid SNP.  Then that file is used with the function
+sure that everything in it has a solid SNP.  Then that file is used with the function
 `runHaplot` to extract haplotypes from the aligned reads in the `map` directory.  
-If you run R and set the working directory to `map`, then this is what that   
-looks like (if you have installed the haPLOType Shiny app into `~/Shiny/haPLOType`).
+An example of an vcf file and SAM files extracted from an actual GT-seq runfish 
+data is available in the `inst/extdata`.
+
+
 ```{r runHaplot, eval=FALSE}
  
-library(haplot)
+library(microhaplot)
 
-run.label <- "satrovirens_8_17_16"
-sam.path <- "./"
-label.path <- "label.txt"
-vcf.path <- "satro384_noMNP_noComplex_noPriors.vcf"
-app.path <- "~/Shiny/haPLOType"
+run.label <- "sebastes"
+sam.path <- system.file("extdata","." , package="microhaplot")
+label.path <- system.file("extdata", "label.txt", package = "microhaplot")
+vcf.path <- system.file("extdata", "sebastes.vcf", package = "microhaplot")
+app.path <- system.file("shiny","microhaplot" , package="microhaplot")
 
 haplo.read.tbl <- runHaplot(run.label = run.label,
            sam.path=sam.path,
@@ -262,3 +267,4 @@ haplo.read.tbl <- runHaplot(run.label = run.label,
            app.path=app.path)
 ```
 
+*** need to make modification on the rockfish data ***
