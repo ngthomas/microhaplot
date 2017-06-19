@@ -201,6 +201,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
 
   observeEvent(input$selectDB, {
+
     cat(file = stderr(), "select DB_", input$selectDB, "_", "----\n")
     if (input$selectDB == "" || is.null(input$selectDB))
       return()
@@ -210,7 +211,6 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     panelParam$tot.indiv <- length(unique(haplo.sum$id))
 
     if (panelParam$tot.indiv ==0) return()
-
     if (!"group" %in% colnames(haplo.sum))
       haplo.sum <-
       cbind.data.frame("group" = "unlabel",
@@ -273,6 +273,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     Min.filter.haplo()
     #Filter.haplo.by.RDnAR()
     #Filter.haplo.sum()
+
 
     srhapPg$makePlot <- FALSE
     extract.pos.file()
@@ -1867,7 +1868,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       ungroup() %>%
       mutate(
              center.x.accept = mean(depth[depth>=filterParam$minRD]),
-             center.x.reject = mean(depth[depth<filterParam$minRD])) %>%
+             center.x.reject = mean(depth[depth<filterParam$minRD]),
+             center.y = 0.5+ min(n.accept.indiv/2, n.reject.indiv/2)) %>%
       group_by(haplo, id) %>%
       mutate(is.pass = 1*(depth >=filterParam$minRD))
 
@@ -1899,11 +1901,11 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
        geom_text(data=haplo.match.rep, aes(
          label=n.accept.indiv,
                       x=center.x.accept,
-         y=10), hjust=-1, vjust=-1)+
+         y=center.y), hjust=-1, vjust=-1)+
       geom_text(data=haplo.match.rep, aes(
         label=n.reject.indiv,
         x=center.x.reject,
-        y=10), hjust=-1, vjust =-1)
+        y=center.y), hjust=-1, vjust =-1)
 
       #geom_density(adjust=0.5, color=NA)+
     g + facet_grid(haplo~.)+#, scales="free_y")+
@@ -1953,7 +1955,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       mutate(
         center.x.accept = min(mean(allele.balance[allele.balance>=filterParam$minAR]),
                               0.9),
-        center.x.reject = min(mean(allele.balance[allele.balance<filterParam$minAR]),0.9))%>%
+        center.x.reject = min(mean(allele.balance[allele.balance<filterParam$minAR]),0.9),
+        center.y = 0.5+ min(n.accept.indiv/2, n.reject.indiv/2))%>%
       group_by(haplo, id) %>%
       mutate(is.pass = 1*(allele.balance >=filterParam$minAR))
 
@@ -1969,11 +1972,11 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       geom_text(data=haplo.match.rep, aes(
         label=n.accept.indiv,
         x=center.x.accept,
-        y=10), hjust=2, vjust=-1)+
+        y=center.y), hjust=2, vjust=-1)+
       geom_text(data=haplo.match.rep, aes(
         label=n.reject.indiv,
         x=center.x.reject,
-        y=10), hjust=0, vjust =-1)
+        y=center.y), hjust=0, vjust =-1)
 
 
       g + facet_grid(haplo~.)+#, scales="free_y")+
