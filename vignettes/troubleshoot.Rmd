@@ -1,0 +1,14 @@
+---
+title: "Package Troubleshoot"
+author: "Thomas Ng and Eric C. Anderson"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Package Troubleshoot}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Issue with RunHaplot:
+## Warning message concerning missing Moo.pm
+Suggestion: You might need to examine the system environment path for Perl. It is recommended that the `which Perl` should point to the `/usr/bin` path. 
