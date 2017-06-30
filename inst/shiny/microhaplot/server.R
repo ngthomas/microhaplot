@@ -2542,7 +2542,9 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                    "/",
                    substr(haplotype.2, snp.id, snp.id)
                  )) %>%
-          select(-haplotype.1,-haplotype.2,-read.depth.1,-read.depth.2)
+          select(-haplotype.1,-haplotype.2,-read.depth.1,-read.depth.2) %>%
+          rename("indiv.ID" = id)
+
         write.csv(haplo.all, file)
 
       }
@@ -2567,7 +2569,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
           expected.freq = round(expected.freq, 3)
         )
       haplo.all.tbl <-
-        haplo.summaryTbl() %>% rename("Individual ID" = id)
+        haplo.summaryTbl() %>% rename("indiv.ID" = id)
       haplo.all <-
         left_join(haplo.all.tbl,
                   haplo.freq,
@@ -2596,7 +2598,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       if (is.null(Filter.haplo.sum())) return()
 
       haplo.all <-
-        Filter.haplo.sum() %>% rename("Individual ID" = id) %>%
+        Filter.haplo.sum() %>% rename("indiv.ID" = id) %>%
         select(-sum.Phred.C, -max.Phred.C)
 
       #if ("mapq" %in% colnames(haplo.all)) haplo.all <- haplo.all %>% select(-mapq)
@@ -2618,7 +2620,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                  "/",
                  substr(haplotype.2, snp.id, snp.id)
                )) %>%
-        select(-haplotype.1,-haplotype.2,-read.depth.1,-read.depth.2)
+        select(-haplotype.1,-haplotype.2,-read.depth.1,-read.depth.2) %>%
+        rename("indiv.ID" = id)
     }
 
     if (isolate(input$selectTbl) ==  "locus annotation") {
