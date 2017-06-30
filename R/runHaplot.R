@@ -96,6 +96,9 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
     write(run.perl.script,
       file=paste0(out.path, "/runHapture.sh"),
       append=T)
+    if(i%%10==0) write("wait;",
+                       file=paste0(out.path, "/runHapture.sh"),
+                       append=T)
   })
 
 
