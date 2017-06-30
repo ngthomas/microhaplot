@@ -53,7 +53,7 @@ vignette("haPLOType-walkthrough")
 Now, having done that, we can launch haPLOType on the example data:
 ```r
 library(microhaplot)
-app.path <- "~/Shiny/microhaplot"
+app.path <- "~/Shiny/"
 runHaplotype(app.path)
 ```
 
@@ -80,16 +80,22 @@ Once you have the label file in place, you can run `runHaplot`, a R function tha
  * path to the directory with all SAM files 
  * path to the `label` file you just created
  * path to the VCF file  
-  
+
 ```R
 library(microhaplot)
 
+# to access package sample case study dataset of rockfish
 run.label <- "sebastes"
 sam.path <- system.file("extdata","." , package="microhaplot")
 label.path <- system.file("extdata", "label.txt", package = "microhaplot")
 vcf.path <- system.file("extdata", "sebastes.vcf", package = "microhaplot")
-app.path <- "~/Shiny/microhaplot"
-# -or- app.path <- system.file("shiny","microhaplot" , package="microhaplot")
+app.path <- system.file("shiny","microhaplot" , package="microhaplot")
+
+# for your dataset: customize the following paths
+# sam.path <- "~/microhaplot/extdata/"
+# label.path <- "~/microhaplot/extdata/label.txt"
+# vcf.path <- "~/microhaplot/extdata/sebastes.vcf"
+# app.path <- "~/Shiny/microhaplot"
 
 haplo.read.tbl <- runHaplot(run.label = run.label,
            sam.path=sam.path,
