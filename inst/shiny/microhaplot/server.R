@@ -277,8 +277,11 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     srhapPg$makePlot <- FALSE
     extract.pos.file()
+    Filter.haplo.sum()
+
     #cat(file=stderr(), "--", colnames(annotateTab$tbl) %>% unlist, "\n")
 
+    cat(file = stderr(), "Done loading", input$selectDB, "_", "----\n")
   }, priority = -3)
 
   ## updating Locus and individidual choice at the start of the session:
@@ -821,6 +824,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   Filter.haplo.by.RDnAR <- reactive({
     haplo.sum <- Min.filter.haplo()
 
+    #cat(file=stderr(), "successfull pass on haplo.sum --- ", dim(haplo.sum),"=--\n")
+
     if (is.null(haplo.sum))
       return ()
 
@@ -856,12 +861,14 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     haplo.filter <- Filter.haplo.by.RDnAR()
 
-    if (is.null(haplo.filter))
+    if (is.null(haplo.filter) || nrow(haplo.filter) == 0)
       return ()
 
     Update.ave.entropy()
     groupPg$width <- dim(haplo.filter)[1]
     hapPg$width <- haplo.filter %>% filter(rank <= 2) %>% select(haplo) %>% unique %>% unlist %>% length
+
+    #cat(file=stderr(), "successfull pass on filter.haplo.sum --- ", dim(haplo.filter),"=--\n")
 
     haplo.filter
   })
@@ -942,7 +949,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       theme_bw() +
       theme(
         legend.position = "bottom",
-        panel.margin = unit(0, 'mm'),
+        panel.spacing = unit(0, 'mm'),
         panel.border = element_rect(size = 0,colour = "white"),
         axis.line.y = element_line(color="grey", size = 0.5),
         plot.margin = unit(c(0, 3, 0, 0), "mm")
@@ -953,7 +960,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       coord_cartesian(ylim = rangesH$y)
   }, height = function()
     ifelse(groupPg$width == 0, 0,
-           max(
+           as.numeric(input$lociHeight) * max(
              ifelse(
                input$selectLocus == "ALL",
                ifelse(
@@ -1004,7 +1011,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       theme(
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
-        panel.margin = unit(0, 'mm'),
+        panel.spacing = unit(0, 'mm'),
         panel.border = element_rect(size = 0,colour = "white"),
         plot.margin = unit(c(0, 2, 0, 0), "mm")
       ) +
@@ -1013,7 +1020,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       coord_cartesian(ylim = rangesH$y)
     #scale_x_discrete(limits=c(-1, max(frac.calleable$n)+1)) #breaks= pretty_breaks()
   }, height = function()
-    ifelse(groupPg$width == 0, 0, max(
+    ifelse(groupPg$width == 0, 0, as.numeric(input$lociHeight) * max(
       ifelse(
         input$selectLocus == "ALL",
         ifelse(
@@ -1068,7 +1075,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       theme(
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
-        panel.margin = unit(0, 'mm'),
+        panel.spacing = unit(0, 'mm'),
         panel.border = element_rect(size = 0,colour = "white"),
         plot.margin = unit(c(0, 3, 0, 0), "mm")
       ) +
@@ -1079,7 +1086,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
   }, height = function()
     ifelse(groupPg$width == 0, 0,
-           max(
+           as.numeric(input$lociHeight) * max(
              ifelse(
                input$selectLocus == "ALL",
                ifelse(
@@ -1129,7 +1136,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       theme(
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
-        panel.margin = unit(0, 'mm'),
+        panel.spacing = unit(0, 'mm'),
         panel.border = element_rect(size = 0,colour = "white"),
         plot.margin = unit(c(0, 0, 0, 0), "mm")
       ) +
@@ -1137,7 +1144,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       xlim(locusPg$l) +
       coord_flip(xlim = rangesH$y)
   }, height = function()
-    ifelse(groupPg$width == 0, 0, max(
+    ifelse(groupPg$width == 0, 0, as.numeric(input$lociHeight) * max(
       ifelse(
         input$selectLocus == "ALL",
         ifelse(
@@ -1164,7 +1171,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     haplo.filter <- Filter.haplo.sum()
 
-    if (dim(haplo.filter)[1] == 0)
+
+    if (is.null(haplo.filter) || dim(haplo.filter)[1] == 0)
       return ()
     if (dim(panelParam$indiv.label.tbl)[1] == 0)
       return()
@@ -1173,6 +1181,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       group_by(locus, id, group) %>%
       summarise(depth.ratio = ifelse(length(depth) == 1, 0, min(allele.balance)),
                 depth.first = max(depth))
+
+    #cat(file=stderr(), "should be safe \n")
 
     haplo.filter <-
       right_join(haplo.filter, panelParam$indiv.label.tbl, by = "id")
@@ -1203,7 +1213,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       xlab ("ratio of the 2nd : 1st common haplotype\n(allelic ratio)") +
       theme(
         legend.position = "bottom",
-        panel.margin = unit(0, 'mm'),
+        panel.spacing = unit(0, 'mm'),
         panel.border = element_rect(size = 0, colour = "white"),
         axis.line.y = element_line(color="grey", size = 0.5),
         plot.margin = unit(c(0, 2, 0, 0), "mm")
@@ -1218,7 +1228,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       )
   }, height = function()
     ifelse(groupPg$width == 0, 0,
-           max(
+           as.numeric(input$indivHeight) * max(
              ifelse(
                input$selectIndiv == "ALL",
                ifelse(
@@ -1238,6 +1248,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       return ()
     if (dim(panelParam$locus.label.tbl)[1] == 0)
       return()
+
+    if(is.null(Filter.haplo.sum())) return()
 
     filter.haplo <- Filter.haplo.sum() %>%
       group_by(id, locus) %>%
@@ -1265,7 +1277,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       theme(
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
-        panel.margin = unit(c(0,0,0,0), 'mm'),
+        panel.spacing = unit(c(0,0,0,0), 'mm'),
         panel.border = element_rect(size = 0,colour = "white"),
         plot.margin = unit(c(0, 3, 0, 0), "mm")
       ) +
@@ -1275,7 +1287,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     #scale_x_discrete(limits=c(-1, max(frac.calleable$n)+1)) #breaks= pretty_breaks()
   }, height = function()
     ifelse(groupPg$width == 0, 0,
-           max(
+           as.numeric(input$indivHeight) * max(
              ifelse(
                input$selectIndiv == "ALL",
                ifelse(
@@ -1327,7 +1339,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       theme(
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
-        panel.margin = unit(0, 'mm'),
+        panel.spacing = unit(0, 'mm'),
         panel.border = element_rect(size = 0,colour = "white"),
         plot.margin = unit(c(0,4, 0, 0), "mm")
       ) +
@@ -1339,7 +1351,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
   }, height = function()
     ifelse(groupPg$width == 0, 0,
-           max(
+           as.numeric(input$indivHeight) * max(
              ifelse(
                input$selectIndiv == "ALL",
                ifelse(
@@ -1378,7 +1390,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   #     theme_bw()+
   #     theme(axis.text.y=element_blank(),
   #           axis.ticks.y=element_blank(),
-  #           panel.margin = unit(0, 'mm'))+
+  #           panel.spacing = unit(0, 'mm'))+
   #     #plot.margin = unit(c(0, 0, 0, 0), "mm"))+
   #     #scale_x_log10()+
   #     ylim(indivPg$i)+
@@ -1427,7 +1439,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       theme(
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
-        panel.margin = unit(0, 'mm'),
+        panel.spacing = unit(0, 'mm'),
         panel.border = element_rect(size = 0,colour = "white"),
         plot.margin = unit(c(0, 2, 0, 0), "mm")
       ) +
@@ -1438,7 +1450,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
   }, height = function()
     ifelse(groupPg$width == 0, 0,
-           max(
+           as.numeric(input$indivHeight) * max(
              ifelse(
                input$selectIndiv == "ALL",
                ifelse(
@@ -1566,7 +1578,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   #     theme(
   #       #axis.text.y=element_blank(),
   #       axis.ticks.y = element_blank(),
-  #       panel.margin = unit(0, 'mm'),
+  #       panel.spacing = unit(0, 'mm'),
   #       plot.margin = unit(c(0, 0, 0, 0), "mm")
   #     )
   # }, height = function() {
@@ -1624,7 +1636,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         #axis.text.y = element_blank(),
         panel.border = element_rect(size = 0,colour = "white"),
         axis.ticks.y = element_blank(),
-        panel.margin = unit(0, 'mm'),
+        panel.spacing = unit(0, 'mm'),
         plot.margin = unit(c(0, 0, 0, 0), "mm")
       )
   }, height = function() {
@@ -1653,7 +1665,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   #     theme(
   #       axis.text.y = element_blank(),
   #       axis.ticks.y = element_blank(),
-  #       panel.margin = unit(0, 'mm'),
+  #       panel.spacing = unit(0, 'mm'),
   #       plot.margin = unit(c(0, 0, 0, 0), "mm")
   #     )
   # }, height = function() {
@@ -1710,7 +1722,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
         panel.border = element_rect(size = 0,colour = "white"),
-        panel.margin = unit(0, 'mm'),
+        panel.spacing = unit(0, 'mm'),
         plot.margin = unit(c(0, 0, 0, 0), "mm")
       )
   }, height = function() {
@@ -1748,7 +1760,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         color = "red"
       )+
       theme(strip.text.y = element_text(angle =360,size=0, margin=margin(0,0,0,0)),
-            panel.margin = unit(0, 'mm'),
+            panel.spacing = unit(0, 'mm'),
             panel.border = element_rect(size = 0,colour = "white"),
             #axis.line.x = element_line(color="grey", size = 0.5),
             plot.margin = unit(c(2, 0, 2, 0), "mm"))
@@ -1785,7 +1797,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         color = "red"
       )+
       theme(strip.text.y = element_text(angle =360,size=0, margin=margin(0,0,0,0)),
-            panel.margin = unit(0, 'mm'),
+            panel.spacing = unit(0, 'mm'),
             panel.border = element_rect(size = 0,colour = "white"),
             plot.margin = unit(c(2, 0, 2, 1), "mm"))
     # geom_vline(
@@ -1830,7 +1842,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       theme(strip.text.y = element_text(angle =360, margin=margin(0,2,0,0)),
             strip.background  = element_rect(fill="white",size = 0,linetype = "blank"),
             panel.border=element_rect(fill="white",size = 0,linetype = "blank"),
-            panel.margin = unit(0, 'mm'),
+            panel.spacing = unit(0, 'mm'),
             plot.margin = unit(c(2, 0, 6, -5), "mm"),
             aspect.ratio =1000)
 
@@ -1887,7 +1899,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     #     linetype = "dashed",
     #     color = "red"
     #   )+
-    #   theme(panel.margin = unit(0, 'mm'),
+    #   theme(panel.spacing = unit(0, 'mm'),
     #     plot.margin = unit(c(2, 0, 2, 0), "mm"))
 
 
@@ -1919,7 +1931,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         color = "red"
       )+
       theme(strip.text.y = element_text(angle =360,size=0, margin=margin(0,0,0,0)),
-            panel.margin = unit(0, 'mm'),
+            panel.spacing = unit(0, 'mm'),
             panel.border = element_rect(size = 0,colour = "white"),
             #axis.line.y = element_line(color="grey", size = 1),
             plot.margin = unit(c(2, 0, 2, 1), "mm"))
@@ -1991,7 +2003,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       )+
       theme(strip.text.y = element_text(angle =360,size=0, margin=margin(0,0,0,0)),
             panel.border = element_rect(size = 0,colour = "white"),
-            panel.margin = unit(0, 'mm'),
+            panel.spacing = unit(0, 'mm'),
             plot.margin = unit(c(2, 0, 2, 0), "mm"))
 
   }, height = function() {
@@ -2306,7 +2318,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       theme_bw()+
       theme(axis.text.y = element_blank(),
             axis.ticks.y = element_blank(),
-            panel.margin = unit(c(0,0,0,0), 'mm'),
+            panel.spacing = unit(c(0,0,0,0), 'mm'),
             panel.border = element_rect(size = 0,colour = "white"),
             plot.margin = unit(c(2, 0, 2, 0), "mm"))
   }, height = function() {

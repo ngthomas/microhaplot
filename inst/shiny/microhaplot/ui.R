@@ -267,20 +267,20 @@ shinyUI(
                  tabPanel(
                    h5("by Individual"),
                    fluidRow(
-                     column(
-                       4,
-                       column(3, h5("Indiv:"), offset = 0),
-                       column(9, h5(textOutput("indivSelect")), style =
-                                "margin-left: 0px; color:grey")
-                     ),
+                     #column(
+                     #  4,
+                     #  column(3, h5("Indiv:"), offset = 0),
+                     #  column(9, h5(textOutput("indivSelect")), style =
+                     #           "margin-left: 0px; color:grey")
+                    # ),
 
                      #column(4,  column(3, h5("By Indiv:"), offset=0),
                      #       column(9, h6(textOutput("indivSelect")), style="margin-left: 0px; color:grey")),
                      column(4, column(
                        12,
-                       column(3, h6("Show")),
+                       column(7, h6("Display (indiv/pg) : ")),
                        column(
-                         6,
+                         5,
                          selectInput(
                            "indivPerDisplay",
                            label = NULL,
@@ -296,9 +296,9 @@ shinyUI(
                            selected =
                              15
                          )
-                       ),
-                       column(2, h6("indiv"))
-                       )),
+                       )#,
+                       #column(3,h6("indiv/pg"))
+                     )),
                      column(4, column(
                        12,
                        column(1, h6("Page:")),
@@ -313,7 +313,7 @@ shinyUI(
                          ),
                          offset = 1
                        ),
-                       column(1, h6(" of ")),
+                       column(1, h6("of ")),
                        column(1, h6(textOutput("maxIndivPage")))#,
                        # column(
                        #   2,
@@ -321,6 +321,26 @@ shinyUI(
                        #   offset = 1
                        # )
                      )),
+                     column(4,column(4,h6("Height:")),
+                            column(8,
+                                   selectInput(
+                                     "indivHeight",
+                                     label = NULL,
+                                     choices = list(
+                                       "50%" = 0.5,
+                                       "100%" =
+                                         1,
+                                       "150%" =
+                                         1.5,
+                                       "200%" =
+                                         2,
+                                       "500%" =
+                                         5
+                                     ),
+                                     selected =
+                                       1
+                                   )
+                                   )),
                      style = "border-bottom: 1px double #d9d9d9;  margin-bottom: 20px; padding-top:15px"
                    ),
                    #border-top: 2px dashed #d9d9d9;
@@ -364,12 +384,12 @@ shinyUI(
                  tabPanel(
                    h5("by Locus"),
                    fluidRow(
-                     column(
-                       4,
-                       column(3, h5("Locus:"), offset = 0),
-                       column(9, h5(textOutput("locusSelect")), style =
-                                "margin-left: 0px; color:grey")
-                     ),
+                     #column(
+                     #  4,
+                     #  column(3, h5("Locus:"), offset = 0),
+                     #  column(9, h5(textOutput("locusSelect")), style =
+                     #           "margin-left: 0px; color:grey")
+                     #),
 
                      #            column(5,column(12,
                      #                            column(2,h5("Locus:"),style="margin-top:0%;font-weight:bold"),
@@ -382,9 +402,9 @@ shinyUI(
                      #style="padding-right: 0px;padding-left:0px; padding-right: 0px;margin: -3% 0 0 0;")),
                      column(4, column(
                        12,
-                       column(3, h6("Show")),
+                       column(7, h6("Display (loci/pg) : ")),
                        column(
-                         6,
+                         5,
                          selectInput(
                            "locusPerDisplay",
                            label = NULL,
@@ -399,10 +419,8 @@ shinyUI(
                            ),
                            selected =
                              15
-                         ),
-                         offset = 1
-                       ),
-                       column(2, h6("loci"))
+                         )
+                       )
                      )),
                      column(4, column(
                        12,
@@ -426,6 +444,26 @@ shinyUI(
                        #   offset = 1
                        # )
                      )),
+                     column(4,column(4,h6("Height:")),
+                            column(8,
+                                   selectInput(
+                                     "lociHeight",
+                                     label = NULL,
+                                     choices = list(
+                                       "50%" = 0.5,
+                                       "100%" =
+                                         1,
+                                       "150%" =
+                                         1.5,
+                                       "200%" =
+                                         2,
+                                       "500%" =
+                                         5
+                                     ),
+                                     selected =
+                                       1
+                                   )
+                            )),
                      style = "border-bottom: 1px double #d9d9d9;  margin-bottom: 20px; padding-top:15px"
                    ),
                    fluidRow(
