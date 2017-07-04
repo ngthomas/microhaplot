@@ -1847,7 +1847,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
             aspect.ratio =1000)
 
   }, height = function() {
-    ifelse(hapPg$width == 0,
+    ifelse(hapPg$width == 0 || input$selectLocus == "ALL",
            0,
            max(hapPg$width*30, 300))
   })
@@ -1937,7 +1937,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
             plot.margin = unit(c(2, 0, 2, 1), "mm"))
 
   }, height = function() {
-    ifelse(hapPg$width == 0,
+    ifelse(hapPg$width == 0 || input$selectLocus == "ALL",
            0,
            max(hapPg$width*30, 300))
   })
@@ -2007,7 +2007,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
             plot.margin = unit(c(2, 0, 2, 0), "mm"))
 
   }, height = function() {
-    ifelse(hapPg$width == 0,
+    ifelse(hapPg$width == 0 || input$selectLocus == "ALL",
            0,
            max(hapPg$width*30, 300))
   })
