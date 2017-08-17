@@ -9,6 +9,7 @@ library("grid")
 library("scales")
 library("microhaplot")
 library("reshape2")
+library("feather")
 
 
 shinyServer(function(input, output, session) {
@@ -43,31 +44,31 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                             "<p><b>relies only on locus-specific param.</b>: this option disregards the current selection of min. read depth and allelic ratio. ",
                             "Instead, the filtering process uses parameters previously defined at a single-locus level</p>",
                             "<p></p>",
-                            "<p><b>serves as the minimal baseline</b>: this option sets the selected critera as the lower bound</p> "),
+                            "<p><b>serves as the minimal baseline </b>: this option applies the current selected critera as the lower bound. This will irreversibly might change previously defined locus-specific parameters!!</p> "),
              placement="bottom",
              trigger="hover")
 
   dirFiles <- list.files()
-  rds.file <- grep(".rds", dirFiles)
+  feather.file <- grep(".feather", dirFiles)
+  pos.feather.file <- grep("_posinfo.feather", dirFiles)
+  annotate.feather.file <- grep("_annotate.feather", dirFiles)
+  feather.file <- setdiff(feather.file, c(pos.feather.file,annotate.feather.file))
 
+  rds.file <- grep(".rds", dirFiles)
   pos.rds.file <- grep("_posinfo.rds", dirFiles)
   annotate.rds.file <- grep("_annotate.rds", dirFiles)
   rds.file <- setdiff(rds.file, c(pos.rds.file,annotate.rds.file))
+
+  file.name.ls <- c(feather.file, rds.file)
+
   haplo.sum <- NULL
 
-  for (rdsFile in rds.file){
-    colnames.file <- colnames(rdsFile)
-    "group" %in% colnames.file
-
-  }
-
-
-  if (length(rds.file) > 0) {
-    select.file.tem <- dirFiles[rds.file[1]]
+  if (length(file.name.ls) > 0) {
+    select.file.tem <- dirFiles[file.name.ls[1]]
     updateSelectInput(session,
                       "selectDB",
                       selected = select.file.tem,
-                      choices = dirFiles[rds.file])
+                      choices = dirFiles[file.name.ls])
   }
 
   update.Haplo.file <- reactive({
@@ -75,15 +76,34 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         is.null(input$selectDB) || !file.exists(input$selectDB))
       return()
     #cat(file=stderr(), "select DB_", input$selectDB, "_----\n")
-    readRDS(input$selectDB)  %>% ungroup() %>% mutate(id = as.character(id),
-                                                      locus =as.character(locus),
-                                                      group=as.character(group))
+    if(length(grep(".feather", input$selectDB))) {
+    read_feather(input$selectDB)  %>%
+        ungroup() %>%
+        mutate(id = as.character(id),
+               locus =as.character(locus),
+               group=as.character(group)) %>%
+        select(-sum.Phred.C, -max.Phred.C)
+    } else {
+      readRDS(input$selectDB)  %>%
+        ungroup() %>%
+        mutate(id = as.character(id),
+               locus =as.character(locus),
+               group=as.character(group)) %>%
+        select(-sum.Phred.C, -max.Phred.C)
+    }
   })
 
   extract.pos.file <- reactive({
-    pos.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_posinfo.rds")
+    if(length(grep(".feather", input$selectDB))) {
+    pos.file <- strsplit(input$selectDB, split=".feather") %>% unlist %>% paste0(.,"_posinfo.feather")
     if (!file.exists(pos.file)) return ()
-    readRDS(pos.file)
+    read_feather(pos.file)
+    }
+    else {
+      pos.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_posinfo.rds")
+      if (!file.exists(pos.file)) return ()
+      readRDS(pos.file)
+    }
 
   })
 
@@ -91,7 +111,11 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   # keep status (1=keep), annotation
 
   extract.annotate.file <- reactive({
-    annotate.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_annotate.rds")
+    if(length(grep(".feather", input$selectDB))) {
+    annotate.file <- strsplit(input$selectDB, split=".feather") %>% unlist %>% paste0(.,"_annotate.feather") }
+    else{
+      annotate.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_annotate.rds")
+    }
     if (!file.exists(annotate.file)) {
       annotateTab$tbl <- data.frame(locus = as.character(panelParam$locus.label),
                                     ave.entropy = c("NA",rep(0, panelParam$n.locus)),
@@ -105,7 +129,11 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     }
 
 
-    annotateTab$tbl <- readRDS(annotate.file) %>% ungroup() %>% mutate(locus = as.character(locus))
+    if(length(grep(".feather", annotate.file))) {
+    annotateTab$tbl <- read_feather(annotate.file) %>% ungroup() %>% mutate(locus = as.character(locus)) }
+    else {
+      annotateTab$tbl <- readRDS(annotate.file) %>% ungroup() %>% mutate(locus = as.character(locus))
+    }
 
 
   })
@@ -725,8 +753,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     annotateTab$tbl$status[match.indx] <- input$locusAccept
     annotateTab$tbl$comment[match.indx] <- input$locusComment[1]
 
-    annotate.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_annotate.rds")
-    saveRDS(annotateTab$tbl, annotate.file)
+    if(length(grep(".feather", input$selectDB))) {
+    annotate.file <- strsplit(input$selectDB, split=".feather") %>% unlist %>% paste0(.,"_annotate.feather")
+    write_feather(annotateTab$tbl, annotate.file) }
+    else {
+      annotate.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_annotate.rds")
+      saveRDS(annotateTab$tbl, annotate.file)
+    }
 
   })
 
@@ -749,8 +782,14 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     annotateTab$tbl$min.rd[match.indx] <-  filterParam$minRD
     annotateTab$tbl$min.ar[match.indx] <-  filterParam$minAR
 
-    annotate.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_annotate.rds")
-    saveRDS(annotateTab$tbl, annotate.file)
+    if(length(grep(".feather", input$selectDB))) {
+      annotate.file <- strsplit(input$selectDB, split=".feather") %>% unlist %>% paste0(.,"_annotate.feather")
+      write_feather(annotateTab$tbl, annotate.file) }
+    else {
+      annotate.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_annotate.rds")
+      saveRDS(annotateTab$tbl, annotate.file)
+    }
+
 
   })
 
@@ -833,13 +872,21 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                                annotateTab$tbl,
                                by="locus")
 
-    if ("3" %in% input$filterOpts)
+    if ("3" %in% input$filterOpts) {
       haplo.join.ar <- haplo.join.ar %>% mutate(min.rd = ifelse(filterParam$minRD>min.rd,
                                                                 filterParam$minRD,
                                                                 min.rd),
                                                 min.ar= ifelse(filterParam$minAR>min.ar,
                                                                filterParam$minAR,
                                                                min.ar))
+
+      annotateTab$tbl <- annotateTab$tbl %>% mutate(min.rd = ifelse(filterParam$minRD>min.rd,
+                                                                    filterParam$minRD,
+                                                                    min.rd),
+                                                    min.ar= ifelse(filterParam$minAR>min.ar,
+                                                                   filterParam$minAR,
+                                                                   min.ar))
+    }
 
     if (! "2" %in% input$filterOpts)
       haplo.join.ar <- haplo.join.ar %>%
@@ -2600,8 +2647,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       haplo.filter <- Min.filter.haplo()
       if (is.null(haplo.filter)) return()
 
-      haplo.all <- haplo.filter %>% rename("indiv.ID" = id) %>%
-        select(-sum.Phred.C, -max.Phred.C)
+      haplo.all <- haplo.filter %>% rename("indiv.ID" = id) #%>%
+        #select(-sum.Phred.C, -max.Phred.C)
 
     }
 
@@ -2610,8 +2657,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       if (is.null(Filter.haplo.sum())) return()
 
       haplo.all <-
-        Filter.haplo.sum() %>% rename("indiv.ID" = id) %>%
-        select(-sum.Phred.C, -max.Phred.C)
+        Filter.haplo.sum() %>% rename("indiv.ID" = id) #%>%
+        #select(-sum.Phred.C, -max.Phred.C)
 
       #if ("mapq" %in% colnames(haplo.all)) haplo.all <- haplo.all %>% select(-mapq)
 
