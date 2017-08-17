@@ -95,13 +95,13 @@ to work for the specialized task of extracting and analyzing microhaplotypes.
 
 The starting point for haPLOT requires:
 
-1.  An indexed, BAM file of reads aligned to the reference sequences for each amplicon.
+1.  An indexed, SAM file of reads aligned to the reference sequences for each amplicon.
 2. A VCF file whose contents define the positions in each reference sequence from which
 you want to extract variants into microhaplotypes.  Note that the *individuals* that appear
 in the VCF file need not be the same ones whose reads appear in the assemblies.  The VCF
 is merely used as a way of defining positions to extract. Still, since the content of microhaplotype 
 is based on the variant positions listed in the VCF file, it is crucial for the VCF file
-to only contain highly relieable variant sites.
+to only contain highly reliable variant sites.
 
 
 
