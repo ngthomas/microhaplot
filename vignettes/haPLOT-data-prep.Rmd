@@ -267,4 +267,3 @@ haplo.read.tbl <- runHaplot(run.label = run.label,
            app.path=app.path)
 ```
 
-*** need to make modification on the rockfish data ***
