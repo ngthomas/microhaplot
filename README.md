@@ -1,12 +1,16 @@
 # microhaplot   
 
-`microhaplot` generates visual summaries of microhaplotypes found in short read alignments. All you need are alignment SAM files and variant call VCF file.
+`microhaplot` generates visual summaries of microhaplotypes found in short read alignments. All you need are alignment SAM 
+files and a variant call VCF file. (The latter tells `microhaplot` which SNPs to include into microhaplotypes).  It was 
+designed for extracting and visualized haplotypes from high-quality amplicon sequencing data.  We have used it extensively
+to process amplicon sequencing data (with 100 to 500 amplicons) from rockfish and Chinook salmon, generated on an Illumina 
+MiSeq sequencer.  It should be extensible to sequences from capture arrays, like RAPTURE data.
 
-This software exists as a an R package `microhaplot` that includes within it the code to set up and 
+This software exists as an R package `microhaplot` that includes within it the code to set up and 
 establish an Rstudio/Shiny server to visualize and manipulate the data.  There are two key steps in 
 the `microhaplot` worflow:
 
-1. The first step is to summarize alignment and variation data into a single data frame that is 
+1. The first step is to summarize alignment and variant (SNP) data into a single data frame that is 
 easily operated upon.  This is done using the function `microhaplot::runHaplot`.  You must supply a 
 VCF file that includes variants that you are interested in extracting, and as many SAM files 
 (one for each individual) that you want to extract read information from at each of the variants. 
@@ -17,7 +21,7 @@ for later use.  Depending on the size of the data set, this can take a few minut
 
 2. The second step is to run the haPLOType Shiny app to visualize the sequence information, call genotypes using
 simple read-depth based filtering criteria, and curate the loci. haPLOType is suitable for quick assesement
-and quality control of haplotype generated from library runs. Plot summaries include read depth, fraction of callable haplotypes, Hardy-Weinberg
+and quality control of haplotypes generated from library runs. Plot summaries include read depth, fraction of callable haplotypes, Hardy-Weinberg
 equilibrium plots, and more. 
 
 
@@ -53,7 +57,7 @@ vignette("haPLOType-walkthrough")
 Now, having done that, we can launch haPLOType on the example data:
 ```r
 library(microhaplot)
-app.path <- "~/Shiny/"
+app.path <- "~/Shiny/microhaplot"
 runHaplotype(app.path)
 ```
 
