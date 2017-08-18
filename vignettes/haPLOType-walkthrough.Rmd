@@ -1,8 +1,9 @@
 ---
-title: "A First Walk Through haPLOType"
+title: "Walkthough guide to haPLOType"
 author: "Thomas Ng and Eric C. Anderson"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{microhaPlot walkthrough}
   %\VignetteEngine{knitr::rmarkdown}
@@ -32,21 +33,20 @@ the group "pop2".
 
 ## The Basics
 
-The first thing you will want to get straight is that there are essentially four different "panels" 
-on the haPLOType viewer that will always stay with you.  From top to bottom they are:
+The first thing you will want to get straight is that there are essentially four different "panels" on the haPLOType viewer that will always stay with you.  From top to bottom they are:
 
-1. **The interaction tabsets:**  These are the three tabs that live at the top of the page with the light
+1. **The interaction tabset:**  These are the three tabs that live at the top of the page with the light
 blue background.  Any one of the three: ">field selection", "+read criteria", and "+locus annotation"
 can be selected.  Whichever one is selected determines the content of the panel directly beneath---the
-user input panel, the panel with the light gray background.
-    a. **field Selection tab:** If the "> field selection" tabset is
-selected, then the user input panel will include dropdown boxes that let you choose a group, locus, or
-individual(s) that you wish to focus on (this choice affects what gets shown in different plots and outputs,
+user input panel, the panel with the light gray background.  
+
+    a. **field Selection tab:** If the "> field selection" is selected, then the user input panel will include dropdown boxes that let you choose a group, locus, or individual(s) that you wish to focus on (this choice affects what is shown in different plots and outputs,
 etc.) It also includes "backwards-and-forwards" buttons, "<" and ">", that let you step individually through
-loci (the buttons to the right of "Locus") or through individuals (fish in this case---the buttons to the 
-right of the "Indiv" dropdown box.) These are very useful when you want to work your way through each 
+
+loci (the buttons to the right* of "Locus") or through individuals (fish in this case---the buttons to the 
+right* of the "Indiv" dropdown box.) These are very useful when you want to work your way through each 
 locus individually and choose those that do (and do not) appear to be reliable enough to include in a 
-panel of amplicons.
+panel of amplicons. * - Note: the location and relative position of each button might change pending on the width of the viewing window.
     b. **read criteria tab:** In the "+ read criteria" tab, you are given the choice to define the minimal read depth and minimal allelic ratio that microhaplotypes must have to pass through the read depth and allelic ratio filters.
    _Minimal Read Depth_ defines the minimal number of reads that are observed for a particular microhaplotype in a single individual's locus. It can only take values greater than or equal to 0.
    The _allelic ratio_ or _allelic balance_ is defined as the ratio of the observed read depth of a microhaplotype to the read depth of the most common microhaplotype in an individual at a locus.
@@ -58,21 +58,20 @@ panel of amplicons.
    There are other options that located on the right hand side that gives you more ways to define filtering criteria. Details for each of the options are shown if you hover your pointer over it. 
     c. **locus annotation:** This tab is for users to keep track of whether a certain locus should be tossed out based on its quality or other attributes. This is most useful when a particular locus has been chosen under the "field selection" panel. There is also a small textbox that lets you insert any comment regarding the locus group. Remember to press the save button for submission. All of this annotation information can be retreived under the table selection for "locus annotation" under `Output` tab.
 
-
 1. **The main body panel:** This occupies most of haPLOType's screen real estate.  It is where the actual
 plots, tables, and other results are rendered.  What gets rendered here depends on which main body panel
 has been chosen.  That choice is made using the *main panel choice tabset* described below.
-1. The **main panel choice tabset** is always down at the bottom, and is a tabset that allows you to choose the contents 
+1. The **main panel choice tabset** is always down at the bottom, and is a tabset that allows you to choose the contents
 of the main body panel:
-    a. *Panel:* which data set do you want to explore.  When you started haPLOType it should have had the 
+    a. *Panel:* which data set do you want to explore.  When you started haPLOType it should have had the
     dropdown menu for "fish2_example.rds".
     b. *Summary Info: * let's you choose plot-summaries that give you a good overview of the characteristics of groups, individuals, or loci.
-    c. *Filter Analysis:* let's you explore 1) a tabular summary (the "Broad Summary") of the number of haplotypes observed and 
+    c. *Filter Analysis:* let's you explore 1) a tabular summary (the "Broad Summary") of the number of haplotypes observed and
     individuals called subject to different levels of filtering. 2) "Criteria Breakdown" shows the distribution of read depths
     and the allelic depth ratios of different haplotypes at individual loci, and 3) "Microhap Summaries" shows haplotype frequencies,
-    and a visual summary of conformance to Hardy-Weinberg proportions of individual loci, and also portrays the position of the 
+    and a visual summary of conformance to Hardy-Weinberg proportions of individual loci, and also portrays the position of the
     variants within the sequence.
-    d. *Inferential Analysis: * is a wrapper that integrates with the "Sr.MicroHap" Bayesian haplotype caller which is 
+    d. *Inferential Analysis: * is a wrapper that integrates with the "Sr.MicroHap" Bayesian haplotype caller which is
     in development still.
     e. *Output: * provides a place to get a number of tabular views of the data that are sortable and searchable.  This can
     be very useful when you want to dig into the nitty-gritty details of the short read data.  It also allows you to download
@@ -81,10 +80,10 @@ of the main body panel:
     
 With that background we are ready to start exploring the example data.
 
-## Mission one: An overview of loci 
+## Mission one: An overview of loci
 
-The first thing we are going to do is get an overview of the data with no filtering, focusing on 
-different loci.  Not surprisingly, for this we choose *Summary Info --> By Locus*.  We also want to 
+The first thing we are going to do is get an overview of the data with no filtering, focusing on
+different loci.  Not surprisingly, for this we choose *Summary Info --> By Locus*.  We also want to
 make sure that we are starting from the defaults in ">field selection" (ALL group, ALL loci, ALL individuals),
 and under "+read criteria" you want to ensure that "Minimal Read Depth" and "Minimal Allelic Ratio" are
 both set to 0.  (If you had changed these before, then, once you set them back to 0, you should hit the "apply"
@@ -99,16 +98,16 @@ the loci, 15 at a time by choosing which page to go to using the "Page" selector
 
 The four figures shown in this By Locus summary are, from left to right:
 
-1. The distribution of the number of haplotypes observed per individual.  Recall that these are subject to the 
+1. The distribution of the number of haplotypes observed per individual.  Recall that these are subject to the
 current filters, of which there are none, so each haplotype, even if it is only observed at a read depth of
 1 read in an individual is counted as observed.  This plot is a bubble plot that essentially is giving
 histogram-like information.  The y-axis has different loci on different lines.  The x-axis is the number of unique haplotypes
 and the size and shading of the bubbles indicate how many individuals in the data set had the given 
 number of unique haplotypes.    It is particularly revealing to have a peek at the locus `tag_id_1166`.  Most individuals
-have a large number of different haplotypes, likely occurring at very low read depths.  At any rate, this 
+have a large number of different haplotypes, likely occurring at very low read depths.  At any rate, this
 plot makes it clear that there are a lot of low-read-depth sequences that are superfluous and incorrect.
 
-1. Moving to the right is another figure that has loci arranged on the y-axis and number of haplotypes on the 
+1. Moving to the right is another figure that has loci arranged on the y-axis and number of haplotypes on the
 x-axis.  However, in this case, the number is counting the total number of unique haplotypes observed at the
 locus when only the two highest-read-depth haplotypes are recorded per individual.
 
@@ -145,10 +144,10 @@ the loci, just double click the body of the left figure.
 
 ## Mission Two: An overview of individauls
 
-We can take those same filters we just applied and get a good overview of our sequencing data on an 
+We can take those same filters we just applied and get a good overview of our sequencing data on an
 individual basis.  Go ahead of choose *Summary Info-->By Individual*.  from the main panel choice
 tabset.  The initial screen that comes up includes only 15 of the individuals.  We can change that
-by choosing "ALL" in the "Display ----- indivs" dropdown. 
+by choosing "ALL" in the "Display ----- indivs" dropdown.
 
 This "By Individuals" summary view of the data provides four different plots.  From left to right they
 are:
@@ -174,47 +173,47 @@ values as dots within them.
 
 It should be noted that the colors of the bubbles on the left-most graph indicate the different
 groups that the individuals fall into.  This is particularly useful when individuals from different
-populations or species are in the alignment.  In the case of our example data, we have merely 
+populations or species are in the alignment.  In the case of our example data, we have merely
 assigned half of the individuals to be from "pop1" and the other half from "pop2".
 
 ### Spotting some dodgy individuals
 
-This overview of all the individuals gives us a good chance to spot a few problem fish 
-right off the bat.  Just scanning down the fraction of loci that the individuals might be 
+This overview of all the individuals gives us a good chance to spot a few problem fish
+right off the bat.  Just scanning down the fraction of loci that the individuals might be
 called at, it is clear that s45 and s277 have not been well sequenced.  That is clear by
-looking at the distribution of read depths across loci.  Perhaps even more intriguing is 
-individual s288 that seems to have pretty reasonable read depths, but very poor allelic 
+looking at the distribution of read depths across loci.  Perhaps even more intriguing is
+individual s288 that seems to have pretty reasonable read depths, but very poor allelic
 balance.  
 
 ### Looking at the raw counts for s288
 
 At this point, we may as well have a tour of the facilities for visualizing the data
 in tabular format.  If we want to see the tabular data for individual s288, it
-is fairly straightforward --- choose "Output" from the main panel choice tabset.   By 
+is fairly straightforward --- choose "Output" from the main panel choice tabset.   By
 default this will show a few lines of the "Observed variants (unfiltered)" table.
 You can change which table is viewed using the "Select Table" dropdown, but unfiltered
 observed variants is great for now.  
 
 In the search box on the right, enter s288 and hit return.  This will filter the table to only
-those rows that include s288.  Once that is done, click on the "locus" column heading to 
+those rows that include s288.  Once that is done, click on the "locus" column heading to
 sort entries by locus.  Voila! Now you can peruse all the observed variants and their read
 depths at this individual s288.  Where it says "Show 15 entries" you should change the "15"
 to "All".  This will give you a single scrollable window of all the entries for s288.  Note that
 the column "Haplo" gives the sequence of the reads at the variable positions.  These are
 essentially the haplotypic states of the reads.
 
-Going through the data for 288, it is clear that there will be some genotypes that are not 
+Going through the data for 288, it is clear that there will be some genotypes that are not
 straightforward to call.  For example, at locus `tag_id_879` there are three different
-haplotypes with read depths over 50:  128 reads of CCCTCTG, 100 reads of CCCTCAG, and 
-57 of GCCCCTG.  That is clearly going to be difficult to genotype.  Perhaps this 
+haplotypes with read depths over 50:  128 reads of CCCTCTG, 100 reads of CCCTCAG, and
+57 of GCCCCTG.  That is clearly going to be difficult to genotype.  Perhaps this
 individual has contaminated DNA or represents two individuals that were barcoded equivalently.
 It probably should be tossed out of the final data set.
 
 ### Raw count data for a less dodgy individual?
 
-So, the data for s288 was a little disquieting, but recall that was an individual that 
+So, the data for s288 was a little disquieting, but recall that was an individual that
 looked pathological from the very beginning.  So, what if we look at the raw count
-data for an individual that doesn't look so dodgy?  This will be a good exercise to 
+data for an individual that doesn't look so dodgy?  This will be a good exercise to
 build up some intuition about how genotyping might be done with microhaplotype read
 data.
 
@@ -231,9 +230,9 @@ are largely quite similar.
 When we start to get down to the level of assessing how well it appears different amplicons will
 allow genotyping via microhaplotypes, it is time to turn to the "Filter Analysis" panel choice.
 First, go ahead and choose *Filter Analysis --> Broad Summary*.  This view gives you a tabular
-perspective on the outcome of different filtering choices on the total number of haplotypes 
+perspective on the outcome of different filtering choices on the total number of haplotypes
 recorded in the data set.  The field selection choices that are present are applied here. So,
-if ALL loci are selected, then it counts up the total number of haplotypes typed and the total 
+if ALL loci are selected, then it counts up the total number of haplotypes typed and the total
 number of individuals typed at all loci.  If you select just one locus, the results reflect that
 one locus.
 
@@ -249,28 +248,28 @@ these when broken down by haplotype.  The filtering choices in effect appear as 
 To see how the inferred haplotypes look in terms of haplotype frequencies, and also how the genotypes
 look in terms of Hardy-Weinberg equilibrium, you can choose *Filter Analysis --> Microhap Summaries*.
 This view consists of four figures.  The first, in the upper left simply shows the frequencies (and the total read depth) of
-different haplotypes.  The right hand part of that same top figure shows the relationship between the 
+different haplotypes.  The right hand part of that same top figure shows the relationship between the
 observed frequency of different genotypes and the expected frequencies under Hardy-Weinberg equilibrium.
-The individuals used in creating these summaries depends on which "Group" is chosen.  In this case we have 
+The individuals used in creating these summaries depends on which "Group" is chosen.  In this case we have
 "ALL" chosen, and that is fine because the two groups are essentially identical, genetically.  However,
-if we were dealing with groups that were genetically differentiated, we would not want to assess 
+if we were dealing with groups that were genetically differentiated, we would not want to assess
 conformance to Hardy-Weinberg proportions of a mixture of those different groups!  In such a case
 it is worthwhile to look at one group at a time.
 
 The expected number of different genotypes is shown by the oulines of circles and the observed number by the
-filled, colored circles.  Green are homozygotes, orange are heterozygotes, and it should be relatively 
-self-explanatory.  There is not a scale, but if you click in the center of any of the genotypes with 
+filled, colored circles.  Green are homozygotes, orange are heterozygotes, and it should be relatively
+self-explanatory.  There is not a scale, but if you click in the center of any of the genotypes with
 observed (non-zero) counts, you will be told (in the upper left of the figure) what the expected and
 observed numbers were for that genotype.  These plots are not meant to provide a stringent test
-of departures from Hardy-Weinberg equilibrium, but do allow the user to diagnose loci that are 
+of departures from Hardy-Weinberg equilibrium, but do allow the user to diagnose loci that are
 grotesquely far out of Hardy-Weinberg equilibrium.
 
-Below the haplotype frequencies and HW conformance plots you will find a simple bubble plot 
+Below the haplotype frequencies and HW conformance plots you will find a simple bubble plot
 expressing haplotype frequencies in the different groups.  In the case of the example data there
 are only two different groups and they have very similar allele frequencies.  This plot becomes more
 useful when one is comparing allele frequencies across many different groups.
 
-Finally, you may need to scroll down to see the final figure in this display.  It is a reprentation of the 
+Finally, you may need to scroll down to see the final figure in this display.  It is a representation of the
 haplotype sequences, their frequencies, and the positions of the variants within them along each amplicon.
 
 ## Output of data
@@ -281,9 +280,6 @@ saves output in CSV files.
 
 ## Locus annotation
 
-The program can be used to annotate differrent loci (and assign filtering criteria to them). This 
-annotation can be done using the "+locus annotation" interaction tabset, and the results saved 
+The program can be used to annotate different loci (and assign filtering criteria to them). This
+annotation can be done using the "+locus annotation" interaction tabset, and the results saved
 by downloading the locus annotation data from the *Outputs* panel.
-
-
-
