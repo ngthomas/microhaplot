@@ -497,7 +497,40 @@ shinyUI(
                  tabPanel(
                    h5("Broad Summary"),
                    fluidRow(
+                     column(1, h5("")),
+                     column(11, h6("- Counting overall # of the top two (or all) unique qualified haplotype ")),
+                     column(1, h5("")),
+                     column(11, h6("- Num of indiv w/ calleable haplotype (or w/ more than two qualified haplotype) ")),
+                     # column(1, h6("keeping"), style="margin-bottom: 20px; padding-top:20px; text-align:right"),
+                     # column(2,
+                     #        selectInput("RDnARplotOpt", label ="",
+                     #                        choices = list("at most two" = 1,
+                     #                                       "all" = 2),
+                     #                        selected = 1)),
+                     # column(7, h6("qualified haplotypes per individual"),
+                     #        style="margin-bottom: 20px; padding-top:20px; text-align:left"),
                      column(12, plotOutput("RDnARplot", height = "auto"))
+                   ),
+                   fluidRow(
+                     div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
+                   )
+                 ),
+
+                 tabPanel(
+                   h5("Questioneable Call"),
+                   column(12, plotOutput("ambigIndivPlot", height = "auto")),
+                   column(12, plotOutput("ambigLociPlot", height = "auto")),
+                   fluidRow(
+                     column(12,bsAlert("cutoffhapAlert")),
+                     column(12, h6("top 2 common haplotype (top) vs non-top 2 haplotype (bottom)")),
+                     column(2, plotOutput("uchaplabel", height = "auto"),
+                            style="padding-left:0px; padding-right:0px"
+                     ),
+                     column(5, plotOutput("uchapReadDepth", height = "auto")),
+                     column(5, plotOutput("uchapAllelicRatio", height = "auto"))
+                   ),
+                   fluidRow(
+                     div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
                    )
                  ),
 
@@ -536,7 +569,6 @@ shinyUI(
                      div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
                    )
                  ),
-
 
       #locus assessement panel
 
@@ -667,6 +699,10 @@ shinyUI(
       # table panel
       tabPanel(
         "Output",
+        fixedPanel(
+          #top="200px",
+          style = "z-index:9;background-color:white; margin-top: -20px; padding-top: 10px; height:80px",
+          width="100%",
         fluidRow(
           column(
           6,
@@ -681,7 +717,7 @@ shinyUI(
                 "reported indiv haplotype", "SNP report", "locus annotation"),
               selected = "observed variants (unfiltered)"
             ),
-            style = "padding-right: 0px; margin-top:-20px;margin-bottom:-20px;padding-left:0%; padding-right: 0px;"
+            style = "background-color:white; padding-right: 0px; margin-top:-20px;margin-bottom:-30px;padding-left:0%; padding-right: 0px;"
           )
         ),
         column(6, column(
@@ -690,14 +726,15 @@ shinyUI(
           column(4, downloadButton('downloadData', 'Download'))
           #column(8, "* tbl is sensitve to field selection")
         )),
-        style = "border-bottom: 1px double #d9d9d9;  margin-bottom: 40px; padding-top:15px; padding-bottom:20px"),
+        style = "border-bottom: 1px double #d9d9d9;  margin-bottom: 40px; padding-top:15px; padding-bottom:20px")
+        ),
 
         #style = "border-bottom: 2px dashed #d9d9d9; border-top: 2px dashed #d9d9d9; margin-bottom: 5px; margin-top: 10px; padding-bottom: 15px; padding-top:15px"),
 
 
 
         column(12, DT::dataTableOutput('haploTbl'),
-               style = "padding-bottom: 40px; border-bottom: 8px solid white; background: white"),
+               style = "padding-bottom: 40px; border-bottom: 8px solid white; background: white; margin-top: 120px;"),
         fluidRow(
           div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
         )
