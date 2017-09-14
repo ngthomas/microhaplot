@@ -1,5 +1,5 @@
-library(shiny)
-library(shinyBS)
+library("shiny")
+library("shinyBS")
 library("ggplot2")
 library("plyr")
 library("dplyr")
@@ -799,17 +799,21 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.sum <- Filter.haplo.sum()
     if (is.null(haplo.sum))
       return ()
-    haplo.filter <- haplo.sum %>% filter(rank <=2)
 
-    haplo.filter <- haplo.filter %>%
-      group_by(locus, id, group) %>%
-      arrange(-depth) %>%
-      summarise(
-        haplotype.1 = ifelse(length(depth) == 1, haplo[1], sort(haplo)[1]),
-        haplotype.2 = ifelse(length(depth) == 1, haplo[1], sort(haplo)[2]),
+    pi <- haplo.sum %>%
+      group_by(group, locus, id) %>%
+      summarise(potential.issue = 1*(max(rank) > 2))
+
+    hap <- haplo.sum %>% filter(rank <=2) %>%
+      arrange(haplo) %>%
+      group_by(group, locus, id) %>%
+                summarise(
+        haplotype.1 = haplo[1],
+        haplotype.2 = ifelse(max(rank)==1, haplo[1], haplo[2]),
         read.depth.1 = depth[1],
-        read.depth.2 = ifelse(length(depth) == 1, depth[1], depth[2])
-      )
+        read.depth.2 = ifelse(max(rank) ==1, depth[1], depth[2]))
+
+    left_join(hap, pi, by=c("group","locus","id"))
   })
 
   haplo.freqTbl <- reactive({
@@ -1780,6 +1784,257 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     )
   })
 
+  # panel that takes potential issues in calling haplotypes for individuals with more than two filtered haplotypes
+
+  output$ambigIndivPlot <- renderPlot({
+
+    if (is.null(input$selectLocus) ||
+        is.null(input$selectIndiv) ||
+        input$selectDB == "" ||
+        is.null(input$selectDB) || is.null(locusPg$l)) {
+      return()
+    }
+
+    haplo.filter <- Min.filter.haplo()
+    if(is.null(Min.filter.haplo)) return()
+
+    haplo.rep <- haplo.filter %>%
+      filter(depth >= filterParam$minRD,
+             allele.balance >= filterParam$minAR) %>%
+      group_by(id, locus) %>%
+      summarise(n.accept.haplo = 1*(max(rank)>2)) %>%
+      group_by(id) %>%
+      summarise(n.loci.ambig = sum(n.accept.haplo)) %>%
+      group_by(n.loci.ambig) %>%
+      summarise(n.indiv = n(),
+                indiv.label = ifelse(n.indiv > 10,
+                                     paste0(c(id[1:10],"..."),collapse = "\n"),
+                                     paste0(id,collapse = "\n")))
+
+    max.x <- max(haplo.rep$n.loci.ambig)
+
+    ggplot(haplo.rep, aes(x=n.loci.ambig, y=1, size=n.indiv))+
+      geom_point(aes(color=factor(n.loci.ambig)))+
+      #geom_text(aes(label=n.indiv), color="white")+
+      geom_text(aes(label=indiv.label, y=0.8), hjust="center", vjust=1, size=4)+
+      xlab("num of loci of individuals with more than two qualified haplotypes") +
+      ylab("")+
+      theme_bw()+
+      scale_color_discrete(guide=F)+
+      scale_size_continuous(range = c(4, 18), guide = FALSE) +
+      scale_x_continuous(limits=c(0,max.x+1),breaks=round(seq(0,max.x,
+                                                              length.out= ifelse(max.x >20,
+                                                                                 20,max.x+1))),minor_breaks = F,
+                         position = "top")+
+      scale_y_continuous(limits=c(0,1.2),breaks=1,minor_breaks = NULL,labels = NULL)+
+      theme(axis.text.y = element_blank(),
+            axis.ticks.y = element_blank(),
+            panel.grid.major.x = element_blank(),
+            axis.ticks.x = element_line(colour = "black"),
+            panel.border=element_rect(size = 0,linetype = "blank"),
+            plot.margin = unit(c(2, 0, 6, -5), "mm"))
+  }, height = 400)
+
+  output$ambigLociPlot <- renderPlot({
+
+    if (is.null(input$selectLocus) ||
+        is.null(input$selectIndiv) ||
+        input$selectDB == "" ||
+        is.null(input$selectDB) || is.null(locusPg$l)) {
+      return()
+    }
+
+    haplo.filter <- Min.filter.haplo()
+    if(is.null(Min.filter.haplo)) return()
+
+    haplo.rep <- haplo.filter %>%
+      filter(depth >= filterParam$minRD,
+             allele.balance >= filterParam$minAR) %>%
+      group_by(id, locus) %>%
+      summarise(n.accept.haplo = 1*(max(rank)>2)) %>%
+      group_by(locus) %>%
+      summarise(n.indiv.ambig = sum(n.accept.haplo)) %>%
+      group_by(n.indiv.ambig) %>%
+      summarise(n.loci = n(),
+                loci.label = ifelse(n.loci > 10,
+                                     paste0(c(locus[1:10],"..."),collapse = "\n"),
+                                     paste0(locus,collapse = "\n")))
+
+    max.x <- max(haplo.rep$n.indiv.ambig)
+
+    if(is.null(max.x)) return()
+    ggplot(haplo.rep, aes(x=n.indiv.ambig, y=1, size=n.loci))+
+      geom_point(aes(color=factor(n.indiv.ambig)))+
+      #geom_text(aes(label=n.indiv), color="white")+
+      geom_text(aes(label=loci.label, y=0.8), hjust="center", vjust=1, size=4)+
+      xlab("num of individuals that calls more than two qualified haplotypes /loci") +
+      ylab("")+
+      theme_bw()+
+      scale_color_discrete(guide=F)+
+      scale_size_continuous(range = c(4, 18), guide = FALSE) +
+      scale_x_continuous(limits=c(0,max.x+1),breaks=round(seq(0,max.x,
+                                                              length.out= ifelse(max.x >20,
+                                                                                 20,max.x+1))),minor_breaks = F,
+                         position = "top")+
+      scale_y_continuous(limits=c(0,1.2),breaks=1,minor_breaks = NULL,labels = NULL)+
+      theme(axis.text.y = element_blank(),
+            axis.ticks.y = element_blank(),
+            panel.grid.major.x = element_blank(),
+            axis.ticks.x = element_line(colour = "black"),
+            panel.border=element_rect(size = 0,linetype = "blank"),
+            plot.margin = unit(c(2, 0, 6, -5), "mm"))
+  }, height = 400)
+
+  output$uchaplabel <- renderPlot({
+
+    if (is.null(input$selectLocus) ||
+        input$selectLocus == "ALL" ||
+        is.null(input$selectIndiv) ||
+        input$selectDB == "" ||
+        is.null(input$selectDB) || is.null(locusPg$l)) {
+      return()
+    }
+
+    haplo.filter <- Min.filter.haplo()
+    if(is.null(Min.filter.haplo)) return()
+
+    haplo.rep <- haplo.filter %>% filter(depth >= filterParam$minRD,
+                                         allele.balance >= filterParam$minAR) %>%
+      select(haplo) %>% unique %>% unlist()
+
+    if(length(haplo.rep)>30) cat(file=stderr(), "You are requesting display for 30+ microhaplotype.Please adjust the critera to narrow down further.\n")
+    if (length(haplo.rep)==0 | length(haplo.rep)>30) return()
+
+
+    haplo.rep.df <- data.frame(haplo=factor(haplo.rep, level=sort(haplo.rep,decreasing=T)),
+                               x=0,
+                               y=0)
+
+    ggplot(haplo.rep.df, aes(x,y, fill=haplo))+
+      geom_point(size=0, color="white")+
+      #geom_density(adjust=0.5, color=NA)+
+      facet_grid(haplo~., scales="free_y")+
+      scale_x_continuous("",breaks=NULL,limits=c(0,0.1))+
+      scale_fill_discrete(guide=FALSE,direction=-1)+
+      scale_y_continuous("",breaks=NULL,limits=c(0,0.1))+ #breaks=1
+      theme_bw()+
+      theme(strip.text.y = element_text(angle =360, margin=margin(0,2,0,0)),
+            strip.background  = element_rect(fill="white",size = 0,linetype = "blank"),
+            panel.border=element_rect(fill="white",size = 0,linetype = "blank"),
+            panel.spacing = unit(0, 'mm'),
+            plot.margin = unit(c(2, 0, 6, -5), "mm"),
+            aspect.ratio =1000)
+
+  }, height = function() {
+    ifelse(hapPg$width == 0 || input$selectLocus == "ALL",
+           0,
+           max(hapPg$width*30, 300))
+  })
+
+  output$uchapReadDepth <- renderPlot({
+
+    if (is.null(input$selectLocus) ||
+        input$selectLocus == "ALL" ||
+        is.null(input$selectIndiv) ||
+        input$selectDB == "" ||
+        is.null(input$selectDB) || is.null(locusPg$l)) {
+      return()
+    }
+
+    haplo.filter <- Min.filter.haplo()
+    if(is.null(Min.filter.haplo)) return()
+
+    haplo.rep <- haplo.filter %>% filter(depth >= filterParam$minRD,
+                                         allele.balance >= filterParam$minAR) %>%
+      select(haplo) %>% unique %>% unlist()
+
+    if (length(haplo.rep)==0 | length(haplo.rep)>30) return()
+
+
+    haplo.match.rep <- haplo.filter %>% filter(haplo %in% haplo.rep) %>%
+      group_by(haplo, id) %>%
+      mutate(top.2 = ifelse(rank <=2, 0.1, -0.1))
+
+    if (nrow(haplo.match.rep)==0) return()
+
+    ggplot(haplo.match.rep)+
+      geom_point(data=haplo.match.rep, aes(x=depth, y=top.2, color=factor(top.2), pch=factor(top.2)),size=4, alpha=1)+
+      facet_grid(haplo~.)+#, scales="free_y")+
+      scale_x_log10("distrib. of read depth")+
+      scale_color_discrete(guide=FALSE)+
+      scale_shape_discrete(guide=F)+
+      #scale_y_continuous("",breaks=NULL)+ #breaks=1
+      theme_bw()+
+      geom_vline(
+        xintercept = filterParam$minRD,
+        linetype = "dashed",
+        color = "red"
+      )+
+      scale_y_continuous("",limits=c(-0.3,0.3),breaks=0,minor_breaks = NULL,labels = NULL)+
+      theme(axis.text.y = element_blank(),
+            axis.ticks.y = element_blank(),
+            strip.text.y = element_text(angle =360,size=0, margin=margin(0,0,0,0)),
+            panel.spacing = unit(0, 'mm'),
+            panel.border = element_rect(size = 0,colour = "white"),
+            plot.margin = unit(c(2, 0, 2, 1), "mm"))
+
+  }, height = function() {
+    ifelse(hapPg$width == 0 || input$selectLocus == "ALL",
+           0,
+           max(hapPg$width*30, 300))
+  })
+
+  output$uchapAllelicRatio <- renderPlot({
+
+    if (is.null(input$selectLocus) ||
+        input$selectLocus == "ALL" ||
+        is.null(input$selectIndiv) ||
+        input$selectDB == "" ||
+        is.null(input$selectDB) || is.null(locusPg$l)) {
+      return()
+    }
+
+    haplo.filter <- Min.filter.haplo()
+
+    haplo.rep <- haplo.filter %>% filter(depth >= filterParam$minRD,
+                                         allele.balance >= filterParam$minAR) %>%
+      select(haplo) %>% unique %>% unlist()
+
+    if (length(haplo.rep)==0 | length(haplo.rep)>30) return()
+
+    haplo.match.rep <- haplo.filter %>% filter(haplo %in% haplo.rep) %>%
+      group_by(haplo, id) %>%
+      mutate(top.2 = ifelse(rank <=2, 0.1, -0.1))
+
+    if (nrow(haplo.match.rep)==0) return()
+
+  ggplot(haplo.match.rep)+
+    geom_point(data=haplo.match.rep, aes(x=allele.balance, y=top.2, color=factor(top.2), pch=factor(top.2)),size=4, alpha=1)+
+    facet_grid(haplo~.)+#, scales="free_y")+
+    scale_x_log10("distrib. of allelic ratio",breaks=c(0.01,0.1,0.2,0.5,1))+
+    scale_color_discrete(guide=FALSE)+
+    scale_shape_discrete(guide=F)+
+    #scale_y_continuous("",breaks=NULL)+ #breaks=1
+    theme_bw()+
+    geom_vline(
+      xintercept = filterParam$minAR,
+      linetype = "dashed",
+      color = "red"
+    )+
+    scale_y_continuous("",limits=c(-0.3,0.3),breaks=0,minor_breaks = NULL,labels = NULL)+
+    theme(axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          strip.text.y = element_text(angle =360,size=0, margin=margin(0,0,0,0)),
+          panel.spacing = unit(0, 'mm'),
+          panel.border = element_rect(size = 0,colour = "white"),
+          plot.margin = unit(c(2, 0, 2, 0), "mm"))
+
+  }, height = function() {
+    ifelse(hapPg$width == 0 || input$selectLocus == "ALL",
+           0,
+           max(hapPg$width*30, 300))
+  })
+
 
   ## filter status:cutoff distribution panel
 
@@ -1872,7 +2127,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                                          allele.balance >= filterParam$minAR) %>%
       select(haplo) %>% unique %>% unlist()
 
-    if (length(haplo.rep)==0) return()
+    if (length(haplo.rep)==0 | length(haplo.rep)>30) return()
 
     haplo.rep.df <- data.frame(haplo=factor(haplo.rep, level=sort(haplo.rep,decreasing=T)),
                                x=0,
@@ -1918,6 +2173,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.rep <- haplo.filter %>% filter(rank <= 2,depth >= filterParam$minRD,
                                          allele.balance >= filterParam$minAR) %>%
       select(haplo) %>% unique %>% unlist()
+
+    if (length(haplo.rep)==0 | length(haplo.rep)>30) return()
 
     haplo.match.rep <- haplo.filter %>% filter(haplo %in% haplo.rep) %>%
       mutate(haplo=factor(haplo, level=sort(haplo.rep,decreasing=T))) %>%
@@ -2005,6 +2262,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                                          allele.balance >= filterParam$minAR) %>%
       select(haplo) %>% unique %>% unlist()
 
+    if (length(haplo.rep)==0 | length(haplo.rep)>30) return()
+
     haplo.match.rep <- haplo.filter %>% filter(haplo %in% haplo.rep) %>%
       mutate(haplo=factor(haplo, level=sort(haplo.rep,decreasing=T))) %>%
       group_by(haplo) %>%
@@ -2058,7 +2317,6 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
            0,
            max(hapPg$width*30, 300))
   })
-
 
   ##ABOUT HAPLOTYPE distribution panel
 
@@ -2476,7 +2734,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   output$RDnARplot <- renderPlot({
     if (is.null(input$selectIndiv) ||
         input$selectDB == "" ||
-        is.null(input$selectDB) || is.null(locusPg$l))
+        is.null(input$selectDB) || is.null(locusPg$l) ||
+        length(filterParam$minRD) ==0)
       return ()
 
 
@@ -2492,25 +2751,34 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     hap.sel <- Min.filter.haplo()
     if(is.null(hap.sel)) return()
-    hap.sel <- hap.sel %>% filter(rank <=2)
+
+    hap.top.2 <- hap.sel %>% filter(rank <=2)
 
     label.grid <- apply(rd.af.grid, 1, function(i){
       af<-i[1]
       rd<-i[2]
-      hap.sel %>%
+      hap.2 <- hap.top.2 %>%
         filter(depth >= rd,
                allele.balance >= af) %>%
         group_by(locus) %>%
         summarise(num.hap = length(unique(haplo)), num.pass.indiv = length(unique(id))) %>%
         ungroup() %>%
-        summarise(descr = paste0(sum(num.hap),
-                                 " hap,\n",
-                                 round(mean(num.pass.indiv,na.rm = T)),
-                                 " indiv"
-                                 #"(",
-                                 #round(mean(num.pass.indiv)*100/panelParam$n.indiv,2),
-                                 #"%)"
-        ))
+        summarise(num.hap.pass = sum(num.hap),
+                  num.indiv.pass = round(mean(num.pass.indiv,na.rm = T)))
+
+      hap.all <- hap.sel %>% filter(depth >= rd, allele.balance >= af) %>% group_by(locus) %>%
+        summarise(num.hap = length(unique(haplo)), num.ambig.indiv = sum(rank==3)) %>%
+        ungroup() %>%
+        summarise(num.hap.pass.2 = sum(num.hap),
+                  num.ambig.ind = round(mean(num.ambig.indiv,na.rm = T)))
+
+      cbind(hap.all, hap.2) %>%
+        summarise(descr = ifelse(num.hap.pass == num.hap.pass.2,
+                                 paste0(num.hap.pass, " hap,\n",
+                                        num.indiv.pass, " (",num.ambig.ind,") indiv"),
+                                 paste0(num.hap.pass," (",num.hap.pass.2,") hap,\n",
+                                        num.indiv.pass, " (",num.ambig.ind,") indiv")
+                                 ))
     }) %>% bind_rows()
 
     rd.af.grid.tbl <- cbind(rd.af.grid, label.grid)
@@ -2518,7 +2786,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     rd.af.grid.tbl <- rd.af.grid.tbl %>%
       group_by(af,rd)%>%
-      mutate(color.grp = 1*(filterParam$minRD==rd) + (1*filterParam$minAR==af))
+      mutate(color.grp = 1*(filterParam$minRD==rd) + 1*(filterParam$minAR==af))
 
     ggplot(rd.af.grid.tbl, aes(x=factor(rd), y=factor(af))) +
       geom_tile(color="black", aes(fill=factor(color.grp)), size=0.1, linetype="dashed")+
@@ -2621,18 +2889,22 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     #observeEvent(input$selectTbl, {
 
     if (input$selectTbl == "reported indiv haplotype") {
-      if (is.null(haplo.freqTbl())) return()
-      haplo.freq <-
-        haplo.freqTbl() %>% mutate(
+
+      haplo.summary <- haplo.summaryTbl()
+      if (is.null(haplo.summary))
+        return()
+
+      haplo.freq <- haplo.freqTbl() %>% mutate(
           obs.freq = round(obs.freq, 3),
           expected.freq = round(expected.freq, 3)
         )
-      haplo.all.tbl <-
-        haplo.summaryTbl() %>% rename("indiv.ID" = id)
+
+
       haplo.all <-
-        left_join(haplo.all.tbl,
+        left_join(haplo.summary %>% rename("indiv.ID" = id),
                   haplo.freq,
                   by = c("locus", "haplotype.1", "haplotype.2"))
+
       # haplo.isAccept <-
       #   data.frame(
       #     locus = panelParam$locus.label.bare,
