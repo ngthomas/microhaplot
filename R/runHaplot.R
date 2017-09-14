@@ -76,23 +76,26 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
   if(!file.exists(paste0(out.path,"/intermed"))) dir.create(paste0(out.path,"/intermed"))
 
   # catch any problem in label file
-  read.label <- tryCatch(read.table(label.path,sep="\t"), error = function(c) {
+  read.label <- tryCatch(read.table(label.path,sep="\t",stringsAsFactors = F), error = function(c) {
     c$message <- paste0(c$message, " (in ", label.path , ")")
     stop(c)
   })
   if (dim(read.label)[2]<3) stop(label.path, "contains less than 3 columns.")
 
 
-  i <- 1
-  garb <- apply(read.label, 1, function(line) {
-    if(!file.exists(paste0(sam.path,"/",line[1]))) stop("the sam file, ", sam.path,"/",line[1], ", does not exist")
+
+  garb <- sapply(1:nrow(read.label), function(i) {
+
+    line <- read.label[i,] %>% unlist
+    if(!file.exists(paste0(sam.path,"/",line[1]))) stop("the SAM file, ",
+                                                        sam.path,"/",line[1], ", does not exist")
     run.perl.script <- paste0("perl ", haptureDir,
       " -v ", vcf.path, " ",
       " -s ", sam.path, "/", line[1],
       " -i ", line[2],
       " -g ", line[3], " > ",
       out.path, "/intermed/", run.label, "_", line[2],"_",i,".summary &");
-    i <<- i+1
+
     write(run.perl.script,
       file=paste0(out.path, "/runHapture.sh"),
       append=T)
@@ -138,8 +141,8 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
     haplo.cleanup <- haplo.sum %>% dplyr::select(group, id, locus, haplo, depth, sum.Phred.C, max.Phred.C)}
 
   haplo.add.balance <- haplo.cleanup %>%
+    dplyr::arrange(desc(depth)) %>%
     dplyr::group_by(locus,id) %>%
-    dplyr::arrange(-depth) %>%
     dplyr::mutate(allele.balance = depth/depth[1], rank=row_number() ) %>%
     dplyr::ungroup()
 
