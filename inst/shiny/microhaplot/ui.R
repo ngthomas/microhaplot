@@ -518,8 +518,20 @@ shinyUI(
 
                  tabPanel(
                    h5("Questioneable Call"),
-                   column(12, plotOutput("ambigIndivPlot", height = "auto")),
-                   column(12, plotOutput("ambigLociPlot", height = "auto")),
+                   column(12, plotOutput("ambigIndivPlot", height = "auto",
+                                         dblclick = dblclickOpts(id = "aip_dblclick"),
+                                         brush = brushOpts(
+                                           id = "aip_Brush",
+                                           direction = "x",
+                                           resetOnNew = TRUE
+                                         ))),
+                   column(12, plotOutput("ambigLociPlot", height = "auto",
+                                         dblclick = dblclickOpts(id = "alp_dblclick"),
+                                         brush = brushOpts(
+                                           id = "alp_Brush",
+                                           direction = "x",
+                                           resetOnNew = TRUE
+                                         ))),
                    fluidRow(
                      column(12,bsAlert("cutoffhapAlert")),
                      column(12, h6("top 2 common haplotype (top) vs non-top 2 haplotype (bottom)")),
