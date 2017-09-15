@@ -185,7 +185,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   })
 
   # needs better label
-  ranges <- reactiveValues(y = NULL, x = NULL)
+  ranges <- reactiveValues(y = NULL, x = NULL, aip = NULL, alp = NULL)
   rangesH <- reactiveValues(y = NULL)
 
   locusPg <- reactiveValues(l = NULL, width = NULL)
@@ -1608,6 +1608,23 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     }
   })
 
+  observeEvent(input$aip_dblclick, {
+    brush <- input$aip_Brush
+    if (!is.null(brush)) {
+      ranges$aip <- c(brush$xmin, brush$xmax)
+    } else {
+      ranges$aip <- 0
+    }
+  })
+
+  observeEvent(input$alp_dblclick, {
+    brush <- input$alp_Brush
+    if (!is.null(brush)) {
+      ranges$alp <- c(brush$xmin, brush$xmax)
+    } else {
+      ranges$alp <- 0
+    }
+  })
 
   # by-group distribution panel
 
@@ -1809,22 +1826,28 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       summarise(n.indiv = n(),
                 indiv.label = ifelse(n.indiv > 10,
                                      paste0(c(id[1:10],"..."),collapse = "\n"),
-                                     paste0(id,collapse = "\n")))
+                                     paste0(id,collapse = "\n")),
+                label.position.y = ifelse(n.indiv%%2==1,0.8,0.77))
 
     max.x <- max(haplo.rep$n.loci.ambig)
+    if(length(ranges$aip)==1 | is.null(ranges$aip[1])) ranges$aip <- c(0,max.x+1)
 
     ggplot(haplo.rep, aes(x=n.loci.ambig, y=1, size=n.indiv))+
       geom_point(aes(color=factor(n.loci.ambig)))+
       #geom_text(aes(label=n.indiv), color="white")+
-      geom_text(aes(label=indiv.label, y=0.8), hjust="center", vjust=1, size=4)+
+      geom_text(aes(label=indiv.label, y=label.position.y), hjust="center", vjust=1, size=4)+
       xlab("num of loci of individuals with more than two qualified haplotypes") +
       ylab("")+
       theme_bw()+
       scale_color_discrete(guide=F)+
       scale_size_continuous(range = c(4, 18), guide = FALSE) +
-      scale_x_continuous(limits=c(0,max.x+1),breaks=round(seq(0,max.x,
-                                                              length.out= ifelse(max.x >20,
-                                                                                 20,max.x+1))),minor_breaks = F,
+      scale_x_continuous(limits=ranges$aip,
+                         breaks=round(seq(ranges$aip[1],
+                                          ranges$aip[2],
+                                          length.out= ifelse(ranges$aip[2]-ranges$aip[1] >20,
+                                                             20,
+                                                             (ranges$aip[2]-ranges$aip[1])+1))),
+                         minor_breaks = F,
                          position = "top")+
       scale_y_continuous(limits=c(0,1.2),breaks=1,minor_breaks = NULL,labels = NULL)+
       theme(axis.text.y = element_blank(),
@@ -1858,23 +1881,29 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       summarise(n.loci = n(),
                 loci.label = ifelse(n.loci > 10,
                                      paste0(c(locus[1:10],"..."),collapse = "\n"),
-                                     paste0(locus,collapse = "\n")))
+                                     paste0(locus,collapse = "\n")),
+                label.position.y = ifelse(n.loci%%2==1,0.8,0.77))
 
     max.x <- max(haplo.rep$n.indiv.ambig)
+    if(length(ranges$alp)==1 | is.null(ranges$alp[1])) ranges$alp <- c(0,max.x+1)
 
     if(is.null(max.x)) return()
     ggplot(haplo.rep, aes(x=n.indiv.ambig, y=1, size=n.loci))+
       geom_point(aes(color=factor(n.indiv.ambig)))+
       #geom_text(aes(label=n.indiv), color="white")+
-      geom_text(aes(label=loci.label, y=0.8), hjust="center", vjust=1, size=4)+
+      geom_text(aes(label=loci.label, y=label.position.y), hjust="center", vjust=1, size=4)+
       xlab("num of individuals that calls more than two qualified haplotypes /loci") +
       ylab("")+
       theme_bw()+
       scale_color_discrete(guide=F)+
       scale_size_continuous(range = c(4, 18), guide = FALSE) +
-      scale_x_continuous(limits=c(0,max.x+1),breaks=round(seq(0,max.x,
-                                                              length.out= ifelse(max.x >20,
-                                                                                 20,max.x+1))),minor_breaks = F,
+      scale_x_continuous(limits=ranges$alp,
+                         breaks=round(seq(ranges$alp[1],
+                                          ranges$alp[2],
+                                          length.out= ifelse(ranges$alp[2]-ranges$alp[1] >20,
+                                                             20,
+                                                             (ranges$alp[2]-ranges$alp[1])+1))),
+                         minor_breaks = F,
                          position = "top")+
       scale_y_continuous(limits=c(0,1.2),breaks=1,minor_breaks = NULL,labels = NULL)+
       theme(axis.text.y = element_blank(),
