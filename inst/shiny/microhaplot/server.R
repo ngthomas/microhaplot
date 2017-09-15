@@ -1927,12 +1927,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.filter <- Min.filter.haplo()
     if(is.null(Min.filter.haplo)) return()
 
-    haplo.rep <- haplo.filter %>% filter(depth >= filterParam$minRD,
+
+    haplo.rep <- haplo.filter %>% filter(rank <=2, depth >= filterParam$minRD,
                                          allele.balance >= filterParam$minAR) %>%
       select(haplo) %>% unique %>% unlist()
 
-    if(length(haplo.rep)>30) cat(file=stderr(), "You are requesting display for 30+ microhaplotype.Please adjust the critera to narrow down further.\n")
-    if (length(haplo.rep)==0 | length(haplo.rep)>30) return()
+    if(length(haplo.rep)>50) cat(file=stderr(), "You are requesting display for 50+ microhaplotype.Please adjust the critera to narrow down further.\n")
+    if (length(haplo.rep)==0 | length(haplo.rep)>50) return()
 
 
     haplo.rep.df <- data.frame(haplo=factor(haplo.rep, level=sort(haplo.rep,decreasing=T)),
@@ -1973,11 +1974,11 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.filter <- Min.filter.haplo()
     if(is.null(Min.filter.haplo)) return()
 
-    haplo.rep <- haplo.filter %>% filter(depth >= filterParam$minRD,
+    haplo.rep <- haplo.filter %>% filter(rank <=2,depth >= filterParam$minRD,
                                          allele.balance >= filterParam$minAR) %>%
       select(haplo) %>% unique %>% unlist()
 
-    if (length(haplo.rep)==0 | length(haplo.rep)>30) return()
+    if (length(haplo.rep)==0 | length(haplo.rep)>50) return()
 
 
     haplo.match.rep <- haplo.filter %>% filter(haplo %in% haplo.rep) %>%
@@ -2025,11 +2026,11 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     haplo.filter <- Min.filter.haplo()
 
-    haplo.rep <- haplo.filter %>% filter(depth >= filterParam$minRD,
+    haplo.rep <- haplo.filter %>% filter(rank <=2,depth >= filterParam$minRD,
                                          allele.balance >= filterParam$minAR) %>%
       select(haplo) %>% unique %>% unlist()
 
-    if (length(haplo.rep)==0 | length(haplo.rep)>30) return()
+    if (length(haplo.rep)==0 | length(haplo.rep)>50) return()
 
     haplo.match.rep <- haplo.filter %>% filter(haplo %in% haplo.rep) %>%
       group_by(haplo, id) %>%
@@ -2156,7 +2157,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                                          allele.balance >= filterParam$minAR) %>%
       select(haplo) %>% unique %>% unlist()
 
-    if (length(haplo.rep)==0 | length(haplo.rep)>30) return()
+    if (length(haplo.rep)==0 | length(haplo.rep)>50) return()
 
     haplo.rep.df <- data.frame(haplo=factor(haplo.rep, level=sort(haplo.rep,decreasing=T)),
                                x=0,
@@ -2203,7 +2204,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                                          allele.balance >= filterParam$minAR) %>%
       select(haplo) %>% unique %>% unlist()
 
-    if (length(haplo.rep)==0 | length(haplo.rep)>30) return()
+    if (length(haplo.rep)==0 | length(haplo.rep)>50) return()
 
     haplo.match.rep <- haplo.filter %>% filter(haplo %in% haplo.rep) %>%
       mutate(haplo=factor(haplo, level=sort(haplo.rep,decreasing=T))) %>%
@@ -2291,7 +2292,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                                          allele.balance >= filterParam$minAR) %>%
       select(haplo) %>% unique %>% unlist()
 
-    if (length(haplo.rep)==0 | length(haplo.rep)>30) return()
+    if (length(haplo.rep)==0 | length(haplo.rep)>50) return()
 
     haplo.match.rep <- haplo.filter %>% filter(haplo %in% haplo.rep) %>%
       mutate(haplo=factor(haplo, level=sort(haplo.rep,decreasing=T))) %>%
