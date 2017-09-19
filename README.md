@@ -72,11 +72,11 @@ First you need to create a tab-separate **label** file with 3 info columns: path
 
 The `label` file looks like this:
 ```txt
-s6.sam  s6      gopher
+s6.sam  s6      copper
 s11.sam s11     copper
-s13.sam s13     kelp
+s13.sam s13     gold
 s14.sam s14     kelp
-s18.sam s18     gopher
+s18.sam s18     gold
 ``` 
 
 Once you have the label file in place, you can run `runHaplot`, a R function that generates tables of microhaplotype, by providing the following:
