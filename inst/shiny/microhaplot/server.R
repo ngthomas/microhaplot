@@ -17,17 +17,25 @@ shinyServer(function(input, output, session) {
 
   output$about <- renderUI({
     HTML(
-      paste("<strong>Microhaplot</strong> offers a streamline visual environment to assess quality of microhaplotype extracted from short read alignment files.
+      paste("<strong>Microhaplot</strong> offers a streamline visual environment to assess quality of microhaplotype from short read alignment files.
           You can find most of the interactive features such as defining critera or adding locus comments at the top panel
 while the bottom panel hosts a wide selection of tables and graphical summaries.",
-            "<br/>",
+            "",
             "<i>Summary Info</i>: microhaplotype summaries that are either grouped by group label, individual, or locus. These plots are great
           for gathering the big picture",
+            "",
             "<i>Filter Analysis</i>: this section is useful to fine-tune your criteria at a single locus level",
+            "",
             "<i>Inferential Analysis</i>: still in the works",
+            "",
             "<i>Output</i>: You can view or download tables of raw or finalized microhaplotypes (in csv format)",
-            "<br/>",
+            "",
             "<b>Contact & Citation</b>",
+            "If you have questions or suggest, feel free to contact me at <b>tngthomasng@gmail.com</b>",
+            "",
+            "<b>citation</b>: Ng, Thomas C. & Anderson Eric C. (2017, June 30). ngthomas/microhaplot: microhaplotype viewer. Zenodo. http://doi.org/10.5281/zenodo.821679",
+            "<br/>",
+            '<a href="https://doi.org/10.5281/zenodo.821679"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.821679.svg" alt="DOI"></a>',
             sep="<br/>"))
   })
 
