@@ -392,6 +392,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     filterParam$minRD <- input$coverageMin
     filterParam$minAR <- input$minAlleleRatio
     Filter.haplo.by.RDnAR()
+    ranges$aip <- 0
+    ranges$alp <- 0
   })
 
   observeEvent(input$selectGroup, {
@@ -1821,7 +1823,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     }
 
     haplo.filter <- Min.filter.haplo()
-    if(is.null(Min.filter.haplo)) return()
+    if(is.null(Min.filter.haplo)) {return()}
 
     haplo.rep <- haplo.filter %>%
       filter(depth >= filterParam$minRD,
