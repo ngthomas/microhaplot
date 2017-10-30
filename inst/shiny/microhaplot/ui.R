@@ -534,7 +534,7 @@ shinyUI(
                                          ))),
                    fluidRow(
                      column(12,bsAlert("cutoffhapAlert")),
-                     column(12, h6("top 2 common haplotype (top) vs non-top 2 haplotype (bottom)")),
+                     column(12, ""),#h6("top 2 common haplotype (top) vs non-top 2 haplotype (bottom)")),
                      column(2, plotOutput("uchaplabel", height = "auto"),
                             style="padding-left:0px; padding-right:0px"
                      ),
