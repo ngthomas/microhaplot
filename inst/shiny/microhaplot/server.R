@@ -196,8 +196,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   ranges <- reactiveValues(y = NULL, x = NULL, aip = NULL, alp = NULL)
   rangesH <- reactiveValues(y = NULL)
 
-  locusPg <- reactiveValues(l = NULL, width = NULL)
-  indivPg <- reactiveValues(i = NULL, width = NULL)
+  locusPg <- reactiveValues(l = NULL, width = NULL, maxPg = 1)
+  indivPg <- reactiveValues(i = NULL, width = NULL, maxPg = 1)
   groupPg <- reactiveValues(g = NULL, width = 1)
   hapPg <- reactiveValues(width = NULL, HW.exp= NULL, HW.obs= NULL, HW.tbl=NULL,
                           indiv.hap.grp=NULL)
@@ -450,6 +450,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       output$maxlocusPage <- renderText({
         "1"
       })
+      locusPg$maxPg <- 1
       updateNumericInput(session, "locusPage", value = 1, max = 1)
 
       updateCheckboxGroupInput(session,
@@ -483,6 +484,10 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
               as.numeric(input$locusPerDisplay)
           ))
         })
+      locusPg$maxPg <- ceiling(
+        as.numeric(panelParam$n.locus) /
+          as.numeric(input$locusPerDisplay)
+      )
       updateNumericInput(
         session,
         "locusPage",
@@ -521,6 +526,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       output$maxlocusPage <- renderText({
         "1"
       })
+      locusPg$maxPg <- 1
       updateNumericInput(session, "locusPage", value = 1, max = 1)
       locusPg$l <- input$selectLocus
       rangesH$y <- c(0, 2)
@@ -530,6 +536,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         output$maxlocusPage <- renderText({
           "1"
         })
+        locusPg$maxPg <- 1
         updateNumericInput(session,
                            "locusPage",
                            value = 1,
@@ -545,6 +552,10 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                 as.numeric(input$locusPerDisplay)
             ))
           })
+        locusPg$maxPg <- ceiling(
+          as.numeric(panelParam$n.locus) /
+            as.numeric(input$locusPerDisplay)
+        )
         #cat(file=stderr(), "haha_", as.numeric(panelParam$n.locus)/as.numeric(input$locusPerDisplay), "_----\n")
         updateNumericInput(session, "locusPage", max = ceiling(
           as.numeric(panelParam$n.locus)
@@ -562,10 +573,11 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   })
 
   observeEvent(input$locusPage, {#updateLocusSizeDisplay, {
-    if(input$locusPage <=0){
-      updateNumericInput(session, "locusPage", value = 1)
-      return()
-    }
+    if(is.null(input$locusPage) | is.na(input$locusPage) |!is.numeric(input$locusPage)) return()
+
+    if(input$locusPage <=0) updateNumericInput(session, "locusPage", value = 1)
+
+    if(input$locusPage > locusPg$maxPg) updateNumericInput(session, "locusPage", value = locusPg$maxPg)
 
     if (input$selectLocus == "ALL") {
       if (input$locusPerDisplay == 100) {
@@ -604,6 +616,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       output$maxIndivPage <- renderText({
         "1"
       })
+      indivPg$maxPg <- 1
       updateNumericInput(session, "indivPage", value = 1, max = 1)
       indivPg$i <- input$selectIndiv
       ranges$y <- c(0, 2)
@@ -616,6 +629,9 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
               as.numeric(input$indivPerDisplay)
           ))
         })
+      indivPg$maxPg <- ceiling(
+        as.numeric(panelParam$n.indiv) /
+          as.numeric(input$indivPerDisplay))
       updateNumericInput(
         session,
         "indivPage",
@@ -662,6 +678,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       output$maxIndivPage <- renderText({
         "1"
       })
+      indivPg$maxPg <- 1
       updateNumericInput(session, "indivPage", value = 1, max = 1)
       indivPg$i <- input$selectIndiv
       ranges$y <- c(0, 2)
@@ -671,6 +688,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         output$maxIndivPage <- renderText({
           "1"
         })
+        indivPg$maxPg <- 1
         updateNumericInput(session,
                            "indivPage",
                            value = 1,
@@ -686,6 +704,10 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                 as.numeric(input$indivPerDisplay)
             ))
           })
+        indivPg$maxPg <- ceiling(
+          as.numeric(panelParam$n.indiv) /
+            as.numeric(input$indivPerDisplay)
+        )
         updateNumericInput(session, "indivPage", max = ceiling(
           as.numeric(panelParam$n.indiv)
           / as.numeric(input$indivPerDisplay)
@@ -702,9 +724,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   })
 
   observeEvent(input$indivPage, { #updateIndivSizeDisplay
+    if(is.null(input$indivPage) | is.na(input$indivPage) |!is.numeric(input$indivPage)) return()
     if(input$indivPage <=0){
       updateNumericInput(session, "indivPage", value = 1)
-      return()
+      #return()
+    }
+    if(input$indivPage > indivPg$maxPg) {
+      updateNumericInput(session, "indivPage", value = indivPg$maxPg)
     }
 
     if (input$selectIndiv == "ALL") {
@@ -1993,12 +2019,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     haplo.match.rep <- haplo.filter %>% filter(haplo %in% haplo.rep) %>%
       group_by(haplo, id) %>%
-      mutate(top.2 = ifelse(rank <=2, 0.1, -0.1))
+      mutate(top.2 = ifelse(rank ==1, 0.2, ifelse(rank==2, 0, -0.2)),
+             rank.mod = ifelse(rank ==1, 0, ifelse(rank==2, 1, 2)))
 
     if (nrow(haplo.match.rep)==0) return()
 
     ggplot(haplo.match.rep)+
-      geom_point(data=haplo.match.rep, aes(x=depth, y=top.2, color=factor(top.2), pch=factor(top.2)),size=4, alpha=1)+
+      geom_point(data=haplo.match.rep, aes(x=depth, y=top.2, color=factor(rank.mod), pch=factor(top.2)),size=2.5, alpha=0.9)+
       facet_grid(haplo~.)+#, scales="free_y")+
       scale_x_log10("distrib. of read depth")+
       scale_color_discrete(guide=FALSE)+
@@ -2044,12 +2071,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     haplo.match.rep <- haplo.filter %>% filter(haplo %in% haplo.rep) %>%
       group_by(haplo, id) %>%
-      mutate(top.2 = ifelse(rank <=2, 0.1, -0.1))
+      mutate(top.2 = ifelse(rank ==1, 0.2, ifelse(rank==2, 0, -0.2)),
+             rank.mod = ifelse(rank ==1, 0, ifelse(rank==2, 1, 2)))
 
     if (nrow(haplo.match.rep)==0) return()
 
   ggplot(haplo.match.rep)+
-    geom_point(data=haplo.match.rep, aes(x=allele.balance, y=top.2, color=factor(top.2), pch=factor(top.2)),size=4, alpha=1)+
+    geom_point(data=haplo.match.rep, aes(x=allele.balance, y=top.2, color=factor(rank.mod), pch=factor(top.2)),size=2.5, alpha=0.9)+
     facet_grid(haplo~.)+#, scales="free_y")+
     scale_x_log10("distrib. of allelic ratio",breaks=c(0.01,0.1,0.2,0.5,1))+
     scale_color_discrete(guide=FALSE)+
