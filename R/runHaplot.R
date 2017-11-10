@@ -89,19 +89,20 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
     line <- read.label[i,] %>% unlist
     if(!file.exists(paste0(sam.path,"/",line[1]))) stop("the SAM file, ",
                                                         sam.path,"/",line[1], ", does not exist")
+
+    wait.ln <- ifelse(i%%10==0,";wait;",";")
+
     run.perl.script <- paste0("perl ", haptureDir,
       " -v ", vcf.path, " ",
       " -s ", sam.path, "/", line[1],
       " -i ", line[2],
       " -g ", line[3], " > ",
-      out.path, "/intermed/", run.label, "_", line[2],"_",i,".summary &");
+      out.path, "/intermed/", run.label, "_", line[2],"_",i,".summary &",
+      wait.ln);
 
     write(run.perl.script,
       file=paste0(out.path, "/runHapture.sh"),
       append=T)
-    if(i%%10==0) write("wait;",
-                       file=paste0(out.path, "/runHapture.sh"),
-                       append=T)
   })
 
 
