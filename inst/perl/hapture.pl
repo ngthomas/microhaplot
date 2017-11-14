@@ -94,6 +94,7 @@ while(<SAM>) {
 	#skip if the alignment id is not found in the vcf hash ref
 	next if not defined $vcf->{$id};
 
+  next if $lines[5] eq "*";
 	my $cigar = Bio::Cigar->new($lines[5]);
 	my @qseq = split "", $lines[9];
 	my @qseq_qual = split "", $lines[10];
@@ -130,12 +131,12 @@ while(<SAM>) {
 
 	$hap->{$id}->{$hapRead->{"seq"}}->{"ct"}++;
 	for my $i (0..$#{$vcf->{$id}}) {
-	  
+
 	  if(! defined ${$hap->{$id}->{$hapRead->{"seq"}}->{"maxC"}}[$i]) {
 	 	${$hap->{$id}->{$hapRead->{"seq"}}->{"maxC"}}[$i] = 0;
 	 	${$hap->{$id}->{$hapRead->{"seq"}}->{"sC"}}[$i] = 0;
 	 	}
-	 	
+
 		my $q = 10**(-(ord(${$hapRead->{"qual"}}[$i])-33)/10);
 		#${$hap->{$id}->{$hapRead->{"seq"}}->{"logC"}}[$i]+= log(1-$q) ;
 	 	#${$hap->{$id}->{$hapRead->{"seq"}}->{"logW"}}[$i]+= log($q);
