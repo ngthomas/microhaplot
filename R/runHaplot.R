@@ -115,7 +115,16 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
 
   summary.tbl<-paste0(out.path,"/intermed/all.summary")
 
+  system(paste0("rm -f ",summary.tbl))
+
   concat.file <- paste0("cat ",out.path, "/intermed/", run.label, "_", "*.summary",">",summary.tbl)
+
+  # just in case if the user has loads of sam files and running out of buffer
+  if(nrow(read.label)>100) {
+    concat.file <- paste0("find ",out.path, "/intermed -name ", run.label, "_", "*.summary",
+                          "| while read F; do cat ${F} >>",summary.tbl, ";done")
+  }
+
   system(concat.file)
 
   haplo.sum <- read.table(summary.tbl, stringsAsFactors = FALSE, sep="\t") %>% dplyr::tbl_df()
