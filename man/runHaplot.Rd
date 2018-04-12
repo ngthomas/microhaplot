@@ -5,8 +5,8 @@
 \title{Extract haplotype from alignment reads.}
 \usage{
 runHaplot(run.label, sam.path, label.path, vcf.path, out.path = sam.path,
-  add.filter = FALSE, app.path = system.file("shiny", "haPLOType", package =
-  "haplot"))
+  add.filter = FALSE, app.path = system.file("shiny", "microhaplot", package
+  = "microhaplot"))
 }
 \arguments{
 \item{run.label}{character vector. Run label to be used to display in haPLOType. Required}
@@ -24,7 +24,7 @@ runHaplot(run.label, sam.path, label.path, vcf.path, out.path = sam.path,
 \item{app.path}{string. Path to shiny haPLOType app. Optional. If not specified, the path is default to local app path.}
 }
 \description{
-The function \code{haplot} extracts haplotype from sequence alignment files through perl script \code{hapture} and returns a summary table of the read depth and read quality associate with haplotype.
+The function \code{microhaplot} extracts haplotype from sequence alignment files through perl script \code{hapture} and returns a summary table of the read depth and read quality associate with haplotype.
 }
 \examples{
 run.label<-"example 1"
@@ -33,4 +33,3 @@ label.path <- "data/satro_sample/sample_label.txt"
 vcf.path <- "data/satro_sample/sebastes.vcf"
 # runHaplot(run.label, sam.path, label.path, vcf.path)
 }
-
