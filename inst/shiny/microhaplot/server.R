@@ -1702,30 +1702,34 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     all.indiv <-
       update.Haplo.file() %>% group_by(group, locus) %>% summarise(nIndiv = ifelse(input$selectIndiv !=
                                                                                      "ALL", 1, length(unique(id))))
+
+
     filter.indiv <-
       Filter.haplo.sum() %>% group_by(group, locus) %>% summarise(fIndiv = length(unique(id)))
     frac.calleable <-
       left_join(filter.indiv, all.indiv, by = c("group", "locus")) %>% mutate(f =
                                                                                 fIndiv / nIndiv)
 
+
     filter.indiv <- filter.indiv %>% group_by(group) %>% summarise(fIndiv = round(mean(fIndiv)))
 
+    mean.f.tbl <- frac.calleable %>% group_by(group) %>%
+      summarise(mean.f = mean(f, na.rm = T))
 
-    mean.f.tbl <-
-      frac.calleable %>% group_by(group) %>% summarise(mean.f = mean(f, na.rm =
-                                                                       T))
-    #     if(is.null(frac.calleable)) return()
+
+    #if(is.null(frac.calleable)) return()
     #     frac.calleable[is.na(frac.calleable)]<- 0
     #
     #     if (input$selectLocus != "ALL") {
     #       frac.calleable <- frac.calleable %>% filter(locus == input$selectLocus)
     #     }
 
-    ggplot(frac.calleable, aes(x = f, y = group, color = group)) +
-      geom_point(alpha = 0.5) +
+
+    ggplot()+
+      geom_point(data=frac.calleable, aes(x = f, y = group, color = group), alpha = 0.5) +
       geom_point(
         data = mean.f.tbl,
-        aes(y = group, x = mean.f),
+        aes(x = mean.f, y = group),
         color = "black",
         pch = 3,
         cex = 3
@@ -1807,8 +1811,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     #       frac.calleable <- frac.calleable %>% filter(locus == input$selectLocus)
     #     }
 
-    ggplot(frac.calleable, aes(x = f, y = group, color = group)) +
-      geom_point(alpha = 0.5) +
+    ggplot() +
+      geom_point(data=frac.calleable, aes(x = f, y = group, color = group), alpha = 0.5) +
       geom_point(
         data = mean.f.tbl,
         aes(y = group, x = mean.f),
@@ -2024,7 +2028,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     if (nrow(haplo.match.rep)==0) return()
 
-    ggplot(haplo.match.rep)+
+    ggplot()+
       geom_point(data=haplo.match.rep, aes(x=depth, y=top.2, color=factor(rank.mod), pch=factor(top.2)),size=2.5, alpha=0.9)+
       facet_grid(haplo~.)+#, scales="free_y")+
       scale_x_log10("distrib. of read depth")+
@@ -2076,7 +2080,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     if (nrow(haplo.match.rep)==0) return()
 
-  ggplot(haplo.match.rep)+
+  ggplot()+
     geom_point(data=haplo.match.rep, aes(x=allele.balance, y=top.2, color=factor(rank.mod), pch=factor(top.2)),size=2.5, alpha=0.9)+
     facet_grid(haplo~.)+#, scales="free_y")+
     scale_x_log10("distrib. of allelic ratio",breaks=c(0.01,0.1,0.2,0.5,1))+
@@ -2348,8 +2352,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     if (nrow(haplo.match.rep)==0) return()
 
-    g<- ggplot(haplo.match.rep, aes(x=allele.balance, fill=haplo))+
-      geom_histogram(binwidth = 0.05,boundary = -0.05)+
+    g<- ggplot()+
+      geom_histogram(data=haplo.match.rep, aes(x=allele.balance, fill=haplo), binwidth = 0.05,boundary = -0.05)+
       geom_point(data=haplo.match.rep, aes(x=allele.balance, y=0), size=1.2, alpha=0.4)
       #geom_density(adjust=0.1, color=NA)+
 
@@ -2663,14 +2667,14 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     hapPg$HW.tbl <- left_join(haplo.filter, freq.hap ,by=c("hap1", "hap2"))
 
-    ggplot(haplo.filter,
-           aes(
-             x = hap1,
-             y = hap2,
-             size = n,
-             color = hap1 == hap2
-           )) +
-      geom_point() +
+    ggplot() +
+      geom_point(data=haplo.filter,
+                 aes(
+                   x = hap1,
+                   y = hap2,
+                   size = n,
+                   color = hap1 == hap2
+                 )) +
       xlab("H-W plot: haplotype pair (x,y)") +
       ylab("") +
       geom_point(
