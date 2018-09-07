@@ -33,7 +33,9 @@ with the package.
 
 You can either clone the repository and build the `microhaplot` package yourself, or, more easily, you can
 install it using  [devtools](https://github.com/hadley/devtools). You can get `devtools` by `install.packages("devtools")`.
-
+  
+**To mac user: remember to install [XQuartz](https://www.xquartz.org/), when upgrading your macOS to a new major version.**   
+ 
 Once you have `devtools` available in R, you can get `microhaplot` this way:
 ```r
 devtools::install_github("ngthomas/microhaplot", build_vignettes = TRUE)
