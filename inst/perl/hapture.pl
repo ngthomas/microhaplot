@@ -89,6 +89,7 @@ while(<SAM>) {
 	next if /^\@/;
 	my @lines = split "\t";
 	my $id = $lines[2];
+    next if $lines[1] >= 256; # skip entries that are secondary alignment or to multiple sites
 	my $st_qpos = $lines[3]; # starting query position
 	#my $mapq = $lines[4]; # mapping quality score
 	#skip if the alignment id is not found in the vcf hash ref
