@@ -4,12 +4,14 @@ library("ggplot2")
 library("plyr")
 library("dplyr")
 library("tidyr")
+#library("tidyverse")
 library("DT")
 library("grid")
 library("scales")
 library("microhaplot")
-library("reshape2")
+#library("reshape2")
 library("feather")
+library("plotly")
 
 
 shinyServer(function(input, output, session) {
@@ -1997,7 +1999,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
   }, height = function() {
     ifelse(hapPg$width == 0 || input$selectLocus == "ALL",
-           0,
+           1,
            max(hapPg$width*30, 300))
   })
 
@@ -2051,7 +2053,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
   }, height = function() {
     ifelse(hapPg$width == 0 || input$selectLocus == "ALL",
-           0,
+           1,
            max(hapPg$width*30, 300))
   })
 
@@ -2103,12 +2105,68 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
   }, height = function() {
     ifelse(hapPg$width == 0 || input$selectLocus == "ALL",
-           0,
+           1,
            max(hapPg$width*30, 300))
   })
 
 
   ## filter status:cutoff distribution panel
+
+  output$biplot <-renderPlotly({
+    #renderPlot({
+    if (is.null(input$selectLocus) ||
+        input$selectLocus == "ALL" ||
+        is.null(input$selectIndiv) ||
+        input$selectDB == "" ||
+        is.null(input$selectDB) || is.null(locusPg$l)) {
+      return()
+    }
+
+    haplo.filter <- Min.filter.haplo()
+    if(is.null(Min.filter.haplo)) return()
+
+    gdepths <- haplo.filter %>%
+      filter(rank <= 2) %>%
+      arrange(group, id, locus, rank) %>%
+      group_by(group, id, locus) %>%
+      summarise(categ = ifelse(length(rank) ==2 && allele.balance[2] >= filterParam$minAR,
+                               "Het","Homoz"),
+                genotype = ifelse(categ=="Het",
+                                   paste0(sort(c(haplo[1],haplo[2])),collapse = "/"),
+                                   paste0(c(haplo[1],haplo[1]),collapse = "/" ) ),
+                top.depth = max(depth),
+                low.depth = min(depth))
+
+    dataset <- gdepths %>%
+      filter(top.depth <= input$max_read_depth,
+             low.depth <= input$max_read_depth)
+
+    g<-ggplot(dataset, aes(x = low.depth, y = top.depth, fill = genotype, shape = categ, label = id)) +
+      geom_vline(xintercept = 0, colour = "black", size = 0.8) +
+      geom_hline(yintercept = 0, colour = "black", size = 0.8) +
+      geom_point(size = 2, stroke=0.3) +
+      scale_shape_manual(values = c(23, 21)) +
+      geom_abline(intercept = 0, slope = 1/input$blue_ab, colour = "blue") +
+      geom_abline(intercept = 0, slope = 1/input$red_ab, colour = "red") +
+      geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+      coord_fixed(ratio = 1, expand = FALSE)+
+      theme_bw() +
+      theme(
+        panel.spacing = unit(0, 'mm'),
+        panel.border = element_rect(size = 0,colour = "white"),
+        axis.line.y = element_line(color="grey", size = 0.5),
+        plot.margin = unit(c(0, 3, 0, 0), "mm")
+      )+
+      xlab("low read depth")+
+      ylab("max read depth")
+
+    plotly::ggplotly(g, height = 400, width = 900)
+
+  }#, height = function() {
+   # ifelse(hapPg$width == 0 || input$selectLocus == "ALL",
+    #       1,600)}
+  )
+
 
   output$allReadDepth <- renderPlot({
 
@@ -2222,7 +2280,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
   }, height = function() {
     ifelse(hapPg$width == 0 || input$selectLocus == "ALL",
-           0,
+           1,
            max(hapPg$width*30, 300))
   })
 
@@ -2314,7 +2372,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
   }, height = function() {
     ifelse(hapPg$width == 0 || input$selectLocus == "ALL",
-           0,
+           1,
            max(hapPg$width*30, 300))
   })
 
@@ -2386,7 +2444,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
   }, height = function() {
     ifelse(hapPg$width == 0 || input$selectLocus == "ALL",
-           0,
+           1,
            max(hapPg$width*30, 300))
   })
 
@@ -2473,7 +2531,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   }, height = function() {
     ifelse(groupPg$width == 0,
            0,
-           ifelse(input$selectLocus == "ALL", 0, max(hapPg$width*20, 400)))
+           ifelse(input$selectLocus == "ALL", 1, max(hapPg$width*20, 400)))
   })
 
   MakeHapFreqTable <- reactive({
@@ -2573,7 +2631,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   }, height = function() {
     ifelse(groupPg$width == 0,
            0,
-           ifelse(input$selectLocus == "ALL", 0, max(hapPg$width*30, 400)))
+           ifelse(input$selectLocus == "ALL", 1, max(hapPg$width*30, 400)))
   })
 
 
@@ -2701,7 +2759,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   }, height = function() {
     ifelse(groupPg$width == 0,
            0,
-           ifelse(input$selectLocus == "ALL", 0, max(hapPg$width*30, 400)))
+           ifelse(input$selectLocus == "ALL", 1, max(hapPg$width*30, 400)))
   })
 
   # event when haplotype by group
@@ -2796,7 +2854,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   }, height = function() {
     ifelse(groupPg$width == 0,
            0,
-           ifelse(input$selectLocus == "ALL", 0, max(hapPg$width*20, 400)))
+           ifelse(input$selectLocus == "ALL", 1, max(hapPg$width*20, 400)))
   })
 
 
