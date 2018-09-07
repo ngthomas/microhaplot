@@ -2134,14 +2134,14 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                 genotype = ifelse(categ=="Het",
                                    paste0(sort(c(haplo[1],haplo[2])),collapse = "/"),
                                    paste0(c(haplo[1],haplo[1]),collapse = "/" ) ),
-                top.depth = max(depth),
-                low.depth = min(depth))
+                first.depth = depth[1],
+                second.depth = ifelse(length(rank)==2,depth[2],0))
 
     dataset <- gdepths %>%
-      filter(top.depth <= input$max_read_depth,
-             low.depth <= input$max_read_depth)
+      filter(first.depth <= input$max_read_depth,
+             second.depth <= input$max_read_depth)
 
-    g<-ggplot(dataset, aes(x = low.depth, y = top.depth, fill = genotype, shape = categ, label = id)) +
+    g<-ggplot(dataset, aes(x = second.depth, y = first.depth, fill = genotype, shape = categ, label = id)) +
       geom_vline(xintercept = 0, colour = "black", size = 0.8) +
       geom_hline(yintercept = 0, colour = "black", size = 0.8) +
       geom_point(size = 2, stroke=0.3) +
@@ -2157,8 +2157,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         axis.line.y = element_line(color="grey", size = 0.5),
         plot.margin = unit(c(0, 3, 0, 0), "mm")
       )+
-      xlab("low read depth")+
-      ylab("max read depth")
+      xlab("second read depth")+
+      ylab("first read depth")
 
     plotly::ggplotly(g, height = 400, width = 900)
 
