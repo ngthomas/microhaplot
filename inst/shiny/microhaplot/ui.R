@@ -1,5 +1,6 @@
 library(shiny)
 library(shinyBS)
+library(plotly)
 
 # Define UI for application that draws a histogram
 shinyUI(
@@ -540,6 +541,36 @@ shinyUI(
                      ),
                      column(5, plotOutput("uchapReadDepth", height = "auto")),
                      column(5, plotOutput("uchapAllelicRatio", height = "auto"))
+                   ),
+                   fluidRow(
+                     div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
+                   )
+                 ),
+                 tabPanel(
+                   h5("Scatter Analysis"),
+                   fluidRow(
+                     column(3, sliderInput("red_ab",
+                                           label = "Red line allele balance",
+                                           min = 0,
+                                           max = 1,
+                                           value = 0.4,
+                                           step = 0.02)),
+
+                     column(3, sliderInput("blue_ab",
+                                           label = "Blue line allele balance",
+                                           min = 0,
+                                           max = 1,
+                                           value = 0.3,
+                                           step = 0.02)),
+
+                     column(6, shinyWidgets::sliderTextInput("max_read_depth",
+                                                              label = "Max Read Depth To Show On Plot:",
+                                                              choices = 10 * 2^(0:13),
+                                                              selected = 1280,
+                                                              grid = T,
+                                                              width = "600px")),
+                     column(12,plotlyOutput("biplot"), height = "auto")
+                     #plotOutput("biplot"), height = "auto")
                    ),
                    fluidRow(
                      div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
