@@ -15020,8 +15020,7 @@ for my $id (keys %{$hap}){
 				#(join ",", @{$hap->{$id}->{$h}->{"logW"}}), # log scale phred stat for being a miscalled base
 				#(join ",", @{$vcf->{$id}}); # variant position
 				(join ",", @{$hap->{$id}->{$h}->{"sC"}}), # sum of prob for calling correct base
-				(join ",", @{$hap->{$id}->{$h}->{"maxC"}}), # max phred score
-				"\n";
+				(join ",", @{$hap->{$id}->{$h}->{"maxC"}})."\n"; # max phred score
 
 		#print "\t";
 
