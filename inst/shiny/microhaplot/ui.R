@@ -1,11 +1,12 @@
 library(shiny)
 library(shinyBS)
 library(plotly)
+library(shinyWidgets)
 
 # Define UI for application that draws a histogram
 shinyUI(
   fluidPage(
-    style = "padding-top: 180px;z-index: -1;", #180
+    style = "padding-top: 200px;z-index: -1;", #180
     # Application title
     #titlePanel("Haplotype Viewer"),
     absolutePanel(
@@ -109,25 +110,106 @@ shinyUI(
             column(
               12,
               column(
-                6,
+                7,
                 #column(3, "Filter (per indiv) " ,style = "margin-top:35px;font-weight:bold;padding-left:25px;"),
                 #column(4, "Filter (per indiv)", style = "padding-left:25px; margin-top:3%;font-weight:light"),
-                column(6, numericInput(#sliderInput(
-                  "coverageMin",
-                  "Minimal Read Depth",
-                  min = 0,
+                column(4,
+                       chooseSliderSkin("Modern", color = "#3A75DC"),
+                       shinyWidgets::sliderTextInput("n.alleles",
+                                                     label = "Top n Alleles:",
+                                                     choices = c(0:20,Inf),
+                                                     selected = 2,
+                                                     grid = F,
+                                                     width = 150),
+                  #      knobInput(
+                  # inputId = "n.alleles",
+                  # label = "Keeps Top n Alleles:",
+                  # value = 2,
+                  # min = 1,
+                  # max=20,
+                  # displayPrevious = TRUE,
+                  # displayInput = TRUE,
+                  # lineCap = "round",
+                  # fgColor = "#95C4EE",
+                  # inputColor = "#0E88F3",
+                  # thickness = 0.2,
+                  # angleArc=180,
+                  # angleOffset = -90,
+                  # height=55,
+                  # width=100),
+                  style = "margin-top:10px;text-align:center; margin-bottom:0px; padding-bottom:0px"),
+
+                #column(4, numericInput(#sliderInput(
+                 # "coverageMin",
+                 # "Minimal Read Depth",
+                 # min = 0,
                   #max = 200,
-                  value = 0
-                ),style = "margin-top:10px;text-align:center"),
+                 # value = 0
+                #),style = "margin-top:10px;text-align:center"),
                 #column(1, "and",style = "margin-top:35px;padding-left:15px;font-weight:bold"),
                 #column(2, "Min. allelic ratio:", style = "margin-top:4%;padding-left:2%;font-weight:light"),
-                column(6, sliderInput(
-                  "minAlleleRatio",
-                  "Minimal Allelic Ratio",
-                  min = 0,
-                  max = 1.000,
-                  value = 0
-                ),style = "margin-top:10px;text-align:center"),
+                column(4,
+                       shinyWidgets::sliderTextInput("coverageMin",
+                                                     label = "Min Total Read Depth",
+                                                     choices = c(0:30,50,100,1000,Inf),
+                                                     selected = 2,
+                                                     grid = F,
+                                                     width = 150),
+
+                  #      knobInput(
+                  # inputId = "coverageMin",
+                  # label = "Minimal Total Read Depth:",
+                  # value = 0,
+                  # min = 0,
+                  # max=200,
+                  # displayPrevious = TRUE,
+                  # displayInput = TRUE,
+                  # lineCap = "round",
+                  # fgColor = "#FDC19E",
+                  # inputColor = "#FF6E1A",
+                  # thickness = 0.2,
+                  # angleArc=180,
+                  # angleOffset = -90,
+                  # height=55,
+                  # width=100),
+                       style = "margin-top:10px;text-align:center; margin-bottom:0px; margin-right:0px; padding-bottom:0px;padding-right:0px"),
+
+
+                # column(4, sliderInput(
+                #   "minAlleleRatio",
+                #   "Minimal Allelic Ratio",
+                #   min = 0,
+                #   max = 1.000,
+                #   value = 0
+                # ),style = "margin-top:10px;text-align:center"),
+
+                column(4,
+                       shinyWidgets::sliderTextInput("minAlleleRatio",
+                                                     label = "Min Allelic Ratio:",
+                                                     choices = seq(0,1,0.01),
+                                                     selected = 0,
+                                                     grid = F,
+                                                     width = 150),
+                  #      knobInput(
+                  # inputId = "minAlleleRatio",
+                  # label = "Min Allelic Ratio:",
+                  # value = 0.5,
+                  # min = 0,
+                  # max=1,
+                  # step=0.01,
+                  # displayPrevious = TRUE,
+                  # displayInput = TRUE,
+                  # lineCap = "round",
+                  # fgColor = "#BECBE2",#91DCA7
+                  # inputColor = "#3A75DC",#04C43E
+                  # thickness = 0.2,
+                  # angleArc=180,
+                  # angleOffset = -90,
+                  # height=55,
+                  # width=120),
+                  style = "margin-top:10px;text-align:center; margin-bottom:0px; padding-bottom:0px"),
+
+
                 style = "padding: 0 0 0 0; margin: -1% 0 0 0;"
               ),
               column(
@@ -146,7 +228,13 @@ shinyUI(
                                             width="100%",
                                             style = "margin-top:10px; text-align:center"
                                           )), style =
-                         "margin-top:5px; padding-right: 0px;")
+                         "margin-top:0px; padding-right: 0px;")
+              ),
+              column(
+                3,
+                checkboxGroupInput("filterOpts", label = "", choices=list()),
+
+                style = "margin-top:-15px; margin-left:0px; padding: 0 0 0 0"
               ),
               #column(12, "Keep only top two common reads",style="margin-top:10px;font-weight:bold"),
               #column(12, h5("Post Filtered Table:"),downloadButton('downloadData', 'Download'), align="center",
@@ -154,12 +242,6 @@ shinyUI(
               #style="padding: 0 0 0 0; margin: -3% 0 0 0;",
               #tags$style(type='text/css', "#downloadData { vertical-align:center; height: 40px;margin-top:0px;font-size:20px}")),
               #style="padding: 0 0 0 0; margin: 0% 0 0 0;")
-              column(
-                4,
-                checkboxGroupInput("filterOpts", label = "", choices=list("keeps only top two haplotypes (per indiv)"=1)),
-
-                style = "margin-top:-13px;"
-              ),
               style="background:#F7F7F7; padding-top:10px")#,style = "primary")))
             #style="margin-bottom:10px"
                                        ),
@@ -518,7 +600,7 @@ shinyUI(
                  ),
 
                  tabPanel(
-                   h5("Questioneable Call"),
+                   h5("Quality Suspect"),
                    column(12, plotOutput("ambigIndivPlot", height = "auto",
                                          dblclick = dblclickOpts(id = "aip_dblclick"),
                                          brush = brushOpts(
@@ -541,36 +623,6 @@ shinyUI(
                      ),
                      column(5, plotOutput("uchapReadDepth", height = "auto")),
                      column(5, plotOutput("uchapAllelicRatio", height = "auto"))
-                   ),
-                   fluidRow(
-                     div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
-                   )
-                 ),
-                 tabPanel(
-                   h5("Scatter Analysis"),
-                   fluidRow(
-                     column(3, sliderInput("red_ab",
-                                           label = "Red line allele balance",
-                                           min = 0,
-                                           max = 1,
-                                           value = 0.4,
-                                           step = 0.02)),
-
-                     column(3, sliderInput("blue_ab",
-                                           label = "Blue line allele balance",
-                                           min = 0,
-                                           max = 1,
-                                           value = 0.3,
-                                           step = 0.02)),
-
-                     column(6, shinyWidgets::sliderTextInput("max_read_depth",
-                                                              label = "Max Read Depth To Show On Plot:",
-                                                              choices = 10 * 2^(0:13),
-                                                              selected = 1280,
-                                                              grid = T,
-                                                              width = "600px")),
-                     column(12,plotlyOutput("biplot"), height = "auto")
-                     #plotOutput("biplot"), height = "auto")
                    ),
                    fluidRow(
                      div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
@@ -639,8 +691,8 @@ shinyUI(
                                                delayType = "throttle")),
                  style="padding-left:0px"),
           column(12, htmlOutput("hapByGroupPlotClicked")),
-          column(12, plotOutput("hapByGroupPlot", height =
-                                  "auto",
+          column(12, plotOutput("hapByGroupPlot",
+                                height ="auto",
                                 click = "hapByGroupPlotClick",
                                 hover=hoverOpts(id="hapByGroupPlotHover",
                                                 delay=300,
@@ -652,93 +704,143 @@ shinyUI(
         )
       )
       ),
-
       tabPanel(
-        "Inferential Analysis",
-        "SrMicroHap is sensitive only to the changes in \"Locus\" selector tab\n",
-        wellPanel(fluidRow(
-          column(
-            12,
-            column(
-              2,
-              numericInput(
-                "gibbIter",
-                "Num of Iter:",
-                min = 1,
-                value = 1000,
-                step=1)
+        "In-depth Refinement",
+          fluidRow(
+            column(12,
+                   column(3, h6("Scale: max read depth displayed"),offset = 5,
+                          style="padding-top:0px; margin-top:8px"),
+                   column(4, shinyWidgets::sliderTextInput("max_read_depth",
+                                                           label = "",
+                                                           choices = 10 * 2^(0:13),
+                                                           selected = 1280,
+                                                           grid = F),
+                          style="padding-top:-20px; margin-top:-20px"),
+                   style = "border-bottom: 1px double #d9d9d9;  margin-bottom: 20px; padding-top:-10px; margin-top:-10px"
+                   ),
+            column(4,
+                   column(12, plotOutput("pieCallChart"), height="150px",style="height: 150px; padding:0 0 0 0; margin:0 0 0 0"),
+            column(12, sliderInput("blue_ab",
+                                  label = "Max AR for Homoz (blue)",
+                                  min = 0,
+                                  max = 1,
+                                  value = 0.3,
+                                  ticks= F,
+                                  step = 0.01)),
+            column(12, sliderInput("red_ab",
+                                  label = "Min AR for Het (red)",
+                                  min = 0,
+                                  max = 1,
+                                  value = 0.4,
+                                  ticks=F,
+                                  step = 0.01)),
+            column(12, actionButton(
+              "saveAR",
+              "save",
+              width="100%",
+              style = "margin-top:10px; text-align:center"
+            ))
             ),
-            column(
-              2,
-              numericInput(
-                "fracBurn",
-                "% for Burn-in",
-                min = 0,
-                max = 99,
-                value = 0
-              )
-            ),
-            column(
-              2,
-              numericInput(
-                "randomSeed",
-                label = "Random Seed",
-                value = 34532,
-                min = 1,
-                step = 1
-              ),
-              offset=1
-            ),
-            column(
-              2,
-              selectInput(
-                "selectPrior",
-                label = "Prior Model",
-                c("uniform", "empirical"),
-                selected = "empirical"
-              )
-            ),
-            column(
-              2,
-              actionButton(
-                "submitSrMicroHap",
-                "Submit",
-                icon("random"),
-                style = "margin-top:20px; padding-right: 0px;",
-                width = "100%"
-              ),
-              offset=1
-            )
+            #column(12,plotlyOutput("biplot"), height = "auto")
+            column(8,plotOutput("biplot",
+                                click = "biPlotClick",
+                                hover=hoverOpts(id="biPlotHover",
+                                                delay=300,
+                                                delayType = "throttle")),
+                   height = "auto"),
+            column(12,
+                   DT::dataTableOutput("biPlotTbl"))
           ),
-          column(12, "Parameters define the characteristic of true haplotypes:"),
-          column(12,
-                 column(3, numericInput(
-                   "minRDsr",
-                   label = "min read depth (total indiv)",
-                   value = 10,
-                   min = 1,
-                   step = 1
-                 )),
-                 column(3, numericInput(
-                   "minARsr",
-                   "min allelic ratio",
-                   min = 0,
-                   max = 1,
-                   value = 0.2,
-                   step=0.01
-                 ))
-          ))),
-        fluidRow(column(
-          12, plotOutput("indivHapPosPlot", height = "auto")
-        ),
-        #column(12, plotOutput("allHapFreqPlot", height = "auto")),
-        column(
-          12, plotOutput("HapFreqByGroupPlot", height = "auto")
-        )),
         fluidRow(
           div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
         )
       ),
+      # tabPanel(
+      #   "Inferential Analysis",
+      #   "SrMicroHap is sensitive only to the changes in \"Locus\" selector tab\n",
+      #   wellPanel(fluidRow(
+      #     column(
+      #       12,
+      #       column(
+      #         2,
+      #         numericInput(
+      #           "gibbIter",
+      #           "Num of Iter:",
+      #           min = 1,
+      #           value = 1000,
+      #           step=1)
+      #       ),
+      #       column(
+      #         2,
+      #         numericInput(
+      #           "fracBurn",
+      #           "% for Burn-in",
+      #           min = 0,
+      #           max = 99,
+      #           value = 0
+      #         )
+      #       ),
+      #       column(
+      #         2,
+      #         numericInput(
+      #           "randomSeed",
+      #           label = "Random Seed",
+      #           value = 34532,
+      #           min = 1,
+      #           step = 1
+      #         ),
+      #         offset=1
+      #       ),
+      #       column(
+      #         2,
+      #         selectInput(
+      #           "selectPrior",
+      #           label = "Prior Model",
+      #           c("uniform", "empirical"),
+      #           selected = "empirical"
+      #         )
+      #       ),
+      #       column(
+      #         2,
+      #         actionButton(
+      #           "submitSrMicroHap",
+      #           "Submit",
+      #           icon("random"),
+      #           style = "margin-top:20px; padding-right: 0px;",
+      #           width = "100%"
+      #         ),
+      #         offset=1
+      #       )
+      #     ),
+      #     column(12, "Parameters define the characteristic of true haplotypes:"),
+      #     column(12,
+      #            column(3, numericInput(
+      #              "minRDsr",
+      #              label = "min read depth (total indiv)",
+      #              value = 10,
+      #              min = 1,
+      #              step = 1
+      #            )),
+      #            column(3, numericInput(
+      #              "minARsr",
+      #              "min allelic ratio",
+      #              min = 0,
+      #              max = 1,
+      #              value = 0.2,
+      #              step=0.01
+      #            ))
+      #     ))),
+      #   fluidRow(column(
+      #     12, plotOutput("indivHapPosPlot", height = "auto")
+      #   ),
+      #   #column(12, plotOutput("allHapFreqPlot", height = "auto")),
+      #   column(
+      #     12, plotOutput("HapFreqByGroupPlot", height = "auto")
+      #   )),
+      #   fluidRow(
+      #     div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
+      #   )
+      # ),
       # table panel
       tabPanel(
         "Output",
