@@ -133,7 +133,9 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
 
   num.id <- length(unique(haplo.sum$id))
 
-  cat(paste0("\n...Prepping feather file : ",out.path, "/",run.label,".feather\n"))
+  #cat(paste0("\n...Prepping feather file : ",out.path, "/",run.label,".feather\n"))
+
+  message(paste0("\n...Prepping rds file : ",out.path, "/",run.label,".rds\n"))
 
   if (add.filter) {
 
@@ -163,16 +165,19 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
 
   colnames(vcf.pos.tbl) <- c("locus","pos")
 
-  feather::write_feather(haplo.add.balance, paste0(out.path, "/",run.label,".feather"))
-  feather::write_feather(vcf.pos.tbl, paste0(out.path, "/",run.label,"_posinfo.feather"))
+  #feather::write_feather(haplo.add.balance, paste0(out.path, "/",run.label,".feather"))
+  #feather::write_feather(vcf.pos.tbl, paste0(out.path, "/",run.label,"_posinfo.feather"))
 
-  #saveRDS(haplo.add.balance, paste0(out.path, "/",run.label,".rds"))
-  #saveRDS(vcf.pos.tbl, paste0(out.path, "/",run.label,"_posinfo.rds"))
+  saveRDS(haplo.add.balance, paste0(out.path, "/",run.label,".rds"))
+  saveRDS(vcf.pos.tbl, paste0(out.path, "/",run.label,"_posinfo.rds"))
 
-  cat(paste0("\n\nFeather file: copied into shiny directory: ",app.path, "/",run.label,"*.feather ",
+  #cat(paste0("\n\nFeather file: copied into shiny directory: ",app.path, "/",run.label,"*.feather ",
+  #           "\nRun runHaplotype() to open shiny app.\n\n"))
+  #system(paste0("cp ", out.path, "/",run.label,"*.feather ", app.path, "/.") )
+
+  message(paste0("\n\RDS file: copied into shiny directory: ",app.path, "/",run.label,"*.rds ",
              "\nRun runHaplotype() to open shiny app.\n\n"))
-
-  system(paste0("cp ", out.path, "/",run.label,"*.feather ", app.path, "/.") )
+  system(paste0("cp ", out.path, "/",run.label,"*.rds ", app.path, "/.") )
 
   return(haplo.add.balance)
 }
