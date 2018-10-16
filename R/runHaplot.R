@@ -175,7 +175,7 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
   #           "\nRun runHaplotype() to open shiny app.\n\n"))
   #system(paste0("cp ", out.path, "/",run.label,"*.feather ", app.path, "/.") )
 
-  message(paste0("\n\RDS file: copied into shiny directory: ",app.path, "/",run.label,"*.rds ",
+  message(paste0("\n\nRDS file: copied into shiny directory: ",app.path, "/",run.label,"*.rds ",
              "\nRun runHaplotype() to open shiny app.\n\n"))
   system(paste0("cp ", out.path, "/",run.label,"*.rds ", app.path, "/.") )
 
