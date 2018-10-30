@@ -121,33 +121,8 @@ shinyUI(
                                                      selected = 2,
                                                      grid = F,
                                                      width = 150),
-                  #      knobInput(
-                  # inputId = "n.alleles",
-                  # label = "Keeps Top n Alleles:",
-                  # value = 2,
-                  # min = 1,
-                  # max=20,
-                  # displayPrevious = TRUE,
-                  # displayInput = TRUE,
-                  # lineCap = "round",
-                  # fgColor = "#95C4EE",
-                  # inputColor = "#0E88F3",
-                  # thickness = 0.2,
-                  # angleArc=180,
-                  # angleOffset = -90,
-                  # height=55,
-                  # width=100),
                   style = "margin-top:10px;text-align:center; margin-bottom:0px; padding-bottom:0px"),
 
-                #column(4, numericInput(#sliderInput(
-                 # "coverageMin",
-                 # "Minimal Read Depth",
-                 # min = 0,
-                  #max = 200,
-                 # value = 0
-                #),style = "margin-top:10px;text-align:center"),
-                #column(1, "and",style = "margin-top:35px;padding-left:15px;font-weight:bold"),
-                #column(2, "Min. allelic ratio:", style = "margin-top:4%;padding-left:2%;font-weight:light"),
                 column(4,
                        shinyWidgets::sliderTextInput("coverageMin",
                                                      label = "Min Total Read Depth",
@@ -155,33 +130,7 @@ shinyUI(
                                                      selected = 2,
                                                      grid = F,
                                                      width = 150),
-
-                  #      knobInput(
-                  # inputId = "coverageMin",
-                  # label = "Minimal Total Read Depth:",
-                  # value = 0,
-                  # min = 0,
-                  # max=200,
-                  # displayPrevious = TRUE,
-                  # displayInput = TRUE,
-                  # lineCap = "round",
-                  # fgColor = "#FDC19E",
-                  # inputColor = "#FF6E1A",
-                  # thickness = 0.2,
-                  # angleArc=180,
-                  # angleOffset = -90,
-                  # height=55,
-                  # width=100),
                        style = "margin-top:10px;text-align:center; margin-bottom:0px; margin-right:0px; padding-bottom:0px;padding-right:0px"),
-
-
-                # column(4, sliderInput(
-                #   "minAlleleRatio",
-                #   "Minimal Allelic Ratio",
-                #   min = 0,
-                #   max = 1.000,
-                #   value = 0
-                # ),style = "margin-top:10px;text-align:center"),
 
                 column(4,
                        shinyWidgets::sliderTextInput("minAlleleRatio",
@@ -190,23 +139,6 @@ shinyUI(
                                                      selected = 0,
                                                      grid = F,
                                                      width = 150),
-                  #      knobInput(
-                  # inputId = "minAlleleRatio",
-                  # label = "Min Allelic Ratio:",
-                  # value = 0.5,
-                  # min = 0,
-                  # max=1,
-                  # step=0.01,
-                  # displayPrevious = TRUE,
-                  # displayInput = TRUE,
-                  # lineCap = "round",
-                  # fgColor = "#BECBE2",#91DCA7
-                  # inputColor = "#3A75DC",#04C43E
-                  # thickness = 0.2,
-                  # angleArc=180,
-                  # angleOffset = -90,
-                  # height=55,
-                  # width=120),
                   style = "margin-top:10px;text-align:center; margin-bottom:0px; padding-bottom:0px"),
 
 
@@ -320,8 +252,8 @@ shinyUI(
                ))),
 
       # group label panel
-      navbarMenu("Summary Info",
-                 tabPanel(h5("by Group"),
+      navbarMenu("Summary",
+                 tabPanel(h5("By Group"),
                           # fluidRow(column(
                           #   4,
                           #   column(3, h5("Group:")),
@@ -348,7 +280,7 @@ shinyUI(
 
 
                  tabPanel(
-                   h5("by Individual"),
+                   h5("By Individual"),
                    fluidRow(
                      #column(
                      #  4,
@@ -465,7 +397,7 @@ shinyUI(
                    )
                  ),
                  tabPanel(
-                   h5("by Locus"),
+                   h5("By Locus"),
                    fluidRow(
                      #column(
                      #  4,
@@ -574,63 +506,11 @@ shinyUI(
                  )
       ),
 
-      navbarMenu("Filter Analysis",
+      navbarMenu("Criteria Cutoff",
 
                  # table panel
                  tabPanel(
-                   h5("Broad Summary"),
-                   fluidRow(
-                     column(1, h5("")),
-                     column(11, h6("- Counting overall # of the top two (or all) unique qualified haplotype ")),
-                     column(1, h5("")),
-                     column(11, h6("- Num of indiv w/ calleable haplotype (or w/ more than two qualified haplotype) ")),
-                     # column(1, h6("keeping"), style="margin-bottom: 20px; padding-top:20px; text-align:right"),
-                     # column(2,
-                     #        selectInput("RDnARplotOpt", label ="",
-                     #                        choices = list("at most two" = 1,
-                     #                                       "all" = 2),
-                     #                        selected = 1)),
-                     # column(7, h6("qualified haplotypes per individual"),
-                     #        style="margin-bottom: 20px; padding-top:20px; text-align:left"),
-                     column(12, plotOutput("RDnARplot", height = "auto"))
-                   ),
-                   fluidRow(
-                     div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
-                   )
-                 ),
-
-                 tabPanel(
-                   h5("Quality Suspect"),
-                   column(12, plotOutput("ambigIndivPlot", height = "auto",
-                                         dblclick = dblclickOpts(id = "aip_dblclick"),
-                                         brush = brushOpts(
-                                           id = "aip_Brush",
-                                           direction = "x",
-                                           resetOnNew = TRUE
-                                         ))),
-                   column(12, plotOutput("ambigLociPlot", height = "auto",
-                                         dblclick = dblclickOpts(id = "alp_dblclick"),
-                                         brush = brushOpts(
-                                           id = "alp_Brush",
-                                           direction = "x",
-                                           resetOnNew = TRUE
-                                         ))),
-                   fluidRow(
-                     column(12,bsAlert("cutoffhapAlert")),
-                     column(12, ""),#h6("top 2 common haplotype (top) vs non-top 2 haplotype (bottom)")),
-                     column(2, plotOutput("uchaplabel", height = "auto"),
-                            style="padding-left:0px; padding-right:0px"
-                     ),
-                     column(5, plotOutput("uchapReadDepth", height = "auto")),
-                     column(5, plotOutput("uchapAllelicRatio", height = "auto"))
-                   ),
-                   fluidRow(
-                     div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
-                   )
-                 ),
-
-                 tabPanel(
-                   h5("Criteria Breakdown"),
+                   h5("Global Scope"),
                    fluidRow(
                      column(5, plotOutput("allReadDepth", height = "auto",
                                           # hover = hoverOpts(
@@ -650,62 +530,78 @@ shinyUI(
                      ))#,
                      #column(12, h4("Microhaplotypes that pass the critera:"))
                    ),
-                   bsAlert("cutoffhapAlert"),
+                   #                   bsAlert("cutoffhapAlert"),
                    fluidRow(
+                     column(12, h4(textOutput("DP1"))),
                      column(2, plotOutput("haplabel", height = "auto"),
-                                          style="padding-left:0px; padding-right:0px"
-                            ),
+                            style="padding-left:0px; padding-right:0px"
+                     ),
                      column(5, plotOutput("hapReadDepth", height = "auto",
                                           click = "hapRDClick")),
                      column(5, plotOutput("hapAllelicRatio", height = "auto",
-                                          click = "hapARClick"))
+                                          click = "hapARClick")),
+                     column(12, h4(textOutput("DP2")), textOutput("DP3"))
+                   ),
+                   fluidRow(
+                     #column(12,bsAlert("cutoffhapAlert")),
+                     column(12, ""),#h6("top 2 common haplotype (top) vs non-top 2 haplotype (bottom)")),
+                     column(2, plotOutput("uchaplabel", height = "auto"),
+                            style="padding-left:0px; padding-right:0px"
+                     ),
+                     column(5, plotOutput("uchapReadDepth", height = "auto")),
+                     column(5, plotOutput("uchapAllelicRatio", height = "auto"))
+                   ),
+                   fluidRow(
+                     div(style = "padding: 10px; border-bottom: 2px solid white; background: white")
+                   ),
+                   fluidRow(
+                     #column(1, h5("")),
+                     #column(11, h6("top: Number of the top two (or all) unique qualified haplotype ")),
+                     #column(1, h5("")),
+                     #column(11, h6("bottom: Number of indiv w/ calleable haplotype (or w/ more than two qualified haplotype) ")),
+                     # column(1, h6("keeping"), style="margin-bottom: 20px; padding-top:20px; text-align:right"),
+                     # column(2,
+                     #        selectInput("RDnARplotOpt", label ="",
+                     #                        choices = list("at most two" = 1,
+                     #                                       "all" = 2),
+                     #                        selected = 1)),
+                     # column(7, h6("qualified haplotypes per individual"),
+                     #        style="margin-bottom: 20px; padding-top:20px; text-align:left"),
+                     column(12, plotOutput("RDnARplot", height = "auto"))
                    ),
                    fluidRow(
                      div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
                    )
                  ),
 
-      #locus assessement panel
-
-      tabPanel(
-        h5("Microhap Summaries"),
-        fluidRow(
-          bsAlert("hapAlert")
-        ),
-        fluidRow(
-          column(12,
-          column(6, htmlOutput("hapFreqClicked")),
-          column(6, htmlOutput("hwClicked"))),
-          column(6, plotOutput("hapFreq",
-                               height ="auto",
-                               click = "hapFreqPlotClick",
-                               hover=hoverOpts(id="hapFreqPlotHover",
-                                               delay=300,
-                                               delayType = "throttle")),
-                 style="padding-right:0px"),
-          column(6, plotOutput("PairWiseHap", height =
-                                 "auto",
-                               click = "HWplotClick",
-                               hover=hoverOpts(id="HWPlotHover",
-                                               delay=300,
-                                               delayType = "throttle")),
-                 style="padding-left:0px"),
-          column(12, htmlOutput("hapByGroupPlotClicked")),
-          column(12, plotOutput("hapByGroupPlot",
-                                height ="auto",
-                                click = "hapByGroupPlotClick",
-                                hover=hoverOpts(id="hapByGroupPlotHover",
-                                                delay=300,
-                                                delayType = "throttle"))),
-          column(12, plotOutput("hapSeq", height = "auto"))
-        ),
-        fluidRow(
-          div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
-        )
-      )
+                 tabPanel(
+                   h5("Quality Profile"),
+                   column(12, plotOutput("ambigIndivPlot", height = "auto",
+                                         dblclick = dblclickOpts(id = "aip_dblclick"),
+                                         brush = brushOpts(
+                                           id = "aip_Brush",
+                                           direction = "x",
+                                           resetOnNew = TRUE
+                                         ))),
+                   column(12, plotOutput("ambigLociPlot", height = "auto",
+                                         dblclick = dblclickOpts(id = "alp_dblclick"),
+                                         brush = brushOpts(
+                                           id = "alp_Brush",
+                                           direction = "x",
+                                           resetOnNew = TRUE
+                                         ))),
+                   fluidRow(
+                     div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
+                   )
+                 )
       ),
-      tabPanel(
-        "In-depth Refinement",
+      navbarMenu("Genotype Call",
+                 # table panel
+                 tabPanel(
+                   h5("AR Refinement"),
+                   fluidRow(
+                     bsAlert("ARalert")
+                   ),
           fluidRow(
             column(12,
                    column(3, h6("Scale: max read depth displayed"),offset = 5,
@@ -720,39 +616,86 @@ shinyUI(
                    ),
             column(4,
                    column(12, plotOutput("pieCallChart"), height="150px",style="height: 150px; padding:0 0 0 0; margin:0 0 0 0"),
-            column(12, sliderInput("blue_ab",
+            column(12, sliderInput("max.ar.hm",
                                   label = "Max AR for Homoz (blue)",
                                   min = 0,
                                   max = 1,
                                   value = 0.3,
                                   ticks= F,
                                   step = 0.01)),
-            column(12, sliderInput("red_ab",
+            column(12, sliderInput("min.ar.hz",
                                   label = "Min AR for Het (red)",
                                   min = 0,
                                   max = 1,
                                   value = 0.4,
                                   ticks=F,
                                   step = 0.01)),
-            column(12, actionButton(
-              "saveAR",
-              "save",
+            column(6, actionButton(
+              "preL",
+              "prev locus",
+              width="100%",
+              style = "margin-top:10px; text-align:center"
+            )),
+            column(6, actionButton(
+              "nextL",
+              "next locus",
               width="100%",
               style = "margin-top:10px; text-align:center"
             ))
             ),
             #column(12,plotlyOutput("biplot"), height = "auto")
-            column(8,plotOutput("biplot",
-                                click = "biPlotClick",
-                                hover=hoverOpts(id="biPlotHover",
-                                                delay=300,
-                                                delayType = "throttle")),
+            column(8,
+                   ggiraph::ggiraphOutput("biplot"),
+                   # plotOutput("biplot",
+                   #              click = "biPlotClick",
+                   #              hover=hoverOpts(id="biPlotHover",
+                   #                              delay=300,
+                   #                              delayType = "throttle")),
                    height = "auto"),
             column(12,
                    DT::dataTableOutput("biPlotTbl"))
           ),
         fluidRow(
           div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
+        )
+        ),
+        #locus assessement panel
+
+        tabPanel(
+          h5("Summaries"),
+          fluidRow(
+            bsAlert("hapAlert")
+          ),
+          fluidRow(
+            column(12,
+                   column(6, htmlOutput("hapFreqClicked")),
+                   column(6, htmlOutput("hwClicked"))),
+            column(6, plotOutput("hapFreq",
+                                 height ="auto",
+                                 click = "hapFreqPlotClick",
+                                 hover=hoverOpts(id="hapFreqPlotHover",
+                                                 delay=300,
+                                                 delayType = "throttle")),
+                   style="padding-right:0px"),
+            column(6, plotOutput("PairWiseHap", height =
+                                   "auto",
+                                 click = "HWplotClick",
+                                 hover=hoverOpts(id="HWPlotHover",
+                                                 delay=300,
+                                                 delayType = "throttle")),
+                   style="padding-left:0px"),
+            column(12, htmlOutput("hapByGroupPlotClicked")),
+            column(12, plotOutput("hapByGroupPlot",
+                                  height ="auto",
+                                  click = "hapByGroupPlotClick",
+                                  hover=hoverOpts(id="hapByGroupPlotHover",
+                                                  delay=300,
+                                                  delayType = "throttle"))),
+            column(12, plotOutput("hapSeq", height = "auto"))
+          ),
+          fluidRow(
+            div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
+          )
         )
       ),
       # tabPanel(
@@ -843,7 +786,7 @@ shinyUI(
       # ),
       # table panel
       tabPanel(
-        "Output",
+        "Table",
         fixedPanel(
           #top="200px",
           style = "z-index:9;background-color:white; margin-top: -20px; padding-top: 10px; height:80px",
