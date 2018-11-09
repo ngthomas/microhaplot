@@ -10,7 +10,6 @@ library("scales")
 library("microhaplot")
 #library("reshape2")
 library("feather")
-library("plotly")
 library("ggiraph")
 
 shinyServer(function(input, output, session) {
@@ -2498,7 +2497,6 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
   },height=function(){ifelse(input$selectLocus == "ALL",1,150)})
 
-  #output$biplot <-renderPlotly({
   output$biplot <-renderggiraph({
   #output$biplot <-renderPlot({
 
@@ -2598,7 +2596,6 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                    opts_selection(
                      type = "multiple", css = "fill:#FF0000;stroke:#FF0000;r:6"),
                    opts_hover(css = "fill:#DCECEE;stroke:black;cursor:pointer"))
-    #plotly::ggplotly(g, height = 400, width = 900)
 
   }#, height = function() {
    # ifelse(hapPg$width == 0 || input$selectLocus == "ALL",
