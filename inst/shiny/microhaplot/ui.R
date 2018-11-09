@@ -539,17 +539,7 @@ shinyUI(
                      column(5, plotOutput("hapReadDepth", height = "auto",
                                           click = "hapRDClick")),
                      column(5, plotOutput("hapAllelicRatio", height = "auto",
-                                          click = "hapARClick")),
-                     column(12, h4(textOutput("DP2")), textOutput("DP3"))
-                   ),
-                   fluidRow(
-                     #column(12,bsAlert("cutoffhapAlert")),
-                     column(12, ""),#h6("top 2 common haplotype (top) vs non-top 2 haplotype (bottom)")),
-                     column(2, plotOutput("uchaplabel", height = "auto"),
-                            style="padding-left:0px; padding-right:0px"
-                     ),
-                     column(5, plotOutput("uchapReadDepth", height = "auto")),
-                     column(5, plotOutput("uchapAllelicRatio", height = "auto"))
+                                          click = "hapARClick"))
                    ),
                    fluidRow(
                      div(style = "padding: 10px; border-bottom: 2px solid white; background: white")
@@ -576,6 +566,7 @@ shinyUI(
 
                  tabPanel(
                    h5("Quality Profile"),
+                   # mod to add interactive table, ranks of ranks (based on rank of rd, calleable hap)
                    column(12, plotOutput("ambigIndivPlot", height = "auto",
                                          dblclick = dblclickOpts(id = "aip_dblclick"),
                                          brush = brushOpts(
@@ -604,7 +595,9 @@ shinyUI(
                    ),
           fluidRow(
             column(12,
-                   column(3, h6("Scale: max read depth displayed"),offset = 5,
+                   column(5, checkboxInput("keepSel", label =  "keeps pt selection between loci"),
+                          style="margin-top:4px;"),
+                   column(3, h6("Scale: max read depth displayed"),offset = 0,
                           style="padding-top:0px; margin-top:8px"),
                    column(4, shinyWidgets::sliderTextInput("max_read_depth",
                                                            label = "",
@@ -615,45 +608,56 @@ shinyUI(
                    style = "border-bottom: 1px double #d9d9d9;  margin-bottom: 20px; padding-top:-10px; margin-top:-10px"
                    ),
             column(4,
-                   column(12, plotOutput("pieCallChart"), height="150px",style="height: 150px; padding:0 0 0 0; margin:0 0 0 0"),
-            column(12, sliderInput("max.ar.hm",
-                                  label = "Max AR for Homoz (blue)",
-                                  min = 0,
-                                  max = 1,
-                                  value = 0.3,
-                                  ticks= F,
-                                  step = 0.01)),
-            column(12, sliderInput("min.ar.hz",
-                                  label = "Min AR for Het (red)",
-                                  min = 0,
-                                  max = 1,
-                                  value = 0.4,
-                                  ticks=F,
-                                  step = 0.01)),
-            column(6, actionButton(
-              "preL",
-              "prev locus",
-              width="100%",
-              style = "margin-top:10px; text-align:center"
-            )),
-            column(6, actionButton(
-              "nextL",
-              "next locus",
-              width="100%",
-              style = "margin-top:10px; text-align:center"
-            ))
+                   column(12, plotOutput("pieCallChart",height="auto"),style="padding:0 0 0 0; margin:0 0 0 0"),
+                   column(6, actionButton(
+                     "preL",
+                     "prev locus",
+                     width="100%",
+                     style = "margin-top:10px; text-align:center; margin-bottom:15px"
+                   )),
+                   column(6, actionButton(
+                     "nextL",
+                     "next locus",
+                     width="100%",
+                     style = "margin-top:10px; text-align:center; margin-bottom:15px"
+                   )),
+                   column(12, htmlOutput("savedARstat"), style="margin-bottom:4px"),
+                   column(12, sliderInput("max.ar.hm",
+                                          label = "Max AR for Homoz (blue)",
+                                          min = 0,
+                                          max = 1,
+                                          value = 0.3,
+                                          ticks= F,
+                                          step = 0.01)),
+                   column(12, sliderInput("min.ar.hz",
+                                          label = "Min AR for Het (red)",
+                                          min = 0,
+                                          max = 1,
+                                          value = 0.4,
+                                          ticks=F,
+                                          step = 0.01))
             ),
             #column(12,plotlyOutput("biplot"), height = "auto")
             column(8,
-                   ggiraph::ggiraphOutput("biplot"),
+                   ggiraph::ggiraphOutput("biplot", height = "450px"), height="auto", style= "width:'100%'"
                    # plotOutput("biplot",
-                   #              click = "biPlotClick",
+                   #              click = "biPlotick",
                    #              hover=hoverOpts(id="biPlotHover",
                    #                              delay=300,
                    #                              delayType = "throttle")),
-                   height = "auto"),
+                   ),
             column(12,
-                   DT::dataTableOutput("biPlotTbl"))
+                   DT::dataTableOutput("biPlotTbl")),
+          #),
+          #fluidRow(
+            #column(12,bsAlert("cutoffhapAlert")),
+            column(12, h4(textOutput("DP2")), textOutput("DP3")),
+            column(12, ""),#h6("top 2 common haplotype (top) vs non-top 2 haplotype (bottom)")),
+            column(2, plotOutput("uchaplabel", height = "auto"),
+                   style="padding-left:0px; padding-right:0px"
+            ),
+            column(5, plotOutput("uchapReadDepth", height = "auto")),
+            column(5, plotOutput("uchapAllelicRatio", height = "auto"))
           ),
         fluidRow(
           div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
@@ -789,7 +793,7 @@ shinyUI(
         "Table",
         fixedPanel(
           #top="200px",
-          style = "z-index:9;background-color:white; margin-top: -20px; padding-top: 10px; height:80px",
+          style = "z-index:9;background-color:white; margin-top: -40px; padding-top: 20px; height:80px",
           width="100%",
         fluidRow(
           column(
@@ -802,7 +806,7 @@ shinyUI(
               "selectTbl",
               label = "",
               c("observed variants (unfiltered)","observed variants (filtered)",
-                "reported indiv haplotype", "SNP report", "locus annotation"),
+                "reported indiv haplotype (diploid)", "reported haplotype (flat)", "SNP report", "locus annotation"),
               selected = "observed variants (unfiltered)"
             ),
             style = "background-color:white; padding-right: 0px; margin-top:-20px;margin-bottom:-30px;padding-left:0%; padding-right: 0px;"
