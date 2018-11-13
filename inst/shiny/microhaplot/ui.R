@@ -630,7 +630,7 @@ shinyUI(
                                           ticks= F,
                                           step = 0.01)),
                    column(12, sliderInput("min.ar.hz",
-                                          label = "Min AR for Het (red)",
+                                          label = "Min AR for Het (yellow)",
                                           min = 0,
                                           max = 1,
                                           value = 0.4,
@@ -653,10 +653,10 @@ shinyUI(
             #column(12,bsAlert("cutoffhapAlert")),
             column(12, h4(textOutput("DP2")), textOutput("DP3")),
             column(12, ""),#h6("top 2 common haplotype (top) vs non-top 2 haplotype (bottom)")),
-            column(2, plotOutput("uchaplabel", height = "auto"),
+            column(1, plotOutput("uchaplabel", height = "auto"),
                    style="padding-left:0px; padding-right:0px"
             ),
-            column(5, plotOutput("uchapReadDepth", height = "auto")),
+            column(6, plotOutput("uchapReadDepth", height = "auto")),
             column(5, plotOutput("uchapAllelicRatio", height = "auto"))
           ),
         fluidRow(
