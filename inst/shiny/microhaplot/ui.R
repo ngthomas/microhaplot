@@ -793,7 +793,7 @@ shinyUI(
         "Table",
         fixedPanel(
           #top="200px",
-          style = "z-index:9;background-color:white; margin-top: -40px; padding-top: 20px; height:80px",
+          style = "z-index:9;background-color:white; margin-top: -40px; padding-top: 15px; height:90px",
           width="100%",
         fluidRow(
           column(
@@ -826,7 +826,7 @@ shinyUI(
 
 
         column(12, DT::dataTableOutput('haploTbl'),
-               style = "padding-bottom: 40px; border-bottom: 8px solid white; background: white; margin-top: 120px;"),
+               style = "padding-bottom: 40px; border-bottom: 8px solid white; background: white; margin-top: 100px;"),
         fluidRow(
           div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
         )
