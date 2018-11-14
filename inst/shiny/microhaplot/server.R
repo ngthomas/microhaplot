@@ -1017,15 +1017,22 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     ar <- as.numeric((haplo.sum$rank>1)*haplo.sum$allele.balance)
 
-    call.indx <- which( (ar >= haplo.sum$min.ar)*(ar >= haplo.sum$min.ar.hz) +
-                          (ar <= haplo.sum$min.ar)*(ar <= haplo.sum$max.ar.hm) >0)
+    call.indx <- which(haplo.sum$allele.balance >= haplo.sum$min.ar.hz)
 
-    haplo.all <- haplo.sum[call.indx, ] %>% ungroup() %>%
+    toss.indiv.indx <- which( (ar >= haplo.sum$min.ar)*(ar < haplo.sum$min.ar.hz) +
+                                (ar <= haplo.sum$min.ar)*(ar > haplo.sum$max.ar.hm) >0)
+
+
+    toss.indiv <- haplo.sum[toss.indiv.indx,] %>% select(id, locus) %>% unique()
+
+    haplo.all <- anti_join(haplo.sum[call.indx, ], toss.indiv, by=c("id", "locus")) %>% ungroup() %>%
       select(group, locus, id, haplo, depth, allele.balance, rank)
 
     haplo.1 <- haplo.all %>%
       rename("haplotype.1"=haplo, "read.depth.1" = depth, "ar" = allele.balance) %>%
       filter(rank == 1)
+
+    if(nrow(haplo.1)== 0) return()
     haplo.1$ar <- 1
 
     haplo.joined <- full_join(haplo.1 %>% select(-rank),
@@ -1043,26 +1050,6 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.joined %>% select(group, locus, id, haplotype.1, haplotype.2, read.depth.1, read.depth.2, ar)
 
 
-    # h <- haplo.sum %>% filter(rank <=2) %>%
-    #   arrange(group, id, locus, rank) %>%
-    #   group_by(group, locus, id) %>%
-    #   summarise(
-    #     categ = ifelse(length(rank) >1 &&
-    #                      allele.balance[2] >= filterParam$minAR, "Het","Homoz"),
-    #     haplotype.1 = ifelse(categ=="Het", sort(c(haplo[1],haplo[2]))[1], haplo[1]),
-    #     haplotype.2 = ifelse(categ=="Het", sort(c(haplo[1],haplo[2]))[2], haplo[1]),
-    #     read.depth.1 = depth[1],
-    #     read.depth.2 = ifelse(length(rank)==2,depth[2],0),
-    #     ar = ifelse(categ=="Het", allele.balance[2],
-    #                 ifelse(length(rank)==1,0,allele.balance[2])),
-    #     finalCall = ifelse(categ=="Het",
-    #                               ifelse(ar >= min.ar.hz, "call", "NoCall"),
-    #                               ifelse(ar <= max.ar.hm, "call", "NoCall"))) %>%
-    #   ungroup() %>%
-    #   filter(finalCall != "NoCall") %>%
-    #   select(-categ)
-
-    #left_join(hap, pi, by=c("group","locus","id"))
   })
 
   haplo.freqTbl <- reactive({
@@ -2424,6 +2411,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                 drop.haplo = ifelse(length(rank)>1 & categ == "Homoz",haplo[2], "-"))
 
     if (filterParam$n.alleles > 2) {
+
       h.2 <- left_join( haplo.filter %>%
         filter(rank <= filterParam$n.alleles, rank > 2),
         h, by = c("id", "locus", "group")) %>%
@@ -2432,12 +2420,12 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         summarise(categ = ifelse(allele.balance[1] >= filterParam$minAR,
                                  "Het","-"),
                   genotype = ifelse(categ=="Het",
-                                    paste0(sort(c(haplo.1[1],haplo[1])),collapse = "/"),
-                                    paste0(c(haplo.1[1],"-"),collapse = "/" ) ),
-                  haplo.1 = first.haplo[1],
-                  haplo.2 = haplo[1],
+                                    paste0(sort(c(hap.1[1],haplo[1])),collapse = "/"),
+                                    paste0(c(hap.1[1],"-"),collapse = "/" ) ),
+                  hap.1 = hap.1[1],
+                  hap.2 = haplo[1],
                   ar = allele.balance[1],
-                  rd.1 = first.depth[1],
+                  rd.1 = rd.1[1],
                   rd.2 = depth[1],
                   rank.rel = rank[1],
                   finalCall = ifelse(finalCall[1] == "NoCall",
@@ -2517,11 +2505,14 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                   perc = paste0(round(n*100/n.sample,1),"%"),
                   call.label = ifelse(finalCall[1] == "call", "call", "no call"))
 
+      locus.name <- isolate(input$selectLocus)
+      if (nchar(locus.name) > 15) locus.name <- paste0(substring(locus.name, 0, 14),"...",collapse = "")
+
       ggplot(pc.df, aes(x="", y=n, fill=call.label))+
         geom_bar(width = 1, stat = "identity")+
         geom_text(aes(label = perc), position = position_stack(vjust = 0.65), size =4)+
         coord_polar("y", start=0, direction=-1)+
-        scale_fill_brewer(palette="Blues", direction=-1,name=isolate(input$selectLocus))+
+        scale_fill_brewer(palette="Blues", direction=-1,name=locus.name)+
         theme_minimal()+
         theme(
           axis.title.x = element_blank(),
@@ -3168,19 +3159,18 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         is.null(input$selectDB) || is.null(locusPg$l))
       return ()
 
-    haplo.filter <- Filter.haplo.sum()
-
-    if (is.null(haplo.filter))
+    if (is.null(haplo.summaryTbl())) {
       return()
+    }
+
+    haplo.filter <- haplo.summaryTbl()
 
 
     haplo.filter <- haplo.filter %>%
-      filter(rank <= 2) %>%
       group_by(locus, id) %>%
-      arrange(-depth) %>%
       summarise(
-        hap1 = ifelse(length(depth) == 1, haplo[1], sort(haplo)[1]),
-        hap2 = ifelse(length(depth) == 1, haplo[1], sort(haplo)[2])
+        hap1 = sort(c(haplotype.1, haplotype.2))[1],
+        hap2 = sort(c(haplotype.1, haplotype.2))[2]
       ) %>%
       ungroup() %>%
       group_by(locus, hap1, hap2) %>%
@@ -3199,7 +3189,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
              re.hap2 = sort(c(hap1, hap2))[2])
 
 
-    all.hap <- unique(c(freq.hap$re.hap1,freq.hap$re.hap1))
+    all.hap <- unique(c(freq.hap$re.hap1,freq.hap$re.hap2))
     haplo.filter <- haplo.filter %>% ungroup() %>% mutate(hap1 = factor(as.numeric(factor(hap1, levels=all.hap)),
                                                                         levels=1:length(all.hap)),
                                                           hap2 = factor(as.numeric(factor(hap2, levels=all.hap)),
@@ -3489,17 +3479,21 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         write.csv(annotateTab$tbl, file)
       }
       if (isolate(input$selectTbl) ==  "reported haplotype (flat)"){
+
         haplo.sum <- Filter.haplo.sum()
         if (is.null(haplo.sum))
           return ()
 
-        # adjusted ar
+        call.indx <- which(haplo.sum$allele.balance >= haplo.sum$min.ar.hz)
+
         ar <- as.numeric((haplo.sum$rank>1)*haplo.sum$allele.balance)
 
-        call.indx <- which( (ar >= haplo.sum$min.ar)*(ar >= haplo.sum$min.ar.hz) +
-                              (ar <= haplo.sum$min.ar)*(ar <= haplo.sum$max.ar.hm) >0)
+        toss.indiv.indx <- which( (ar >= haplo.sum$min.ar)*(ar < haplo.sum$min.ar.hz) +
+                                    (ar <= haplo.sum$min.ar)*(ar > haplo.sum$max.ar.hm) >0)
 
-        haplo.all <- haplo.sum[call.indx, ] %>%
+        toss.indiv <- haplo.sum[toss.indiv.indx,] %>% select(id, locus) %>% unique()
+
+        haplo.all <- anti_join(haplo.sum[call.indx, ], toss.indiv, by=c("id", "locus")) %>%
           ungroup() %>%
           select(group, locus, id, haplo, allele.balance, depth) %>%
           mutate(allele.balance = round(allele.balance, 3)) %>%
@@ -3574,13 +3568,16 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       if (is.null(haplo.sum))
         return ()
 
-      # adjusted ar
+      call.indx <- which(haplo.sum$allele.balance >= haplo.sum$min.ar.hz)
+
       ar <- as.numeric((haplo.sum$rank>1)*haplo.sum$allele.balance)
 
-      call.indx <- which( (ar >= haplo.sum$min.ar)*(ar >= haplo.sum$min.ar.hz) +
-       (ar <= haplo.sum$min.ar)*(ar <= haplo.sum$max.ar.hm) >0)
+      toss.indiv.indx <- which( (ar >= haplo.sum$min.ar)*(ar < haplo.sum$min.ar.hz) +
+                                  (ar <= haplo.sum$min.ar)*(ar > haplo.sum$max.ar.hm) >0)
 
-      haplo.all <- haplo.sum[call.indx, ] %>%
+      toss.indiv <- haplo.sum[toss.indiv.indx,] %>% select(id, locus) %>% unique()
+
+      haplo.all <- anti_join(haplo.sum[call.indx, ], toss.indiv, by=c("id", "locus")) %>%
         ungroup() %>%
         select(group, locus, id, haplo, allele.balance, depth) %>%
         mutate(allele.balance = round(allele.balance, 3)) %>%
