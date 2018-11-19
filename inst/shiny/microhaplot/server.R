@@ -163,9 +163,9 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
              max.ar.hm = as.numeric(max.ar.hm),
              min.ar.hz = as.numeric(min.ar.hz))
 
-    if(!"max.ar.hm" %in% colnames(annotateTab$tbl)) {
-      if("n.alleles" %in% colnames(annotateTab$tbl))
-        annotateTab$tbl <- annotateTab$tbl %>% select(-n.alleles)
+    if((!"max.ar.hm" %in% colnames(annotateTab$tbl)) || (!"n.alleles" %in% colnames(annotateTab$tbl))) {
+      #if("n.alleles" %in% colnames(annotateTab$tbl))
+      #  annotateTab$tbl <- annotateTab$tbl %>% select(-n.alleles)
 
       annotateTab$tbl <- bind_cols(annotateTab$tbl,
                                    n.alleles = rep(2, 0, panelParam$n.locus+1),
