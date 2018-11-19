@@ -154,14 +154,6 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     else {
       annotateTab$tbl <- readRDS(annotate.file)
     }
-    annotateTab$tbl <- annotateTab$tbl %>%
-      ungroup() %>%
-      mutate(locus = as.character(locus),
-             min.rd = as.numeric(min.rd),
-             min.ar = as.numeric(min.ar),
-             n.alleles = as.integer(n.alleles),
-             max.ar.hm = as.numeric(max.ar.hm),
-             min.ar.hz = as.numeric(min.ar.hz))
 
     if((!"max.ar.hm" %in% colnames(annotateTab$tbl)) || (!"n.alleles" %in% colnames(annotateTab$tbl))) {
       #if("n.alleles" %in% colnames(annotateTab$tbl))
@@ -179,6 +171,16 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       else {
         saveRDS(annotateTab$tbl, annotate.file)
       }
+
+      annotateTab$tbl <- annotateTab$tbl %>%
+        ungroup() %>%
+        mutate(locus = as.character(locus),
+               min.rd = as.numeric(min.rd),
+               min.ar = as.numeric(min.ar),
+               n.alleles = as.integer(n.alleles),
+               max.ar.hm = as.numeric(max.ar.hm),
+               min.ar.hz = as.numeric(min.ar.hz))
+
 
     }
 
