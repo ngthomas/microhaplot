@@ -1,6 +1,6 @@
 library(shiny)
 library(shinyBS)
-#library(plotly)
+library(plotly)
 library(shinyWidgets)
 
 # Define UI for application that draws a histogram
