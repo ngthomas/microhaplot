@@ -9,6 +9,7 @@ Description: This package has two main functions: 1) to extract microhaplotype f
     summaries plot found in the Shiny App interface.
 Depends:
     R (>= 3.1.2)
+Encoding: UTF-8
 License: GPL-3
 LazyData: TRUE
 Imports:
@@ -27,7 +28,7 @@ Imports:
     ggiraph (>= 0.6.0),
 URL: https://github.com/ngthomas/microhaplot
 BugReports: https://github.com/ngthomas/microhaplot/issues
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr

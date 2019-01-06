@@ -1,11 +1,14 @@
 #' Run Haplotype Plot.
 #'
 #' Run Haplotype shiny
-#' @path Path to shiny haPLOType app. Optional. If not specified, the path is default to local app path.
+#' @param path Path to shiny haPLOType app. Optional. If not specified, the path is default to local app path.
 #' @export
 #' @examples
+#' # this starts a shiny session, so should not be run during R CMD CHECK, etc.
+#' \dontrun{
 #' runHaplotype()
-runHaplotype <- function(path=system.file("shiny", "microhaplot", package = "microhaplot")) {
+#' }
+runHaplotype <- function(path = system.file("shiny", "microhaplot", package = "microhaplot")) {
   if (path == "" || !file.exists(path)) {
     #stop("Could not find Shiny directory. Try re-installing `mypackage`.", call. = FALSE)
     stop("Could not find Shiny directory", call. = FALSE)
@@ -19,18 +22,20 @@ runHaplotype <- function(path=system.file("shiny", "microhaplot", package = "mic
 #' @param path string. directory path. Required
 #' @export
 #' @examples
-#' runHaplotype()
+#' \dontrun{
+#' mvHaplotype("~/Shiny")
+#' }
 mvHaplotype <- function(path) {
   app.dir <- system.file("shiny", "microhaplot", package = "microhaplot")
   if (app.dir == "") {
     stop("Could not find shiny directory. Try re-installing `mypackage`.", call. = FALSE)
   }
 
-  if(!file.exists(paste0(path))) dir.create(path)
+  if (!file.exists(paste0(path))) dir.create(path)
 
   file.copy(paste0(app.dir, "/"),
             paste0(path, "/"),
-            recursive =T)
+            recursive = T)
 }
 
 
@@ -49,11 +54,13 @@ mvHaplotype <- function(path) {
 #' @param app.path string. Path to shiny haPLOType app. Optional. If not specified, the path is default to local app path.
 #' @export
 #' @examples
+#' \dontrun{
 #' run.label<-"example 1"
 #' sam.path<-"data/satro_sample"
 #' label.path <- "data/satro_sample/sample_label.txt"
 #' vcf.path <- "data/satro_sample/sebastes.vcf"
-#' # runHaplot(run.label, sam.path, label.path, vcf.path)
+#' runHaplot(run.label, sam.path, label.path, vcf.path)
+#' }
 runHaplot <- function(run.label, sam.path, label.path, vcf.path,
   out.path=sam.path,
   add.filter=FALSE,
@@ -63,34 +70,34 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
   haptureDir <- system.file("perl", "hapture", package = "microhaplot")
 
   # Need to check whether all path and files exist
-  if(!file.exists(paste0(sam.path))) stop("the path for 'sam.path' - ", sam.path, " does not exist")
-  if(!file.exists(paste0(label.path))) stop("the path for 'label.path' - ", label.path, " does not exist")
-  if(!file.exists(paste0(vcf.path))) stop("the path for 'vcf.path' - ", vcf.path, " does not exist")
-  if(!file.exists(paste0(out.path))) stop("the path for 'out.path' - ", out.path, " does not exist")
+  if (!file.exists(paste0(sam.path))) stop("the path for 'sam.path' - ", sam.path, " does not exist")
+  if (!file.exists(paste0(label.path))) stop("the path for 'label.path' - ", label.path, " does not exist")
+  if (!file.exists(paste0(vcf.path))) stop("the path for 'vcf.path' - ", vcf.path, " does not exist")
+  if (!file.exists(paste0(out.path))) stop("the path for 'out.path' - ", out.path, " does not exist")
 
   # the perl script hapture should display any warning if the label field contains any missing or invalid elements
 
 
   system(paste0("rm -f ", out.path, "/runHapture.sh"))
-  if(file.exists(paste0(out.path,"/intermed"))) system(paste0("rm -f ", out.path, "/intermed/", run.label, "_", "*.summary;"))
-  if(!file.exists(paste0(out.path,"/intermed"))) dir.create(paste0(out.path,"/intermed"))
+  if (file.exists(paste0(out.path,"/intermed"))) system(paste0("rm -f ", out.path, "/intermed/", run.label, "_", "*.summary;"))
+  if (!file.exists(paste0(out.path,"/intermed"))) dir.create(paste0(out.path,"/intermed"))
 
   # catch any problem in label file
-  read.label <- tryCatch(read.table(label.path,sep="\t",stringsAsFactors = F), error = function(c) {
+  read.label <- tryCatch(read.table(label.path,sep = "\t",stringsAsFactors = F), error = function(c) {
     c$message <- paste0(c$message, " (in ", label.path , ")")
     stop(c)
   })
-  if (dim(read.label)[2]<3) stop(label.path, "contains less than 3 columns.")
+  if (dim(read.label)[2] < 3) stop(label.path, "contains less than 3 columns.")
 
 
 
   garb <- sapply(1:nrow(read.label), function(i) {
 
     line <- read.label[i,] %>% unlist
-    if(!file.exists(paste0(sam.path,"/",line[1]))) stop("the SAM file, ",
+    if (!file.exists(paste0(sam.path,"/",line[1]))) stop("the SAM file, ",
                                                         sam.path,"/",line[1], ", does not exist")
 
-    wait.ln <- ifelse(i%%10==0," wait;"," ")
+    wait.ln <- ifelse(i %% 10 == 0," wait;"," ")
 
     run.perl.script <- paste0("perl ", haptureDir,
       " -v ", vcf.path, " ",
@@ -101,33 +108,33 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
       wait.ln)
 
     write(run.perl.script,
-      file=paste0(out.path, "/runHapture.sh"),
-      append=T)
+      file = paste0(out.path, "/runHapture.sh"),
+      append = T)
   })
 
 
   write(paste0("wait; exit 0;"),
-    file=paste0(out.path, "/runHapture.sh"),
-    append=T)
+    file = paste0(out.path, "/runHapture.sh"),
+    append = T)
 
   cat("...running Hapture.pl to extract haplotype information (takes a while)...")
   system(paste0("bash ",out.path,"/runHapture.sh"))
 
-  summary.tbl<-paste0(out.path,"/intermed/all.summary")
+  summary.tbl < -paste0(out.path,"/intermed/all.summary")
 
   system(paste0("rm -f ",summary.tbl))
 
   concat.file <- paste0("cat ",out.path, "/intermed/", run.label, "_", "*.summary",">",summary.tbl)
 
   # just in case if the user has loads of sam files and running out of buffer
-  if(nrow(read.label)>100) {
+  if (nrow(read.label) > 100) {
     concat.file <- paste0("find ",out.path, "/intermed -name ", run.label, "_", "*.summary",
                           "| while read F; do cat ${F} >>",summary.tbl, ";done")
   }
 
   system(concat.file)
 
-  haplo.sum <- read.table(summary.tbl, stringsAsFactors = FALSE, sep="\t") %>% dplyr::tbl_df()
+  haplo.sum <- read.table(summary.tbl, stringsAsFactors = FALSE, sep = "\t") %>% dplyr::tbl_df()
 
   colnames(haplo.sum) <- c("group", "id", "locus", "haplo", "depth", "sum.Phred.C", "max.Phred.C")
 
@@ -142,10 +149,10 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
     haplo.cleanup <- haplo.sum %>%
       dplyr::filter(!grepl("[N]", haplo)) %>%
       dplyr::group_by(locus, id) %>%
-      dplyr::mutate(n.haplo.per.indiv=n()) %>%
+      dplyr::mutate(n.haplo.per.indiv = dplyr::n()) %>%
       dplyr::ungroup() %>%
       dplyr::group_by(locus) %>%
-      dplyr::mutate(n.indiv.per.locus = length(unique(id)), max.uniq.hapl=max(n.haplo.per.indiv)) %>%
+      dplyr::mutate(n.indiv.per.locus = length(unique(id)), max.uniq.hapl = max(n.haplo.per.indiv)) %>%
       dplyr::ungroup() %>%
       dplyr::filter(n.indiv.per.locus > num.id/2, max.uniq.hapl < 40)  %>%
       dplyr::select(group, id, locus, haplo, depth, sum.Phred.C, max.Phred.C) }
@@ -153,15 +160,15 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
     haplo.cleanup <- haplo.sum %>% dplyr::select(group, id, locus, haplo, depth, sum.Phred.C, max.Phred.C)}
 
   haplo.add.balance <- haplo.cleanup %>%
-    dplyr::arrange(desc(depth)) %>%
+    dplyr::arrange(dplyr::desc(depth)) %>%
     dplyr::group_by(locus,id) %>%
-    dplyr::mutate(allele.balance = depth/depth[1], rank=row_number() ) %>%
+    dplyr::mutate(allele.balance = depth/depth[1], rank = dplyr::row_number() ) %>%
     dplyr::ungroup()
 
   vcf.pos.tbl <- read.table(vcf.path) %>%
     .[,1:2] %>% # grabbing locus name, and pos
     dplyr::group_by(V1) %>%
-    dplyr::summarise(pos=paste0(V2, collapse=","))
+    dplyr::summarise(pos = paste0(V2, collapse = ","))
 
   colnames(vcf.pos.tbl) <- c("locus","pos")
 
