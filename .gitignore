@@ -3,3 +3,7 @@
 .RData
 .Ruserdata
 inst/doc
+fish2_example_posinfo.rds
+fish2_example.rds
+example_438fish_324loci.rds
+example_438fish_324loci_posinfo.rds
