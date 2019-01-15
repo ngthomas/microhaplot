@@ -54,13 +54,17 @@ mvHaplotype <- function(path) {
 #' @param app.path string. Path to shiny haPLOType app. Optional. If not specified, the path is default to local app path.
 #' @export
 #' @examples
-#' \dontrun{
-#' run.label<-"example 1"
-#' sam.path<-"data/satro_sample"
-#' label.path <- "data/satro_sample/sample_label.txt"
-#' vcf.path <- "data/satro_sample/sebastes.vcf"
-#' runHaplot(run.label, sam.path, label.path, vcf.path)
-#' }
+#' run.label <- "sebastes"
+#' sam.path <- system.file("extdata","." , package="microhaplot")
+#' label.path <- system.file("extdata", "label.txt", package = "microhaplot")
+#' vcf.path <- system.file("extdata", "sebastes.vcf", package = "microhaplot")
+#' app.path <- system.file("shiny","microhaplot" , package="microhaplot")
+#'
+#' haplo.read.tbl <- runHaplot(run.label = run.label,
+#'                             sam.path = sam.path,
+#'                             label.path = label.path,
+#'                             vcf.path = vcf.path,
+#'                             app.path = app.path)
 runHaplot <- function(run.label, sam.path, label.path, vcf.path,
   out.path=sam.path,
   add.filter=FALSE,
@@ -155,9 +159,10 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
       dplyr::mutate(n.indiv.per.locus = length(unique(id)), max.uniq.hapl = max(n.haplo.per.indiv)) %>%
       dplyr::ungroup() %>%
       dplyr::filter(n.indiv.per.locus > num.id/2, max.uniq.hapl < 40)  %>%
-      dplyr::select(group, id, locus, haplo, depth, sum.Phred.C, max.Phred.C) }
-  else {
-    haplo.cleanup <- haplo.sum %>% dplyr::select(group, id, locus, haplo, depth, sum.Phred.C, max.Phred.C)}
+      dplyr::select(group, id, locus, haplo, depth, sum.Phred.C, max.Phred.C)
+    } else {
+      haplo.cleanup <- haplo.sum %>% dplyr::select(group, id, locus, haplo, depth, sum.Phred.C, max.Phred.C)
+    }
 
   haplo.add.balance <- haplo.cleanup %>%
     dplyr::arrange(dplyr::desc(depth)) %>%

@@ -5,7 +5,7 @@ Version: 0.1.0
 Authors@R: person("Thomas", "Ng", email = "tngthomasng@gmail.com", role = c("aut", "cre"))
 Description: This package has two main functions: 1) to extract microhaplotype from
     individual-based alignment and variant files, specifically from SAM and VCF files
-    2) to call and curate microhaplotype with the aid of simple filter criteria and
+    2) to call and curate microhaplotypes with the aid of simple filter criteria and
     summaries plot found in the Shiny App interface.
 Depends:
     R (>= 3.1.2)

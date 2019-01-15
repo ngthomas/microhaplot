@@ -1,5 +1,5 @@
 ---
-title: "An Introduction to haPLOType"
+title: "An Introduction to microhaplot data preparation"
 author: "Thomas Ng and Eric C. Anderson"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
