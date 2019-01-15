@@ -120,7 +120,7 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
   cat("...running Hapture.pl to extract haplotype information (takes a while)...")
   system(paste0("bash ",out.path,"/runHapture.sh"))
 
-  summary.tbl < -paste0(out.path,"/intermed/all.summary")
+  summary.tbl <- paste0(out.path,"/intermed/all.summary")
 
   system(paste0("rm -f ",summary.tbl))
 
