@@ -5,8 +5,8 @@
 \title{Extract haplotype from alignment reads.}
 \usage{
 runHaplot(run.label, sam.path, label.path, vcf.path, out.path = sam.path,
-  add.filter = FALSE, app.path = system.file("shiny", "microhaplot", package
-  = "microhaplot"))
+  add.filter = FALSE, app.path = system.file("shiny", "microhaplot",
+  package = "microhaplot"))
 }
 \arguments{
 \item{run.label}{character vector. Run label to be used to display in haPLOType. Required}
@@ -27,9 +27,15 @@ runHaplot(run.label, sam.path, label.path, vcf.path, out.path = sam.path,
 The function \code{microhaplot} extracts haplotype from sequence alignment files through perl script \code{hapture} and returns a summary table of the read depth and read quality associate with haplotype.
 }
 \examples{
-run.label<-"example 1"
-sam.path<-"data/satro_sample"
-label.path <- "data/satro_sample/sample_label.txt"
-vcf.path <- "data/satro_sample/sebastes.vcf"
-# runHaplot(run.label, sam.path, label.path, vcf.path)
+run.label <- "sebastes"
+sam.path <- system.file("extdata","." , package="microhaplot")
+label.path <- system.file("extdata", "label.txt", package = "microhaplot")
+vcf.path <- system.file("extdata", "sebastes.vcf", package = "microhaplot")
+app.path <- system.file("shiny","microhaplot" , package="microhaplot")
+
+haplo.read.tbl <- runHaplot(run.label = run.label,
+                            sam.path = sam.path,
+                            label.path = label.path,
+                            vcf.path = vcf.path,
+                            app.path = app.path)
 }

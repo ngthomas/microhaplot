@@ -11,3 +11,6 @@
 NULL
 
 
+#' @importFrom utils combn read.table
+NULL
+
