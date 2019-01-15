@@ -94,20 +94,24 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       return()
     #cat(file=stderr(), "select DB_", input$selectDB, "_----\n")
     if(length(grep(".feather", input$selectDB))) {
-    read_feather(input$selectDB)  %>%
+      table.out <- read_feather(input$selectDB)  %>%
         ungroup() %>%
         mutate(id = as.character(id),
                locus =as.character(locus),
                group=as.character(group)) %>%
         select(-sum.Phred.C, -max.Phred.C)
     } else {
-      readRDS(input$selectDB)  %>%
+      table.out <-readRDS(input$selectDB)  %>%
         ungroup() %>%
         mutate(id = as.character(id),
                locus =as.character(locus),
-               group=as.character(group)) %>%
-        select(-sum.Phred.C, -max.Phred.C)
+               group=as.character(group))
     }
+
+    if ("sum.Phred.C" %in% colnames(table.out)) {
+      table.out <- table.out %>% select(-sum.Phred.C, -max.Phred.C)}
+
+    table.out
   })
 
   extract.pos.file <- reactive({
@@ -1148,7 +1152,6 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                                                     min.ar= filterParam$minAR,
                                                     n.alleles = filterParam$n.alleles)
     }
-
 
     # using the general broad stroke
     if (! "3" %in% filterParam$opts)
