@@ -7,9 +7,15 @@
 runHaplotype(path = system.file("shiny", "microhaplot", package =
   "microhaplot"))
 }
+\arguments{
+\item{path}{Path to shiny haPLOType app. Optional. If not specified, the path is default to local app path.}
+}
 \description{
 Run Haplotype shiny
 }
 \examples{
+# this starts a shiny session, so should not be run during R CMD CHECK, etc.
+\dontrun{
 runHaplotype()
+}
 }

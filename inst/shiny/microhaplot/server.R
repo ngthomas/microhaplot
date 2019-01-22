@@ -1153,7 +1153,6 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                                                     n.alleles = filterParam$n.alleles)
     }
 
-
     # using the general broad stroke
     if (! "3" %in% filterParam$opts)
       haplo.join.ar <- haplo.join.ar %>%
