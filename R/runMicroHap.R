@@ -21,7 +21,7 @@
 #' @param haplo.tbl data frame. A haplotype data frame generated from running `runHaplo`.  The table contains "group" label, individual "id" label,
 #'  "locus" label, observed "haplo"type, haplotype read "depth", "logP.call", "logP.miscall", "pos", "allele.balance","rank", etc.
 #' @param locus string. the locus name. Required
-#' @param n.sample integer. number of iterations. required
+#' @param n.sam integer. number of iterations. required
 #' @param random.seed integer. Set the random seed number. Default sets as 43454. Optional
 #' @param prior.model String. Choose two different prior models: "uniform" - prior set all prior haplotype weight to 1, or "empirical": the prior
 #' alpha values are defined by the number of observed cases under refinement
@@ -74,7 +74,7 @@ tidyHaplo <- function(haplo.tbl, locus.select, min.read.depth) {
     #tidyr::separate(logP.call, paste0("logC.",1:n.sites), sep=",") %>%
     #tidyr::separate(logP.miscall, paste0("logW.",1:n.sites), sep=",") %>%
     dplyr::mutate(uniq.id = as.numeric(factor(id, levels = unique(haplo.tbl$id)))) %>%
-    filter(depth >= min.read.depth)
+    dplyr::filter(depth >= min.read.depth)
 }
 
 setParam <-
@@ -106,7 +106,7 @@ setParam <-
       dplyr::filter(rank < 3 , allele.balance > 0.3, depth > 10) %>%
       #dplyr::filter(!grepl("[N]", haplo)) %>%
       dplyr::group_by(haplo) %>%
-      dplyr::summarise(count = n())
+      dplyr::summarise(count = dplyr::n())
 
     if (is.null(all.haplotype$haplo) || dim(all.haplotype)[1] == 0) {
       cat("No good haplotype candidate")
@@ -177,7 +177,7 @@ setParam <-
       haplo.ct <- haplo.tbl %>%
         dplyr::filter(group == param$group[i]) %>%
         dplyr::group_by(haplo) %>%
-        dplyr::summarise(count = n()) %>%
+        dplyr::summarise(count = dplyr::n()) %>%
         dplyr::right_join(.,
                           data.frame("haplo" = param$haplo, stringsAsFactors = F),
                           by = "haplo")
@@ -366,7 +366,7 @@ PreComputeMatching <- function(param, haplo.tbl) {
 
   # Summing all log P by individual
   index.read.to.indiv <-
-    haplo.tbl %>% dplyr::mutate(indx = row_number()) %>% dplyr::select(uniq.id, indx) %>% as.matrix(ncol =
+    haplo.tbl %>% dplyr::mutate(indx = dplyr::row_number()) %>% dplyr::select(uniq.id, indx) %>% as.matrix(ncol =
                                                                                                       2, byrow = T)
   indic.matrix.read.by.indiv <-
     matrix(0, nrow = param$n.indiv, ncol = n.reads)
