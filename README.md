@@ -92,10 +92,17 @@ library(microhaplot)
 
 # to access package sample case study dataset of rockfish
 run.label <- "sebastes"
-sam.path <- system.file("extdata","." , package="microhaplot")
-label.path <- system.file("extdata", "label.txt", package = "microhaplot")
-vcf.path <- system.file("extdata", "sebastes.vcf", package = "microhaplot")
-app.path <- system.file("shiny","microhaplot" , package="microhaplot")
+
+sam.path <- tempdir()
+untar(system.file("extdata",
+                  "sebastes_sam.tar.gz",
+                  package="microhaplot"),
+      exdir = sam.path)
+      
+label.path <- file.path(sam.path, "label.txt")
+vcf.path <- file.path(sam.path, "sebastes.vcf")
+out.path <- tempdir()
+app.path <- "~/Shiny/microhaplot"
 
 # for your dataset: customize the following paths
 # sam.path <- "~/microhaplot/extdata/"
@@ -104,11 +111,12 @@ app.path <- system.file("shiny","microhaplot" , package="microhaplot")
 # app.path <- "~/Shiny/microhaplot"
 
 haplo.read.tbl <- runHaplot(run.label = run.label,
-           sam.path=sam.path,
-           label.path=label.path,
-           vcf.path=vcf.path,
-           app.path=app.path)
-           
+                            sam.path = sam.path,
+                            out.path = out.path,
+                            label.path = label.path,
+                            vcf.path = vcf.path,
+                            app.path = app.path)
+
 runHaplotype(app.path)
 ```
 
