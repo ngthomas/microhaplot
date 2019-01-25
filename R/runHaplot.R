@@ -68,12 +68,12 @@ mvHaplotype <- function(path) {
 #' mvHaplotype(tempdir())
 #' app.path <- file.path(tempdir(), "microhaplot")
 #'
-#' #haplo.read.tbl <- runHaplot(run.label = run.label,
-#' #                             sam.path = sam.path,
-#' #                             out.path = tempdir(),
-#' #                             label.path = label.path,
-#' #                             vcf.path = vcf.path,
-#' #                             app.path = app.path)
+#' haplo.read.tbl <- runHaplot(run.label = run.label,
+#'                             sam.path = sam.path,
+#'                             out.path = tempdir(),
+#'                             label.path = label.path,
+#'                             vcf.path = vcf.path,
+#'                             app.path = app.path)
 runHaplot <- function(run.label, sam.path, label.path, vcf.path,
   out.path=tempdir(),
   add.filter=FALSE,
