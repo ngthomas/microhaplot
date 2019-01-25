@@ -42,10 +42,10 @@ vcf.path <- file.path(sam.path, "sebastes.vcf")
 mvHaplotype(tempdir())
 app.path <- file.path(tempdir(), "microhaplot")
 
-haplo.read.tbl <- runHaplot(run.label = run.label,
-                            sam.path = sam.path,
-                            out.path = tempdir(),
-                            label.path = label.path,
-                            vcf.path = vcf.path,
-                            app.path = app.path)
+#haplo.read.tbl <- runHaplot(run.label = run.label,
+#                             sam.path = sam.path,
+#                             out.path = tempdir(),
+#                             label.path = label.path,
+#                             vcf.path = vcf.path,
+#                             app.path = app.path)
 }
