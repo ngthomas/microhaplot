@@ -10,4 +10,5 @@ addons:
   apt:
     packages:
       - perl
+      - libmoo-perl
 
