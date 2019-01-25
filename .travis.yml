@@ -11,4 +11,4 @@ addons:
     packages:
       - perl
       - libmoo-perl
-
+      - libnamespace-clean-perl
