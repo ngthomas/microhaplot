@@ -12,5 +12,6 @@ NULL
 
 
 #' @importFrom utils combn read.table
+#' @importFrom dplyr group_trim
 NULL
 

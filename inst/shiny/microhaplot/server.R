@@ -158,7 +158,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     }
 
     annotateTab$tbl <- annotateTab$tbl %>%
-      group_by(locus) %>%
+      group_by(locus) %>% group_trim() %>%
       mutate(max.ar.hm = ifelse(max.ar.hm > min.ar, min.ar, max.ar.hm),
              min.ar.hz = ifelse(min.ar.hz < min.ar, min.ar, min.ar.hz)) %>%
       ungroup()
@@ -224,13 +224,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     entropy.tbl <- haplo.filter %>%
       filter(locus !="ALL", rank <= 2) %>%
-      group_by(locus, group, haplo) %>% summarise(n=n()) %>%
+      group_by(locus, group, haplo) %>% group_trim() %>% summarise(n=n()) %>%
       ungroup() %>%
-      group_by(locus, group) %>%
+      group_by(locus, group) %>% group_trim() %>%
       mutate(f = n/n()) %>%
-      ungroup() %>% group_by(locus, haplo) %>%
+      ungroup() %>% group_by(locus, haplo) %>% group_trim() %>%
       mutate(shan.entropy = f/sum(f)*log(sum(f)/f, base=2)) %>%
-      ungroup() %>% group_by(locus) %>%
+      ungroup() %>% group_by(locus) %>% group_trim() %>%
       summarise(ave.entropy.tem = round(mean(shan.entropy) ,3))
 
     annotateTab$tbl <- left_join(annotateTab$tbl, entropy.tbl, by="locus") %>%
@@ -1025,19 +1025,19 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     obs.freq.tbl <-  haplo.summaryTbl() %>%
       ungroup() %>%
-      group_by(locus) %>%
+      group_by(locus) %>% group_trim() %>%
       mutate(tot.haplo = n()) %>%
-      group_by(locus, haplotype.1, haplotype.2) %>%
+      group_by(locus, haplotype.1, haplotype.2) %>% group_trim() %>%
       summarise(obs.freq = n() / tot.haplo[1])
 
     expect.freq.tbl <-
       gather(obs.freq.tbl, whichHap,  hap1, 2:3) %>%
-      group_by(locus, hap1) %>%
+      group_by(locus, hap1) %>% group_trim() %>%
       summarise(n = sum(obs.freq / 2)) %>%
       mutate(hap2 = hap1, n1 = n) %>%
       expand(., nesting(hap1, n), nesting(hap2, n1)) %>%
       mutate(expected.freq = ifelse(hap1 == hap2, n * n1, 2 * n * n1)) %>%
-      group_by(locus, hap1, hap2) %>%
+      group_by(locus, hap1, hap2) %>% group_trim() %>%
       mutate(haplotype.1 = sort(c(hap1, hap2))[1],
              haplotype.2 = sort(c(hap1, hap2))[2]) %>%
       ungroup() %>%
@@ -1078,7 +1078,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.join.ar <- left_join(haplo.sum,
                                annotateTab$tbl,
                                by="locus") %>%
-      group_by(locus)
+      group_by(locus) %>% group_trim()
 
     ## override if the existed value is below the minimal baseline
     if ("1" %in% filterParam$opts) {
@@ -1123,7 +1123,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.join.ar <- haplo.join.ar %>% ungroup() %>%
       filter(#allele.balance >= min.ar,
              rank <= n.alleles) %>%
-      group_by(group, id, locus) %>%
+      group_by(group, id, locus) %>% group_trim() %>%
       mutate(tot.depth = sum(depth)) %>%
       ungroup() %>%
       filter(tot.depth >= min.rd) %>%
@@ -1144,7 +1144,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                                by="locus") %>% ungroup() %>%
       filter(rank <= n.alleles) %>%
       arrange(group, id, locus, rank) %>%
-      group_by(group, id, locus) %>%
+      group_by(group, id, locus) %>% group_trim() %>%
       summarise(
         tot.depth = sum(depth),
         categ = ifelse(length(rank) > 1  &&
@@ -1180,7 +1180,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     if (is.null(Filter.haplo.sum()))
       return()
     haplo.ct <- Filter.haplo.sum() %>%
-      group_by(locus, id, group) %>%
+      group_by(locus, id, group) %>% group_trim() %>%
       summarise(tot.hapl = n(), tot.depth = sum(depth))
 
   })
@@ -1189,7 +1189,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     if (is.null(Filter.haplo.sum()))
       return()
     haplo.ct <- Filter.haplo.sum() %>%
-      group_by(id, locus) %>%
+      group_by(id, locus) %>% group_trim() %>%
       summarise(tot.depth = sum(depth))
   })
 
@@ -1210,10 +1210,10 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       return()
 
     haplo.tot.tbl <- Get.tbl.by.locus() %>%
-      group_by(locus, tot.hapl) %>%
+      group_by(locus, tot.hapl) %>% group_trim() %>%
       summarise(ct = n()) %>%
       ungroup() %>%
-      group_by(locus) %>%
+      group_by(locus) %>% group_trim() %>%
       mutate(frac = ct / sum(ct))
 
     #cat(file=stderr(), "is it updating_", unlist(haplo.tot.tbl[1,]), "_----\n")
@@ -1287,7 +1287,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
 
     frac.calleable <-
-      haplo.summaryTbl() %>% group_by(locus) %>% summarise(n = length(unique(c(
+      haplo.summaryTbl() %>% group_by(locus) %>% group_trim() %>% summarise(n = length(unique(c(
         haplotype.1, haplotype.2
       ))))
 
@@ -1351,7 +1351,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       ifelse(input$selectIndiv == "ALL", panelParam$n.indiv, 1)
 
     frac.calleable <-
-      haplo.summaryTbl() %>% group_by(locus) %>% summarise(f = n() / nIndiv)
+      haplo.summaryTbl() %>% group_by(locus) %>% group_trim() %>% summarise(f = n() / nIndiv)
     frac.calleable <-
       right_join(frac.calleable, panelParam$locus.label.tbl, by = "locus")
     if (is.null(frac.calleable))
@@ -1425,7 +1425,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     }
 
     readDepth.perI.tbl <-
-      readDepth.perI.tbl %>% group_by(locus) %>% mutate(mean.depth = mean(tot.depth))
+      readDepth.perI.tbl %>% group_by(locus) %>% group_trim() %>% mutate(mean.depth = mean(tot.depth))
 
     ggplot(readDepth.perI.tbl, aes(x = locus, y = tot.depth)) +
       xlab("") +
@@ -1481,7 +1481,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       return()
 
     haplo.filter <- haplo.filter %>%
-      group_by(locus, id, group) %>%
+      group_by(locus, id, group) %>% group_trim() %>%
       summarise(depth.ratio = ifelse(length(depth) == 1, 0, min(allele.balance)),
                 depth.first = max(depth))
 
@@ -1555,10 +1555,10 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     if(is.null(Filter.haplo.sum())) return()
 
     filter.haplo <- Filter.haplo.sum() %>%
-      group_by(id, locus) %>%
+      group_by(id, locus) %>% group_trim() %>%
       summarise(n.hap.locus = n()) %>%
       ungroup() %>%
-      group_by(id, n.hap.locus) %>%
+      group_by(id, n.hap.locus) %>% group_trim() %>%
       summarise(n.locus = n())
 
 
@@ -1616,7 +1616,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       ifelse(input$selectLocus == "ALL", panelParam$n.locus, 1)
 
     haplo.filter <-
-      haplo.summaryTbl() %>% group_by(id) %>% summarise(f = n() / nLocus)
+      haplo.summaryTbl() %>% group_by(id) %>% group_trim() %>% summarise(f = n() / nLocus)
     if (dim(panelParam$indiv.label.tbl)[1] == 0)
       return()
     haplo.filter <-
@@ -1674,7 +1674,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   #
   #   haplo.filter <- Get.tbl.by.id() %>%
   #     ungroup()%>%
-  #     group_by(id) %>%
+  #     group_by(id) %>% group_trim() %>%
   #     summarise(mean.depth = mean(tot.depth))
   #
   #   if(dim(panelParam$indiv.label.tbl)[1]==0) return()
@@ -1726,7 +1726,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.filter[is.na(haplo.filter)] <- 0
 
     haplo.filter <-
-      haplo.filter %>% group_by(id) %>% mutate(mean.depth = mean(depth))
+      haplo.filter %>% group_by(id) %>% group_trim() %>% mutate(mean.depth = mean(depth))
 
     #  if (input$selectIndiv != "ALL") {
     #    haplo.filter <- haplo.filter %>% filter(id == input$selectIndiv)
@@ -1887,7 +1887,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   #     return ()
   #
   #   filter.tbl <-
-  #     Filter.haplo.sum() %>% group_by(group) %>% summarise(n.indiv = length(unique(id)))
+  #     Filter.haplo.sum() %>% group_by(group) %>% group_trim() %>% summarise(n.indiv = length(unique(id)))
   #
   #   ggplot(filter.tbl, aes(x = n.indiv, y = group, color = group)) +
   #     geom_point() +
@@ -1916,20 +1916,20 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
 
     all.indiv <-
-      update.Haplo.file() %>% group_by(group, locus) %>% summarise(nIndiv = ifelse(input$selectIndiv !=
+      update.Haplo.file() %>% group_by(group, locus) %>% group_trim() %>% summarise(nIndiv = ifelse(input$selectIndiv !=
                                                                                      "ALL", 1, length(unique(id))))
 
 
     filter.indiv <-
-      Filter.haplo.sum() %>% group_by(group, locus) %>% summarise(fIndiv = length(unique(id)))
+      Filter.haplo.sum() %>% group_by(group, locus) %>% group_trim() %>% summarise(fIndiv = length(unique(id)))
     frac.calleable <-
       left_join(filter.indiv, all.indiv, by = c("group", "locus")) %>% mutate(f =
                                                                                 fIndiv / nIndiv)
 
 
-    filter.indiv <- filter.indiv %>% group_by(group) %>% summarise(fIndiv = round(mean(fIndiv)))
+    filter.indiv <- filter.indiv %>% group_by(group) %>% group_trim() %>% summarise(fIndiv = round(mean(fIndiv)))
 
-    mean.f.tbl <- frac.calleable %>% group_by(group) %>%
+    mean.f.tbl <- frac.calleable %>% group_by(group) %>% group_trim() %>%
       summarise(mean.f = mean(f, na.rm = T))
 
 
@@ -1978,7 +1978,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   #     return ()
   #
   #   filter.tbl <-
-  #     Filter.haplo.sum() %>% group_by(group) %>% summarise(n.locus = length(unique(locus)))
+  #     Filter.haplo.sum() %>% group_by(group) %>% group_trim() %>% summarise(n.locus = length(unique(locus)))
   #
   #   ggplot(filter.tbl, aes(x = n.locus, y = group, color = group)) +
   #     geom_point() +
@@ -2007,18 +2007,18 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       return ()
 
     all.locus <-
-      update.Haplo.file() %>% group_by(group, id) %>% summarise(nLocus = ifelse(input$selectLocus !=
+      update.Haplo.file() %>% group_by(group, id) %>% group_trim() %>% summarise(nLocus = ifelse(input$selectLocus !=
                                                                                   "ALL", 1, length(unique(locus))))
     filter.locus <-
-      Filter.haplo.sum() %>% group_by(group, id) %>% summarise(fLocus = length(unique(locus)))
+      Filter.haplo.sum() %>% group_by(group, id) %>% group_trim() %>% summarise(fLocus = length(unique(locus)))
     frac.calleable <-
       left_join(filter.locus, all.locus, by = c("group", "id")) %>% mutate(f =
                                                                              fLocus / nLocus)
-    filter.locus <- filter.locus %>% group_by(group) %>% summarise(fLocus = round(mean(fLocus)))
+    filter.locus <- filter.locus %>% group_by(group) %>% group_trim() %>% summarise(fLocus = round(mean(fLocus)))
 
 
     mean.f.tbl <-
-      frac.calleable %>% group_by(group) %>% summarise(mean.f = mean(f, na.rm =
+      frac.calleable %>% group_by(group) %>% group_trim() %>% summarise(mean.f = mean(f, na.rm =
                                                                        T))
     #     if(is.null(frac.calleable)) return()
     #     frac.calleable[is.na(frac.calleable)]<- 0
@@ -2074,11 +2074,11 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.rep <- haplo.filter %>%
       #filter(depth >= filterParam$minRD,
       #       allele.balance >= filterParam$minAR) %>%
-      group_by(id, locus) %>%
+      group_by(id, locus) %>% group_trim() %>%
       summarise(n.accept.haplo = 1*(max(rank)>2)) %>%
-      group_by(id) %>%
+      group_by(id) %>% group_trim() %>%
       summarise(n.loci.ambig = sum(n.accept.haplo)) %>%
-      group_by(n.loci.ambig) %>%
+      group_by(n.loci.ambig) %>% group_trim() %>%
       summarise(n.indiv = n(),
                 indiv.label = ifelse(n.indiv > 10,
                                      paste0(c(id[1:10],"..."),collapse = "\n"),
@@ -2129,11 +2129,11 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.rep <- haplo.filter %>%
       #filter(depth >= filterParam$minRD,
       #       allele.balance >= filterParam$minAR) %>%
-      group_by(id, locus) %>%
+      group_by(id, locus) %>% group_trim() %>%
       summarise(n.accept.haplo = 1*(max(rank)>2)) %>%
-      group_by(locus) %>%
+      group_by(locus) %>% group_trim() %>%
       summarise(n.indiv.ambig = sum(n.accept.haplo)) %>%
-      group_by(n.indiv.ambig) %>%
+      group_by(n.indiv.ambig) %>% group_trim() %>%
       summarise(n.loci = n(),
                 loci.label = ifelse(n.loci > 10,
                                      paste0(c(locus[1:10],"..."),collapse = "\n"),
@@ -2228,14 +2228,14 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.match.rep.1 <- haplo.filter %>%
       filter(hap.1 %in% haplo.rep) %>%
       mutate(haplo=factor(hap.1, level=sort(haplo.rep,decreasing=T))) %>%
-      group_by(haplo, id) %>%
+      group_by(haplo, id) %>% group_trim() %>%
       summarise(top.2 = 0.2 - 0.05*(categ[1]=="Het"),
                 rank.mod = 1, depth = rd.1[1], geno.class = categ[1],
                 is.incl = 1*(finalCall[1]=="call"))
 
     haplo.match.rep.2 <- haplo.filter %>% filter(hap.2 %in% haplo.rep) %>%
       mutate(haplo=factor(hap.2, level=sort(haplo.rep,decreasing=T))) %>%
-      group_by(haplo, id) %>%
+      group_by(haplo, id) %>% group_trim() %>%
       summarise(top.2 = ifelse(rank.rel == 2, 0, -0.2) - 0.05*(categ[1]=="Het"),
              rank.mod = rank.rel,
              depth = rd.2[1], geno.class = categ[1],
@@ -2292,14 +2292,14 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.match.rep.1 <- haplo.filter %>%
       filter(hap.1 %in% haplo.rep) %>%
       mutate(haplo=factor(hap.1, level=sort(haplo.rep,decreasing=T))) %>%
-      group_by(haplo, id) %>%
+      group_by(haplo, id) %>% group_trim() %>%
       summarise(top.2 = 0.2 - 0.05*(categ[1]=="Het"),
                 rank.mod = 1, ar = 1, geno.class = categ[1],
                 is.incl = 1*(finalCall[1]=="call"))
 
     haplo.match.rep.2 <- haplo.filter %>% filter(hap.2 %in% haplo.rep) %>%
       mutate(haplo=factor(hap.2, level=sort(haplo.rep,decreasing=T))) %>%
-      group_by(haplo, id) %>%
+      group_by(haplo, id) %>% group_trim() %>%
       summarise(top.2 = ifelse(rank.rel == 2, 0, -0.2) - 0.05*(categ[1]=="Het"),
                 rank.mod = rank.rel,
                 ar = rd.2/rd.1, geno.class = categ[1],
@@ -2354,7 +2354,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     h <- haplo.filter %>%
       filter(rank <= filterParam$n.alleles) %>%
       arrange(group, id, locus, rank) %>%
-      group_by(group, id, locus) %>%
+      group_by(group, id, locus) %>% group_trim() %>%
       summarise(categ = ifelse(length(rank) >1 &&
                                  allele.balance[2] >= filterParam$minAR,
                                "Het","Homoz"),
@@ -2381,7 +2381,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         filter(rank <= filterParam$n.alleles, rank > 2),
         h, by = c("id", "locus", "group")) %>%
         arrange(group, id, locus, rank) %>%
-        group_by(group, id, locus, rank) %>%
+        group_by(group, id, locus, rank) %>% group_trim() %>%
         summarise(categ = ifelse(allele.balance[1] >= filterParam$minAR,
                                  "Het","-"),
                   genotype = ifelse(categ=="Het",
@@ -2464,7 +2464,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       if(is.null(gdepths)) return()
 
       n.sample <- nrow(gdepths)
-      pc.df <- gdepths %>% group_by(finalCall) %>%
+      pc.df <- gdepths %>% group_by(finalCall) %>% group_trim() %>%
         summarise(n=n(),
                   frac=n/n.sample,
                   perc = paste0(round(n*100/n.sample,1),"%"),
@@ -2612,7 +2612,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     haplo.filter <- Min.filter.haplo() %>%
       filter(rank <= filterParam$n.alleles) %>%
-      group_by(id, locus) %>%
+      group_by(id, locus) %>% group_trim() %>%
       summarise(tot.depth = sum(depth))
 
     if(is.null(Min.filter.haplo)) return()
@@ -2689,7 +2689,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     haplo.filter <- Min.filter.haplo() %>%
       filter(rank <= filterParam$n.alleles) %>%
-      group_by(id, locus) %>%
+      group_by(id, locus) %>% group_trim() %>%
       mutate(tot.depth = sum(depth)) %>%
       ungroup()
 
@@ -2741,7 +2741,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     haplo.filter <- Min.filter.haplo() %>%
       filter(rank <= filterParam$n.alleles) %>%
-      group_by(id, locus) %>%
+      group_by(id, locus) %>% group_trim() %>%
       mutate(tot.depth = sum(depth)) %>%
       ungroup()
 
@@ -2755,7 +2755,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     haplo.match.rep <- haplo.filter %>% filter(haplo %in% haplo.rep) %>%
       mutate(haplo=factor(haplo, level=sort(haplo.rep,decreasing=T))) %>%
-      group_by(haplo) %>%
+      group_by(haplo) %>% group_trim() %>%
       mutate(n.accept.indiv = sum(tot.depth >=filterParam$minRD),
              n.reject.indiv = sum(tot.depth < filterParam$minRD)) %>%
       ungroup() %>%
@@ -2763,7 +2763,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
              center.x.accept = mean(tot.depth[tot.depth>=filterParam$minRD]),
              center.x.reject = mean(tot.depth[tot.depth<filterParam$minRD]),
              center.y = 0.5+ min(n.accept.indiv/2, n.reject.indiv/2)) %>%
-      group_by(haplo, id) %>%
+      group_by(haplo, id) %>% group_trim() %>%
       mutate(is.pass = 1*(tot.depth >=filterParam$minRD))
 
 
@@ -2835,7 +2835,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     haplo.filter <- Min.filter.haplo() %>%
       filter(rank <= filterParam$n.alleles) %>%
-      group_by(id, locus) %>%
+      group_by(id, locus) %>% group_trim() %>%
       mutate(tot.depth = sum(depth)) %>%
       ungroup()
 
@@ -2849,7 +2849,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     haplo.match.rep <- haplo.filter %>% filter(haplo %in% haplo.rep) %>%
       mutate(haplo=factor(haplo, level=sort(haplo.rep,decreasing=T))) %>%
-      group_by(haplo) %>%
+      group_by(haplo) %>% group_trim() %>%
       mutate(n.accept.indiv = sum(allele.balance >=filterParam$minAR),
              n.reject.indiv = sum(allele.balance < filterParam$minAR)) %>%
       ungroup() %>%
@@ -2858,7 +2858,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                               0.9),
         center.x.reject = min(mean(allele.balance[allele.balance<filterParam$minAR]),0.9),
         center.y = 0.5+ min(n.accept.indiv/2, n.reject.indiv/2))%>%
-      group_by(haplo, id) %>%
+      group_by(haplo, id) %>% group_trim() %>%
       mutate(is.pass = 1*(allele.balance >=filterParam$minAR))
 
     if (nrow(haplo.match.rep)==0) return()
@@ -2924,7 +2924,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     if (is.null(haplo.filter) || nrow(haplo.filter) == 0) return()
     haplo.profile.frac <- haplo.filter %>%
-      group_by(haplo) %>%
+      group_by(haplo) %>% group_trim() %>%
       summarise(n = n()) %>%
       ungroup() %>%
       mutate(frac = n / sum(n))
@@ -3004,7 +3004,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     allelic.freq.tbl <- haplo.summaryTbl() %>%
       ungroup() %>%
       gather(., whichHap,  hap, 4:5) %>%
-      group_by(locus, hap) %>%
+      group_by(locus, hap) %>% group_trim() %>%
       summarise(f= n()/(2*n.indiv),
                 n.occur = n(),
                 tot.rd =  sum((whichHap=="haplotype.1")*read.depth.1)+
@@ -3132,24 +3132,24 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
 
     haplo.filter <- haplo.filter %>%
-      group_by(locus, id) %>%
+      group_by(locus, id) %>% group_trim() %>%
       summarise(
         hap1 = sort(c(haplotype.1, haplotype.2))[1],
         hap2 = sort(c(haplotype.1, haplotype.2))[2]
       ) %>%
       ungroup() %>%
-      group_by(locus, hap1, hap2) %>%
+      group_by(locus, hap1, hap2) %>% group_trim() %>%
       summarise(n = n())
 
     n.hap <- 2 * sum(haplo.filter$n)
     freq.hap <- gather(haplo.filter, whichHap,  hap, 2:3) %>%
-      group_by(locus, hap) %>%
+      group_by(locus, hap) %>% group_trim() %>%
       summarise(n = sum(n) / n.hap) %>%
       mutate(hap1 = hap, n1 = n) %>%
       expand(., nesting(hap, n), nesting(hap1, n1)) %>%
       mutate(freq = ifelse(hap == hap1, n * n1, 2 * n * n1)) %>%
       rename("hap1" = hap, "hap2" = hap1) %>%
-      group_by(locus, hap1, hap2) %>%
+      group_by(locus, hap1, hap2) %>% group_trim() %>%
       mutate(re.hap1 = sort(c(hap1, hap2))[1],
              re.hap2 = sort(c(hap1, hap2))[2])
 
@@ -3222,7 +3222,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     allelic.freq.tbl <-  haplo.summaryTbl() %>%
       ungroup() %>%
       gather(., whichHap,  hap, 4:5) %>%
-      group_by(group, locus, hap) %>%
+      group_by(group, locus, hap) %>% group_trim() %>%
       summarise(f= n()/(2*n.indiv),
                 n.indiv = length(unique(id)))
 
@@ -3260,7 +3260,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     allelic.freq.tbl <-  haplo.summaryTbl() %>%
       ungroup() %>%
       gather(., whichHap,  hap, 4:5) %>%
-      group_by(group, locus, hap) %>%
+      group_by(group, locus, hap) %>% group_trim() %>%
       summarise(f= n()/(2*n.indiv),
                 n.indiv = length(unique(id)))
 
@@ -3320,7 +3320,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     hap.top.n <- hap.sel %>%
       filter(rank <= filterParam$n.alleles) %>%
-      group_by(locus, id) %>%
+      group_by(locus, id) %>% group_trim() %>%
       mutate(tot.rd = sum(depth)) %>%
       ungroup()
 
@@ -3332,7 +3332,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
           filter(allele.balance >= af,tot.rd >= rd)
 
       hap.n <- hap.p %>%
-        group_by(locus) %>%
+        group_by(locus) %>% group_trim() %>%
         summarise(num.hap = length(unique(haplo)), num.pass.indiv = length(unique(id))) %>%
         ungroup() %>%
         summarise(num.hap.pass = sum(num.hap),
@@ -3341,8 +3341,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       hap.n %>%
         summarise(descr = paste0(num.hap.pass, " hap,\n", num.indiv.pass, " indiv"))
       # hap.all <- hap.sel %>% filter(allele.balance >= af) %>%
-      #   group_by(locus, id) %>%
-      #   mutate(max.depth = max(tot.depth)) %>% group_by(locus) %>%
+      #   group_by(locus, id) %>% group_trim() %>%
+      #   mutate(max.depth = max(tot.depth)) %>% group_by(locus) %>% group_trim() %>%
       #   summarise(num.hap = length(unique(haplo)), num.ambig.indiv = sum(rank>filterParam$n.alleles)) %>%
       #   ungroup() %>%
       #   summarise(num.hap.pass.n = sum(num.hap),
@@ -3361,7 +3361,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     colnames(rd.af.grid.tbl) <- c("af", "rd", "content")
 
     rd.af.grid.tbl <- rd.af.grid.tbl %>%
-      group_by(af,rd)%>%
+      group_by(af,rd) %>% group_trim() %>%
       mutate(color.grp = 1*(filterParam$minRD==rd) + 1*(filterParam$minAR==af))
 
     ggplot(rd.af.grid.tbl, aes(x=factor(rd), y=factor(af))) +
@@ -3426,7 +3426,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         n.base <- nchar(haplo.summaryTable$haplotype.1)
         haplo.all <-
           haplo.summaryTable[rep(seq(1, nrow(haplo.summaryTable)), n.base),] %>%
-          group_by(locus, id, group) %>%
+          group_by(locus, id, group) %>% group_trim() %>%
           mutate(snp.id = row_number(),
                  snp = paste0(
                    substr(haplotype.1, snp.id, snp.id),
@@ -3513,7 +3513,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       n.base <- nchar(haplo.summaryTable$haplotype.1)
       haplo.all <-
         haplo.summaryTable[rep(seq(1, nrow(haplo.summaryTable)), n.base),] %>%
-        group_by(locus, id, group) %>%
+        group_by(locus, id, group) %>% group_trim() %>%
         mutate(snp.id = row_number(),
                snp = paste0(
                  substr(haplotype.1, snp.id, snp.id),
@@ -3770,7 +3770,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       filter(depth >=filterParam$minRD,
              rank <= 2,
              allele.balance >= filterParam$minAR) %>%
-      group_by(group, id) %>%
+      group_by(group, id) %>% group_trim() %>%
       arrange(-depth) %>%
       summarise(
         haplotype.pair = ifelse(length(depth) == 1,

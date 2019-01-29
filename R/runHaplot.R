@@ -163,10 +163,10 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
 
     haplo.cleanup <- haplo.sum %>%
       dplyr::filter(!grepl("[N]", haplo)) %>%
-      dplyr::group_by(locus, id) %>%
+      dplyr::group_by(locus, id) %>% group_trim() %>%
       dplyr::mutate(n.haplo.per.indiv = dplyr::n()) %>%
       dplyr::ungroup() %>%
-      dplyr::group_by(locus) %>%
+      dplyr::group_by(locus) %>% group_trim() %>%
       dplyr::mutate(n.indiv.per.locus = length(unique(id)), max.uniq.hapl = max(n.haplo.per.indiv)) %>%
       dplyr::ungroup() %>%
       dplyr::filter(n.indiv.per.locus > num.id/2, max.uniq.hapl < 40)  %>%
@@ -177,13 +177,13 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
 
   haplo.add.balance <- haplo.cleanup %>%
     dplyr::arrange(dplyr::desc(depth)) %>%
-    dplyr::group_by(locus,id) %>%
+    dplyr::group_by(locus,id) %>% group_trim() %>%
     dplyr::mutate(allele.balance = depth/depth[1], rank = dplyr::row_number() ) %>%
     dplyr::ungroup()
 
   vcf.pos.tbl <- read.table(vcf.path) %>%
     .[,1:2] %>% # grabbing locus name, and pos
-    dplyr::group_by(V1) %>%
+    dplyr::group_by(V1) %>% group_trim() %>%
     dplyr::summarise(pos = paste0(V2, collapse = ","))
 
   colnames(vcf.pos.tbl) <- c("locus","pos")

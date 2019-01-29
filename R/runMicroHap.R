@@ -97,7 +97,7 @@ setParam <-
     param$n.sites <- nchar(haplo.tbl$haplo[1])
 
     param$grp.assoc.indiv <- haplo.tbl %>%
-      dplyr::group_by(uniq.id) %>%
+      dplyr::group_by(uniq.id) %>% group_trim() %>%
       dplyr::summarise(grp.indx = which(group[1] == param$group)) %>%
       dplyr::arrange(uniq.id) %>% dplyr::select(grp.indx) %>% unlist
 
@@ -105,7 +105,7 @@ setParam <-
     all.haplotype <- haplo.tbl %>%
       dplyr::filter(rank < 3 , allele.balance > 0.3, depth > 10) %>%
       #dplyr::filter(!grepl("[N]", haplo)) %>%
-      dplyr::group_by(haplo) %>%
+      dplyr::group_by(haplo) %>% group_trim() %>%
       dplyr::summarise(count = dplyr::n())
 
     if (is.null(all.haplotype$haplo) || dim(all.haplotype)[1] == 0) {
@@ -176,7 +176,7 @@ setParam <-
     param$pf <- t(sapply(1:param$n.group, function(i) {
       haplo.ct <- haplo.tbl %>%
         dplyr::filter(group == param$group[i]) %>%
-        dplyr::group_by(haplo) %>%
+        dplyr::group_by(haplo) %>% group_trim() %>%
         dplyr::summarise(count = dplyr::n()) %>%
         dplyr::right_join(.,
                           data.frame("haplo" = param$haplo, stringsAsFactors = F),
@@ -192,7 +192,7 @@ setParam <-
     param$h <- array(0, dim = c(param$n.indiv, param$n.haplo))
 
     haplo.select <- haplo.tbl %>%
-      dplyr::group_by(uniq.id) %>%
+      dplyr::group_by(uniq.id) %>% group_trim() %>%
       dplyr::summarise(
         haplo.1.indx = sample(
           1:param$n.haplo,
