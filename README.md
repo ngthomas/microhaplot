@@ -31,6 +31,11 @@ with the package.
    
 ### Installation and Quick Start
 
+#### required Perl dependencies:
+You need to have Perl (version >5.014) installed in your OS in order to run Microhaplot.  
+For Window users, we recommend install it via http://strawberryperl.com/.  
+For Mac and Linux users, Perl can be downloaded from https://www.perl.org/get.html  
+
 You can either clone the repository and build the `microhaplot` package yourself, or, more easily, you can
 install it using  [devtools](https://github.com/hadley/devtools). You can get `devtools` by `install.packages("devtools")`.
   

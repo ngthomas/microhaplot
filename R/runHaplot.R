@@ -89,17 +89,34 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
   if (!file.exists(out.path)) stop("the path for 'out.path' - ", out.path, " does not exist")
   if (!file.exists(app.path)) stop("the path for 'app.path' - ", out.path, " does not exist; try to run mvHaplotype()")
 
+  # check whether perl is installed
+  tryCatch({system("perl -v", intern=T); message("Perl is found in system")},
+           error= function(d) {
+             if(.Platform$OS.type == "windows") {
+               message("Perl is not found in system. Recommend installation from strawberryperl. Be sure to install version >5.014")
+             }else {
+               message("Perl is not found in system. Recommend Installation from perl.org. Be sure to install version >5.014")
+             }
+           })
+
 
   # the perl script hapture should display any warning if the label field contains any missing or invalid elements
 
-  if (file.exists(file.path(out.path, "runHapture.sh"))) file.remove(file.path(out.path, "runHapture.sh"))
+  runHap.name <- ifelse(.Platform$OS.type == "windows", "runHapture.bat", "runHapture.sh")
+
+  if (file.exists(file.path(out.path, runHap.name))) file.remove(file.path(out.path, runHap.name))
 
   if (file.exists(file.path(out.path,"intermed"))) file.remove(
     list.files(file.path(out.path, "intermed"),
-               pattern = paste0(run.label, "_*.summary"),
+               #pattern = paste0(run.label, "_*.summary"),
                full.names=T))
 
-  if (!file.exists(paste0(out.path,"/intermed"))) dir.create(file.path(out.path,"intermed"))
+  if (!file.exists(file.path(out.path,"intermed"))) dir.create(file.path(out.path,"intermed"))
+
+  summary.path <- file.path(out.path, "intermed", "all.summary")
+
+  if(file.exists(summary.path)) file.remove(summary.path)
+
 
   # catch any problem in label file
   read.label <- tryCatch(read.table(label.path,sep = "\t",stringsAsFactors = F), error = function(c) {
@@ -111,45 +128,62 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
   garb <- sapply(1:nrow(read.label), function(i) {
 
     line <- read.label[i,] %>% unlist
-    if (!file.exists(paste0(sam.path,"/",line[1]))) stop("the SAM file, ",
-                                                        sam.path,"/",line[1], ", does not exist")
+    if (!file.exists(file.path(sam.path,line[1]))) stop("the SAM file, ", file.path(sam.path,line[1]), ", does not exist")
 
-    wait.ln <- ifelse(i %% 10 == 0," wait;"," ")
-
-    run.perl.script <- paste0("perl ", haptureDir,
-      " -v ", vcf.path, " ",
-      " -s ", sam.path, "/", line[1],
-      " -i ", line[2],
-      " -g ", line[3], " > ",
-      out.path, "/intermed/", run.label, "_", line[2],"_",i,".summary &",
-      wait.ln)
+    if(.Platform$OS.type == "windows") {
+      run.perl.script <- paste0("perl ", haptureDir,
+                                " -v ", vcf.path, " ",
+                                " -s ", sam.path, "\\", line[1],
+                                " -i ", line[2],
+                                " -g ", line[3], " > ",
+                                out.path, "\\intermed\\", run.label, "_", line[2],"_",i,".summary")
+    } else {
+      wait.ln <- ifelse(i %% 10 == 0," wait;"," ")
+      run.perl.script <- paste0("perl ", haptureDir,
+                                " -v ", vcf.path, " ",
+                                " -s ", sam.path, "/", line[1],
+                                " -i ", line[2],
+                                " -g ", line[3], " > ",
+                                out.path, "/intermed/", run.label, "_", line[2],"_",i,".summary &",
+                                wait.ln)
+    }
 
     write(run.perl.script,
-      file = paste0(out.path, "/runHapture.sh"),
+      file = file.path(out.path, runHap.name),
       append = T)
   })
 
-  write(paste0("wait; exit 0;"),
-    file = paste0(out.path, "/runHapture.sh"),
-    append = T)
-
   message("...running Hapture.pl to extract haplotype information (takes a while)...")
 
-  system(paste0("bash ",out.path,"/runHapture.sh"))
+  if(.Platform$OS.type != "windows") {
 
-  summary.path <- file.path(out.path, "intermed/all.summary")
+    write(paste0("wait;"),
+    file = file.path(out.path, runHap.name),
+    append = T)
 
-  if(file.exists(summary.path)) file.remove(summary.path)
+    concat.cmd <- paste0("cat ",out.path, "/intermed/", run.label, "_", "*.summary"," > ",summary.path)
 
-  concat.file <- paste0("cat ",out.path, "/intermed/", run.label, "_", "*.summary",">",summary.path)
+    # just in case if the user has loads of sam files and running out of buffer
+    if (nrow(read.label) > 100) {
+      concat.cmd <- paste0("find ",out.path, "/intermed -name ", run.label, "_", "*.summary",
+                            "| while read F; do cat ${F} >>",summary.path, ";done")
+    }
 
-  # just in case if the user has loads of sam files and running out of buffer
-  if (nrow(read.label) > 100) {
-    concat.file <- paste0("find ",out.path, "/intermed -name ", run.label, "_", "*.summary",
-                          "| while read F; do cat ${F} >>",summary.path, ";done")
+    write(concat.cmd,
+          file = file.path(out.path, runHap.name),
+          append = T)
+
+    system(paste0("bash ",out.path,"/runHapture.sh"))
+  } else {
+    concat.cmd <- paste0("type ",out.path, "\\intermed\\", run.label, "_", "*.summary"," > ",summary.path)
+
+    write(concat.cmd,
+          file = file.path(out.path, runHap.name),
+          append = T)
+
+
+    system(file.path(out.path, runHap.name))
   }
-
-  system(concat.file)
 
   haplo.sum <- read.table(summary.path, stringsAsFactors = FALSE, sep = "\t") %>% dplyr::tbl_df()
 
