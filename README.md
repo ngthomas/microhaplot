@@ -31,6 +31,11 @@ with the package.
    
 ### Installation and Quick Start
 
+#### required Perl dependencies:
+You need to have Perl (version >5.014) installed in your OS in order to run Microhaplot.  
+For Window users, we recommend install it via http://strawberryperl.com/.  
+For Mac and Linux users, Perl can be downloaded from https://www.perl.org/get.html  
+
 You can either clone the repository and build the `microhaplot` package yourself, or, more easily, you can
 install it using  [devtools](https://github.com/hadley/devtools). You can get `devtools` by `install.packages("devtools")`.
   
@@ -92,10 +97,17 @@ library(microhaplot)
 
 # to access package sample case study dataset of rockfish
 run.label <- "sebastes"
-sam.path <- system.file("extdata","." , package="microhaplot")
-label.path <- system.file("extdata", "label.txt", package = "microhaplot")
-vcf.path <- system.file("extdata", "sebastes.vcf", package = "microhaplot")
-app.path <- system.file("shiny","microhaplot" , package="microhaplot")
+
+sam.path <- tempdir()
+untar(system.file("extdata",
+                  "sebastes_sam.tar.gz",
+                  package="microhaplot"),
+      exdir = sam.path)
+      
+label.path <- file.path(sam.path, "label.txt")
+vcf.path <- file.path(sam.path, "sebastes.vcf")
+out.path <- tempdir()
+app.path <- "~/Shiny/microhaplot"
 
 # for your dataset: customize the following paths
 # sam.path <- "~/microhaplot/extdata/"
@@ -104,11 +116,12 @@ app.path <- system.file("shiny","microhaplot" , package="microhaplot")
 # app.path <- "~/Shiny/microhaplot"
 
 haplo.read.tbl <- runHaplot(run.label = run.label,
-           sam.path=sam.path,
-           label.path=label.path,
-           vcf.path=vcf.path,
-           app.path=app.path)
-           
+                            sam.path = sam.path,
+                            out.path = out.path,
+                            label.path = label.path,
+                            vcf.path = vcf.path,
+                            app.path = app.path)
+
 runHaplotype(app.path)
 ```
 

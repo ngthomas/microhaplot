@@ -1,6 +1,5 @@
 library(shiny)
 library(shinyBS)
-#library(plotly)
 library(shinyWidgets)
 
 # Define UI for application that draws a histogram
@@ -637,7 +636,6 @@ shinyUI(
                                           ticks=F,
                                           step = 0.01))
             ),
-            #column(12,plotlyOutput("biplot"), height = "auto")
             column(8,
                    ggiraph::ggiraphOutput("biplot", height = "450px"), height="auto", style= "width:'100%'"
                    # plotOutput("biplot",

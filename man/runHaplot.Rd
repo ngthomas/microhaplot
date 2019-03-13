@@ -4,9 +4,8 @@
 \alias{runHaplot}
 \title{Extract haplotype from alignment reads.}
 \usage{
-runHaplot(run.label, sam.path, label.path, vcf.path, out.path = sam.path,
-  add.filter = FALSE, app.path = system.file("shiny", "microhaplot",
-  package = "microhaplot"))
+runHaplot(run.label, sam.path, label.path, vcf.path,
+  out.path = tempdir(), add.filter = FALSE, app.path = tempdir())
 }
 \arguments{
 \item{run.label}{character vector. Run label to be used to display in haPLOType. Required}
@@ -17,24 +16,35 @@ runHaplot(run.label, sam.path, label.path, vcf.path, out.path = sam.path,
 
 \item{vcf.path}{string. VCF file path. Required}
 
-\item{out.path}{string. Optional. If not specified, the intermediate files are created under \code{sam.path}, with the assumption that directory is granted for written permission.}
+\item{out.path}{string. Optional. If not specified, the intermediate files are created under \code{TEMPDIR}, with the assumption that directory is granted for written permission.}
 
 \item{add.filter}{boolean. Optional. If true, this removes any haplotype with unknown and deletion alignment characters i.e. "*" and "_", removes any locus with large number of haplotypes ( # > 40) , and remove any locus with fewer than half of the total individuals.}
 
-\item{app.path}{string. Path to shiny haPLOType app. Optional. If not specified, the path is default to local app path.}
+\item{app.path}{string. Path to shiny haPLOType app. Optional. If not specified, the path is default to \code{TEMPDIR}.}
 }
 \description{
 The function \code{microhaplot} extracts haplotype from sequence alignment files through perl script \code{hapture} and returns a summary table of the read depth and read quality associate with haplotype.
 }
 \examples{
+
 run.label <- "sebastes"
-sam.path <- system.file("extdata","." , package="microhaplot")
-label.path <- system.file("extdata", "label.txt", package = "microhaplot")
-vcf.path <- system.file("extdata", "sebastes.vcf", package = "microhaplot")
-app.path <- system.file("shiny","microhaplot" , package="microhaplot")
+
+sam.path <- tempdir()
+untar(system.file("extdata",
+                  "sebastes_sam.tar.gz",
+                  package="microhaplot"),
+      exdir = sam.path)
+
+
+label.path <- file.path(sam.path, "label.txt")
+vcf.path <- file.path(sam.path, "sebastes.vcf")
+
+mvHaplotype(tempdir())
+app.path <- file.path(tempdir(), "microhaplot")
 
 haplo.read.tbl <- runHaplot(run.label = run.label,
                             sam.path = sam.path,
+                            out.path = tempdir(),
                             label.path = label.path,
                             vcf.path = vcf.path,
                             app.path = app.path)

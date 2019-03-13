@@ -10,10 +10,10 @@ mvHaplotype(path)
 \item{path}{string. directory path. Required}
 }
 \description{
-makes a copy of shiny haPLOType to a different directory
+Copies shiny haPLOType app to a different directory
 }
 \examples{
 \dontrun{
-mvHaplotype("~/Shiny")
+mvHaplotype(tempdir())
 }
 }

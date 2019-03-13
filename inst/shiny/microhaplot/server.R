@@ -8,8 +8,6 @@ library("DT")
 library("grid")
 library("scales")
 library("microhaplot")
-#library("reshape2")
-library("feather")
 library("ggiraph")
 
 shinyServer(function(input, output, session) {
@@ -66,17 +64,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
              trigger="hover")
 
   dirFiles <- list.files()
-  feather.file <- grep(".feather", dirFiles)
-  pos.feather.file <- grep("_posinfo.feather", dirFiles)
-  annotate.feather.file <- grep("_annotate.feather", dirFiles)
-  feather.file <- setdiff(feather.file, c(pos.feather.file,annotate.feather.file))
 
   rds.file <- grep(".rds", dirFiles)
   pos.rds.file <- grep("_posinfo.rds", dirFiles)
   annotate.rds.file <- grep("_annotate.rds", dirFiles)
   rds.file <- setdiff(rds.file, c(pos.rds.file,annotate.rds.file))
 
-  file.name.ls <- c(feather.file, rds.file)
+  file.name.ls <- rds.file
 
   haplo.sum <- NULL
 
@@ -93,20 +87,12 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         is.null(input$selectDB) || !file.exists(input$selectDB))
       return()
     #cat(file=stderr(), "select DB_", input$selectDB, "_----\n")
-    if(length(grep(".feather", input$selectDB))) {
-      table.out <- read_feather(input$selectDB)  %>%
-        ungroup() %>%
-        mutate(id = as.character(id),
-               locus =as.character(locus),
-               group=as.character(group)) %>%
-        select(-sum.Phred.C, -max.Phred.C)
-    } else {
+
       table.out <-readRDS(input$selectDB)  %>%
         ungroup() %>%
         mutate(id = as.character(id),
                locus =as.character(locus),
                group=as.character(group))
-    }
 
     if ("sum.Phred.C" %in% colnames(table.out)) {
       table.out <- table.out %>% select(-sum.Phred.C, -max.Phred.C)}
@@ -115,16 +101,10 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   })
 
   extract.pos.file <- reactive({
-    if(length(grep(".feather", input$selectDB))) {
-    pos.file <- strsplit(input$selectDB, split=".feather") %>% unlist %>% paste0(.,"_posinfo.feather")
-    if (!file.exists(pos.file)) return ()
-    read_feather(pos.file)
-    }
-    else {
+
       pos.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_posinfo.rds")
       if (!file.exists(pos.file)) return ()
       readRDS(pos.file)
-    }
 
   })
 
@@ -132,11 +112,9 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   # keep status (1=keep), annotation
 
   extract.annotate.file <- reactive({
-    if(length(grep(".feather", input$selectDB))) {
-    annotate.file <- strsplit(input$selectDB, split=".feather") %>% unlist %>% paste0(.,"_annotate.feather") }
-    else{
+
       annotate.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_annotate.rds")
-    }
+
     if (!file.exists(annotate.file)) {
       annotateTab$tbl <- data.frame(locus = as.character(panelParam$locus.label),
                                     ave.entropy = c("NA",rep(0, panelParam$n.locus)),
@@ -152,12 +130,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       return()
     }
 
+    annotateTab$tbl <- readRDS(annotate.file)
 
-    if(length(grep(".feather", annotate.file))) {
-    annotateTab$tbl <- read_feather(annotate.file) }
-    else {
-      annotateTab$tbl <- readRDS(annotate.file)
-    }
 
     if((!"max.ar.hm" %in% colnames(annotateTab$tbl)) || (!"n.alleles" %in% colnames(annotateTab$tbl))) {
       #if("n.alleles" %in% colnames(annotateTab$tbl))
@@ -169,12 +143,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                                    min.ar.hz = rep(0.5, panelParam$n.locus+1)
                                    )
 
-      if(length(grep(".feather", annotate.file))) {
-        write_feather(annotateTab$tbl, annotate.file)
-      }
-      else {
-        saveRDS(annotateTab$tbl, annotate.file)
-      }
+      saveRDS(annotateTab$tbl, annotate.file)
 
       annotateTab$tbl <- annotateTab$tbl %>%
         ungroup() %>%
@@ -944,13 +913,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     annotateTab$tbl$status[match.indx] <- input$locusAccept
     annotateTab$tbl$comment[match.indx] <- input$locusComment[1]
 
-    if(length(grep(".feather", input$selectDB))) {
-    annotate.file <- strsplit(input$selectDB, split=".feather") %>% unlist %>% paste0(.,"_annotate.feather")
-    write_feather(annotateTab$tbl, annotate.file) }
-    else {
-      annotate.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_annotate.rds")
-      saveRDS(annotateTab$tbl, annotate.file)
-    }
+    annotate.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_annotate.rds")
+    saveRDS(annotateTab$tbl, annotate.file)
 
   })
 
@@ -1002,13 +966,9 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     #                           "<b>ar.hz</b>: ", annotateTab$tbl$min.ar.hz[match.indx]),
     #            trigger = "hover",  placement = "bottom")
 
-    if(length(grep(".feather", input$selectDB))) {
-      annotate.file <- strsplit(input$selectDB, split=".feather") %>% unlist %>% paste0(.,"_annotate.feather")
-      write_feather(annotateTab$tbl, annotate.file) }
-    else {
-      annotate.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_annotate.rds")
-      saveRDS(annotateTab$tbl, annotate.file)
-    }
+
+    annotate.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_annotate.rds")
+    saveRDS(annotateTab$tbl, annotate.file)
 
     Filter.haplo.by.RDnAR()
   })
