@@ -11,10 +11,10 @@ establish an Rstudio/Shiny server to visualize and manipulate the data.  There a
 the `microhaplot` worflow:
 
 1. The first step is to summarize alignment and variant (SNP) data into a single data frame that is 
-easily operated upon.  This is done using the function `microhaplot::runHaplot`.  You must supply a 
+easily operated upon.  This is done using the function `microhaplot::prepHaplotFiles`.  You must supply a 
 VCF file that includes variants that you are interested in extracting, and as many SAM files 
 (one for each individual) that you want to extract read information from at each of the variants. 
-The function `microhaplot::runHaplot` makes a call
+The function `microhaplot::prepHaplotFiles` makes a call
 to PERL to parse the CIGAR strings in the SAM files to extract the variant information at each read
 and store this information into a data frame which gets saved with the installed Shiny app (see below)
 for later use.  Depending on the size of the data set, this can take a few minutes.  
@@ -53,7 +53,7 @@ directory `haPLOType` and fills it with the Shiny app as well as the example dat
 along with that.  
 
 ```r
-microhaplot::mvHaplotype("~/Shiny") # provide a directory path to host the haPLOType app
+microhaplot::mvShinyHaplot("~/Shiny") # provide a directory path to host the haPLOType app
 ```
 To start familiarizing yourself with haPLOType using the provided example data.  We recommend
 going through our first vignette.  Call it up with:
@@ -65,7 +65,7 @@ Now, having done that, we can launch haPLOType on the example data:
 ```r
 library(microhaplot)
 app.path <- "~/Shiny/microhaplot"
-runHaplotype(app.path)
+runShinyHaplot(app.path)
 ```
 
 ### Quick Guide to use microhaplot to parse out SAM and VCF files
@@ -115,14 +115,14 @@ app.path <- "~/Shiny/microhaplot"
 # vcf.path <- "~/microhaplot/extdata/sebastes.vcf"
 # app.path <- "~/Shiny/microhaplot"
 
-haplo.read.tbl <- runHaplot(run.label = run.label,
+haplo.read.tbl <- prepHaplotFiles(run.label = run.label,
                             sam.path = sam.path,
                             out.path = out.path,
                             label.path = label.path,
                             vcf.path = vcf.path,
                             app.path = app.path)
 
-runHaplotype(app.path)
+runShinyHaplot(app.path)
 ```
 
 
