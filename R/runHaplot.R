@@ -1,14 +1,14 @@
-#' Run Haplotype Plot.
+#' Run shiny microhaplot
 #'
-#' Run Haplotype shiny
-#' @param path Path to shiny haPLOType app. Optional. If not specified, the path is default to local app path.
+#' Run shiny microhaplot app
+#' @param path Path to shiny microhaplot app. Optional. If not specified, the path is default to local app path.
 #' @export
 #' @examples
 #' # this starts a shiny session, so should not be run during R CMD CHECK, etc.
 #' \dontrun{
-#' runHaplotype()
+#' runShinyHaplot()
 #' }
-runHaplotype <- function(path = system.file("shiny", "microhaplot", package = "microhaplot")) {
+runShinyHaplot <- function(path = system.file("shiny", "microhaplot", package = "microhaplot")) {
   if (path == "" || !file.exists(path)) {
     #stop("Could not find Shiny directory. Try re-installing `mypackage`.", call. = FALSE)
     stop("Could not find Shiny directory", call. = FALSE)
@@ -16,16 +16,16 @@ runHaplotype <- function(path = system.file("shiny", "microhaplot", package = "m
   shiny::runApp(path, display.mode = "normal")
 }
 
-#' Redirect haPLOType app.
+#' Transfer a copy of microhaplot app.
 #'
-#' Copies shiny haPLOType app to a different directory
+#' Moves shiny microhaplot app to a different directory
 #' @param path string. directory path. Required
 #' @export
 #' @examples
 #' \dontrun{
-#' mvHaplotype(tempdir())
+#' mvShinyHaplot(tempdir())
 #' }
-mvHaplotype <- function(path) {
+mvShinyHaplot <- function(path) {
   app.dir <- system.file("shiny", "microhaplot", package = "microhaplot")
   if (app.dir == "") {
     stop("Could not find shiny directory. Try re-installing `mypackage`.", call. = FALSE)
@@ -39,7 +39,7 @@ mvHaplotype <- function(path) {
 
 
 
-#' Extract haplotype from alignment reads.
+#' Extracts haplotype from alignment reads.
 #'
 #' The function \code{microhaplot} extracts haplotype from sequence alignment files through perl script \code{hapture} and returns a summary table of the read depth and read quality associate with haplotype.
 #'
@@ -65,16 +65,16 @@ mvHaplotype <- function(path) {
 #' label.path <- file.path(sam.path, "label.txt")
 #' vcf.path <- file.path(sam.path, "sebastes.vcf")
 #'
-#' mvHaplotype(tempdir())
+#' mvShinyHaplot(tempdir())
 #' app.path <- file.path(tempdir(), "microhaplot")
 #'
-#' haplo.read.tbl <- runHaplot(run.label = run.label,
+#' haplo.read.tbl <- prepHaplotFiles(run.label = run.label,
 #'                             sam.path = sam.path,
 #'                             out.path = tempdir(),
 #'                             label.path = label.path,
 #'                             vcf.path = vcf.path,
 #'                             app.path = app.path)
-runHaplot <- function(run.label, sam.path, label.path, vcf.path,
+prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
   out.path=tempdir(),
   add.filter=FALSE,
   app.path=tempdir()){
@@ -87,7 +87,7 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
   if (!file.exists(label.path)) stop("the path for 'label.path' - ", label.path, " does not exist")
   if (!file.exists(vcf.path)) stop("the path for 'vcf.path' - ", vcf.path, " does not exist")
   if (!file.exists(out.path)) stop("the path for 'out.path' - ", out.path, " does not exist")
-  if (!file.exists(app.path)) stop("the path for 'app.path' - ", out.path, " does not exist; try to run mvHaplotype()")
+  if (!file.exists(app.path)) stop("the path for 'app.path' - ", out.path, " does not exist; try to run mvShinyHaplot()")
 
   # check whether perl is installed
   tryCatch({system("perl -v", intern=T); message("Perl is found in system")},
@@ -225,7 +225,7 @@ runHaplot <- function(run.label, sam.path, label.path, vcf.path,
   saveRDS(haplo.add.balance, paste0(out.path, "/",run.label,".rds"))
   saveRDS(vcf.pos.tbl, paste0(out.path, "/",run.label,"_posinfo.rds"))
 
-  message(paste0("RDS file: copied into shiny directory: ",app.path, "/",run.label,"*.rds ", "\n\n Run runHaplotype() to open shiny app."))
+  message(paste0("RDS file: copied into shiny directory: ",app.path, "/",run.label,"*.rds ", "\n\nRun the following to open shiny app: runShinyHaplot(\"",app.path,"\")"))
 
   if(file.exists(file.path(app.path, paste0(run.label,"*.rds")))) message("Overwritting previous version -  ", run.label, ".rds in ", app.path)
 

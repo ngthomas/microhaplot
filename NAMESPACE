@@ -2,9 +2,9 @@
 
 export("%>%")
 export(RunSrMicrohap)
-export(mvHaplotype)
-export(runHaplot)
-export(runHaplotype)
+export(mvShinyHaplot)
+export(prepHaplotFiles)
+export(runShinyHaplot)
 importFrom(magrittr,"%>%")
 importFrom(utils,combn)
 importFrom(utils,read.table)

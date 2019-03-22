@@ -4,60 +4,61 @@ author: "Thomas Ng and Eric C. Anderson"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{haPLOT introduction}
+  %\VignetteIndexEntry{microHaplot introduction}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-This vignette concerns itself with an overview of haPLOT and on 
-preparation of data for input into haPLOT.  To learn about how to use
-the graphical features of haPLOT, once your data have been read into haPLOT, see the 
-`haPLOT walkthrough` vignette.
+This vignette concerns itself with an overview of microhaplot and on 
+preparation of data for input into microhaplot Once your data has been transfered to the appropriate Haplot folder, see the `haPLOT walkthrough` vignette to learn more about microhaplot's graphical features.
 
-## How does haPLOT work?
+## How does microhaplot work?
 
-haPLOT is a tool that makes it easy to extract, visualize, and interpret short-read haplotypes---or 
+`microhaplot` is a tool that makes it easy to extract, visualize, and interpret short-read haplotypes---or 
 "microhaplotypes" in the parlance of some---from aligned sequences.
-Before we go further, it will be good to step back and confirm what it is we are calling a short-read haplotype, or 
-a "microhaplotype" within the context of haPLOT.  To define a microhaplotype
-in haPLOT you need first to define a series of positions that a read might align to.  Then, haPLOT can analyze
-the reads aligning at those positions, and extracts the sequence of the reads at those positions.  For example,
+Before we go further, it will be good to step back and confirm of what we are calling as a short-read haplotype, or 
+a "microhaplotype" within the context of microhaplot.
+
+> *What is a microhaplotype?*
+
+To define a microhaplotype you need to first define a reference point or position that a read might align to. Then, `microhaplot` can analyze
+the reads aligning at those positions, and extracts the variant sequence of the reads at those positions. For example,
 let's say that we know SNPs occur at positions 19, 27, 68, and 101 of a particular reference sequence that we have
-aligned our reads to.  If a read aligns there and shows an `A` at position 19, a `G` at position 27, a `C` at position
-68, and another `C` at position 101, then we say the microhaplotype on that read is `AGCC`.  haPLOT is a tool that
+aligned our reads to.  If a read aligns to the ref and shows an `A` at position 19, a `G` at position 27, a `C` at position
+68, and another `C` at position 101, then we say the microhaplotype on that read is `AGCC`.  
+
+`microhaplot` is a tool that
 
 1. automates the extraction of these haplotypes from aligned data (typically amplicon sequencing data)
 2. provides useful filtering and visualizing capabilities for understanding your microhaplotype data and 
 for calling genotypes at microhaplotypes.  
 
-To understand what is involved in getting your data into haPLOT, it will be useful
-to have a brief introduction to what haPLOT does and how it operates.  We will start 
-by listing the things that haPLOT is **not**.
+To understand what is involved in getting your data into `microhaplot`, it will be useful
+to have a brief introduction to what it does and how it operates.  We will start 
+by listing what it is **not**.
 
-- haPLOT **is not a SNP-caller or variant detector**.  It is not the job of haPLOT to determine if a variant might exist in some location
-or not.  You have to tell it the positions where it will find variants.  haPLOT just extracts the bases sequenced on
+- `microhaplot` **is not a SNP-caller or variant detector**.  It is not its job to determine if a variant might exist in a particular location
+or not.  We assume you already know what variant position you want to look for by supplying `microhaplot` a variant caller file (VCF).  `microhaplot` just extracts the bases sequenced on
 different reads at those positions.
-- haPLOT **is not an alignment program**.  haPLOT does not do alignments.  You have to provide aligned data to it.  From the
-aligned data, haPLOT can extract the bases sequenced at the desired locations. 
-- haPLOT **is not a haplotype phasing program**. There is no special algorithm going on in haPLOT to try to assemble haplotypes (across
-reads, for example.) It merely uses the simple fact that a single sequencing read will come from a single chromosome.  So, if you have 
-can read the bases present at 4 variant positions along a 150-bp read, you know that those 4 bases constitute a haplotype.   
-- haPLOT **is not a de-novo assembly algorithm**.  There is no assembly going on here at all!
+- `microhaplot` **is not an alignment program**.  `microhaplot` does not do alignments.  You have to provide aligned data to it.  From the
+aligned data, `microhaplot` can extract the bases sequenced at the desired locations. 
+- `microhaplot` **is not a haplotype phasing program**. There is no special algorithm going on in `microhaplot` to try to assemble haplotypes (across
+reads or loci, for example.) It merely uses the simple fact that a single sequencing read will come from a single chromosome.  So, if you can draw bases present at 4 variant positions along a 150-bp read, you know that those 4 bases constitute a haplotype.   
+- `microhaplot` **is not a de-novo assembly algorithm**.  This package will not infer or sort out any physical linkage between reads of different reference loci.
 
 
+## What kind of data can I use with `microhaplot`?
 
-## What kind of data can I use with haPLOT?
-
-haPLOT is designed to work with short read sequencing data in which 
-there is a relatively small number of places that sequencing reads will start from.
+'microhaplot' is designed to work with short read sequencing data where 
+there is a relatively small number sequencing start sites.
 It is emphatically *not* geared to whole-genome shotgun sequencing data in which 
-you expect each read to start from a different starting place.  We use haPLOT 
-primarily with amplicon sequencing data in which a few hundred fragments (of about 100 bp each)
+you may have overlapping reads with different starting place.  We use 'microhaplot' 
+primarily with amplicon sequencing data in which a few hundred fragments (of about 100 - 150 bp each)
 are amplified by PCR in a few hundred individuals.  The DNA from different individuals is
 bar-coded so that it may be demultiplexed later, and then these amplified fragments are 
 sequenced (usually to fairly high read depth) on an Illumina platform. 
 
-Though we use haPLOT for amplicon sequencing, it might also be useful for 
+Though we use 'microhaplot' for amplicon sequencing, it might also be useful for 
 analyzing haplotype data from experiments that sequence captured or baited fragments,
 (e.g., baited DD-Rad, RAPTURE, myBaits, ExonCapture, etc.), and might even be applicable to
 standard ddRAD or RAD-PE experiments, however, as the number of loci increases and average 
@@ -66,7 +67,7 @@ bigger problem, (and we have more reservations about allelic dropout/null allele
 protocols (ddRAD, Rapture, etc.) than we do with amplicon sequencing).
 
 
-## Why did we write haPLOT?
+## Why did we write 'microhaplot'?
 
 We tried to use existing tools to give us what we needed for our amplicon-based microhaplotypes.
 
@@ -93,7 +94,7 @@ to work for the specialized task of extracting and analyzing microhaplotypes.
 
 ## How, specifically, should I prepare my data?
 
-The starting point for haPLOT requires:
+The starting point for `microhaplot` requires:
 
 1.  An indexed, SAM file of reads aligned to the reference sequences for each amplicon.
 2. A VCF file whose contents define the positions in each reference sequence from which
@@ -245,8 +246,8 @@ nohup freebayes-parallel <(fasta_generate_regions.py gtseq15_loci.fasta.fai 150)
 
 After the above is done, the file `satro384_noMNP_noComplex_noPriors.vcf` can be filtered, if desired, to make 
 sure that everything in it has a solid SNP.  Then that file is used with the function
-`runHaplot` to extract haplotypes from the aligned reads in the `map` directory.  
-An example of an vcf file and SAM files extracted from an actual GT-seq runfish 
+`prepHaplotFiles` to extract haplotypes from the aligned reads in the `map` directory.  
+An example of an vcf file and SAM files extracted from an actual GT-seq rockfish 
 data is available in the `inst/extdata`.
 
 
@@ -255,15 +256,25 @@ data is available in the `inst/extdata`.
 library(microhaplot)
 
 run.label <- "sebastes"
-sam.path <- system.file("extdata","." , package="microhaplot")
-label.path <- system.file("extdata", "label.txt", package = "microhaplot")
-vcf.path <- system.file("extdata", "sebastes.vcf", package = "microhaplot")
-app.path <- system.file("shiny","microhaplot" , package="microhaplot")
 
-haplo.read.tbl <- runHaplot(run.label = run.label,
-           sam.path=sam.path,
-           label.path=label.path,
-           vcf.path=vcf.path,
-           app.path=app.path)
+sam.path <- tempdir()
+untar(system.file("extdata",
+                  "sebastes_sam.tar.gz",
+                  package="microhaplot"),
+      exdir = sam.path)
+
+
+label.path <- file.path(sam.path, "label.txt")
+vcf.path <- file.path(sam.path, "sebastes.vcf")
+
+mvShinyHaplot(tempdir())
+app.path <- file.path(tempdir(), "microhaplot")
+
+haplo.read.tbl <- prepHaplotFiles(run.label = run.label,
+                            sam.path = sam.path,
+                            out.path = tempdir(),
+                            label.path = label.path,
+                            vcf.path = vcf.path,
+                            app.path = app.path)
 ```
 
