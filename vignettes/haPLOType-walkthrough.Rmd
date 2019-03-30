@@ -1,5 +1,5 @@
 ---
-title: "Walkthough guide to haPLOType"
+title: "microhaplot walkthrough"
 author: "Thomas Ng and Eric C. Anderson"
 date: "`r Sys.Date()`"
 output:
@@ -11,9 +11,9 @@ vignette: >
 ---
 
 `microhaplot` comes pre-loaded with some real example data to get you started to learn about its functionality.
-This vignette will walk you through a look at the example data and introduce you to many of the features of `haPLOType`.
+This vignette will walk you through a look at the example data and introduce you to many of the features of `microhaplot`.
 
-The data that we will be exploring together are called `fish2_example.rds` and will appear in the Shiny app dropdown menu
+The data that we will be exploring together are called `sebastes.rds` and will appear in the Shiny app dropdown menu
 after installation following the README on GitHub which tells you to install `microhaplot` like this:
 ```r
 devtools::install_github("ngthomas/microhaplot", build_vignettes = TRUE)
