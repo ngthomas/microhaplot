@@ -1,11 +1,11 @@
 ---
-title: "Walkthough guide to haPLOType"
+title: "Walkthough guide to haplot"
 author: "Thomas Ng and Eric C. Anderson"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{microhaPlot walkthrough}
+  %\VignetteIndexEntry{haplot walkthrough}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
