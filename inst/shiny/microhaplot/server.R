@@ -363,9 +363,9 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     update.annotate.field()
 
     Min.filter.haplo()
+
     #Filter.haplo.by.RDnAR()
     #Filter.haplo.sum()
-
 
     srhapPg$makePlot <- FALSE
     extract.pos.file()

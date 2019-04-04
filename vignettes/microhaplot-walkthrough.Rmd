@@ -17,7 +17,7 @@ The data that we will be exploring will appear in the Shiny app dropdown menu
 after installation following the README on GitHub which tells you to install `microhaplot` like this:
 ```r
 devtools::install_github("ngthomas/microhaplot", build_vignettes = TRUE)
-microhaplot::mvShinyHaplot(tempdir()) # provide a directory path to host the haPLOType app
+microhaplot::mvShinyHaplot(tempdir()) # provide a directory path to host the microhaplot app
 ```  
 and then tells you to launch haplot like this:
 ```r
@@ -31,7 +31,7 @@ Both `fish1.rds` and `fish2.rds` dataset are generated from a high throughput am
 
 ## The Basics
 
-The first thing you will want to get straight is that there are essentially three different "panels" on the haplot viewer that will always stay with you.  From top to bottom they are:
+The `microhaplot` shiny viewer is split into three horizontal "panels". From top to bottom, they are:
 
 1. **The interaction tabset:**  These are the three tabs that live at the top of the page with the light
 blue background.  Any one of the three: "> field selection", "+ read criteria", and "+ locus annotation"
@@ -39,44 +39,52 @@ can be selected.  Whichever one is selected determines the content of the panel 
 user input panel, the panel with the light gray background.  
 
     a. **field Selection tab:**
-    <img src="field_selection.png" title="read criteria tab" width="80%" height="70" />
+    
+    
+    <img src="field_selection.png" title="field selection tab" width="80%" height="70" />
     
     If the "> field selection" is selected, then the user input panel will include dropdown boxes that let you choose a group, locus, or individual(s) that you wish to focus on (this choice affects what is shown in different plots and outputs,
 etc.) It also includes "backwards-and-forwards" buttons, "<" and ">", that sits immediate right to the selected field which allows you to roll backward or forward through the content of the selected field. 
 
     These are very useful when you want to work your way through each locus individually and choose those that do (and do not) appear to be reliable enough to include in a
 panel of amplicons. * - Note: the location and relative position of each button might change pending on the width of the viewing window.
-
+  
+  
     b. **read criteria tab:** 
+        
     <img src="read_criteria_tab.png" title="read criteria tab" width="80%" height="70" />
     
-    In the "+ read criteria" tab, you are given the choice to define the top $n$ alleles, minimal read depth and minimal allelic ratio that microhaplotypes must have to pass through. It is recommend to adjust your filter based on this particular order, starting with:
-    * `Top n Alleles` defines the upper number of microhaplotypes (in a single individual's locus) to be kept starting from the highest read depth to lowest. Ideally, the top n alleles should match up to ploidy level of the species you study. So for a diploid organism, the *top n alleles* should be set to 2.   
+    
+    In the "+ read criteria" tab, you are given the choice to define the top $n$ alleles, minimal read depth and minimal allelic ratio that microhaplotypes must have to pass through. It is recommend to adjust your filter with this particular order, starting from:
+    * `Top n Alleles` defines the upper number of microhaplotypes (in a single individual's locus) to be kept starting from the highest read depth to lowest. Ideally, the top n alleles should match up to ploidy level of the species you study. So for a diploid organism, the *top n alleles* should be set to 2. 
 
       * `Min Total Read Depth` or _Minimal Total Read Depth_ defines the minimal total number of microhaplotype reads that a single individual's locus needs to pass. Importantly, we only add up the read depth of haplotypes that meets the `top n Alleles`. It can only take values greater than or equal to 0.
-      * `Minimal Allelic Ratio` defines the minimal allelic ratio that haplotype needs to pass. Allelic ratio is define as the ratio of the observed read depth of a microhaplotype to the read depth of the most common microhaplotype in an individual at a locus.
+      * `Minimal Allelic Ratio` defines the minimal _allelic ratio_ that haplotype needs to pass. Allelic ratio or allelic balance is define as the ratio of the observed read depth of a microhaplotype to the read depth of the most common microhaplotype in an individual at a locus.
 
         > Ideally, for homozygous individuals, you expect to see the true microhaplotype to have a large read depth and an allelic ratio of one. False or noisy microhaplotypes will have low read depth and allelic ratio close to zero.
 
-        > For an individual that is truly heterozygous, the two true microhaplotypes ideally should have a large and similar number of reads, which means that their allelic ratio should be at or near one. The _Minimal Allelic Ratio_ defines a filter that removes reads from haplotypes with allelic ratio less than the minimum.  It must be between 0 and 1.
+        > For a diploid individual that is truly heterozygous, the two true microhaplotypes ideally should have a large and similar number of reads, which means that their allelic ratio should be at or near one. The `Minimal Allelic Ratio` defines a filter that removes reads from haplotypes with allelic ratio less than the minimum.  It must be between 0 and 1.
 
-        Once you set up these two criteria, you  _apply_ them with the "apply" button. You can also save these criteria if you want to visit them in the future by clicking the "save" button.There are other options that located on the right hand side that gives you more ways to define filtering criteria. Details for each of the options are shown if you hover your pointer over it.
+        Once you set up these three criteria, you _apply_ them with the "apply" button. You can also save these criteria if you want to visit them in the future by clicking the "save" button.There are other options that located on the right hand side that gives you more ways to define filtering criteria. Details for each of the options are shown if you hover your pointer over it.
 
     c. **locus annotation:**
-    <img src="locus_annotation.png" title="read criteria tab" width="80%" height="70" />
-    
-    This tab is for users to keep track of whether a certain locus should be retained based on its quality or other attributes. This is most useful when a particular locus has been chosen under the "field selection" panel. There is also a small textbox that lets you insert any comment regarding the locus group. Remember to press the save button for submission. All of this annotation information can be retreived under the table selection for "locus annotation" under `Output` tab.
+     
+    <img src="locus_annotation.png" title="locus annotation tab" width="80%" height="70" />
+     
+    This tab is for users to keep track of whether a certain locus should be retained based on its quality or other attributes. This is most useful when a particular locus has been chosen under the "field selection" panel. There is also a small textbox that lets you insert any comment regarding the locus group. Remember to press the save button for submission. All of this annotation information can be retreived under the table selection for "locus annotation" under `Output` tab. 
 
-1. **The main body panel:** This occupies most of haPLOType's screen real estate.  It is where the actual
+> **Ways to access saved filter features and annotation in flat format:** All of the saved parameters such as minimal total read and annotation are read and saved as an RDS file in the same directory path as the shiny app. The name of the annotated file carries with a suffix - "_annotate.rds". For example, for fish1.rds data, the annotate file name is fish1_annotate.rds. Another way to retrieve the info is by downloading the "locus annotation" table from `Table` tab at the bottom pane.
+    
+1. **The main body panel:** This occupies most of microhaplot's screen real estate.  It is where the actual
 plots, tables, and other results are rendered.  What gets shown here depends on which main body panel
-has been chosen.  That choice is made using the *main panel choice tabset* described below.
+has been chosen - located right at the bottom.  That choice is made using the *main panel choice tabset* described below.
 
 1. The **main panel choice tabset** is always down at the bottom of the screen, and is a tabset that allows you to choose the contents
 of the main body panel:
-    a. *Panel:* the place where you choose which data set you want to explore.  When you started haPLOType it should have had the
-    dropdown choice for "fish2_example.rds".
+  <img src="main_tab.png" title="main tab" width="60%" height="40" />
+    a. *Panel:* the place where you choose which data set you want to explore.  When you started microhaplot it should have had the dropdown choice for "fish1.rds".
 
-    b. *Summary Info: * lets you choose plot-summaries that give you a good overview of the characteristics of groups, individuals, or loci.
+    b. *Summary Info: * displays condensed graphical summary of the characteristics of microhaplotype reads by groups, individuals, or loci.
 
     c. *Filter Analysis:* contains
         1) a tabular summary (the "Broad Summary") of the number of haplotypes observed and individuals called subject to different levels of filtering.
@@ -85,14 +93,11 @@ of the main body panel:
     and a visual interactive summary of conformance to Hardy-Weinberg proportions of individual loci, and also portrays the position of these
     variants within the sequence.
 
-    d. *Inferential Analysis: * is a wrapper that integrates with the "Sr.MicroHap" Bayesian haplotype caller which is
-    in development still.
-
     e. *Output: * provides a place to get a number of tabular views of the data that are sortable and searchable.  This can
     be very useful when you want to dig into the nitty-gritty details of the short read data.  It also allows you to download
     filtered and called data and genotypes for later analysis.
 
-    f. *About haPlot: * provides a little background about microhaplot and how to cite it and whom to contact about it.
+    f. *About:* provides a little background about microhaplot and how to cite it and whom to contact about it.
 
 With that background we are ready to start exploring the example data.
 

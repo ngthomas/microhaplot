@@ -2,7 +2,7 @@
 % Please edit documentation in R/runHaplot.R
 \name{mvShinyHaplot}
 \alias{mvShinyHaplot}
-\title{Transfer a copy of microHaplot app.}
+\title{Transfer a copy of microhaplot app.}
 \usage{
 mvShinyHaplot(path)
 }
@@ -10,7 +10,7 @@ mvShinyHaplot(path)
 \item{path}{string. directory path. Required}
 }
 \description{
-Moves shiny haPLOType app to a different directory
+Moves shiny microhaplot app to a different directory
 }
 \examples{
 \dontrun{
