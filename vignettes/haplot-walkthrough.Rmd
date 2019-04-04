@@ -1,5 +1,5 @@
 ---
-title: "microhaplot walkthrough"
+title: "haplot walkthrough"
 author: "Thomas Ng and Eric C. Anderson"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -12,52 +12,60 @@ vignette: >
 `microhaplot` comes pre-loaded with some real example data to get you started to learn about its functionality.
 This vignette will walk you through a look at the example data and introduce you to many of the features of `microhaplot`.
 
-The data that we will be exploring together are called `sebastes.rds` and will appear in the Shiny app dropdown menu
+This package is preloaded with two slim down haplotype data file from actual amplicon based sequence runs of two different marine species - `fish1.rds` and `fish2.rds`.
+The data that we will be exploring will appear in the Shiny app dropdown menu
 after installation following the README on GitHub which tells you to install `microhaplot` like this:
 ```r
 devtools::install_github("ngthomas/microhaplot", build_vignettes = TRUE)
-microhaplot::mvHaplotype("~/Shiny") # provide a directory path to host the haPLOType app
+microhaplot::mvShinyHaplot(tempdir()) # provide a directory path to host the haPLOType app
 ```  
-and then tells you to launch haPLOType like this:
+and then tells you to launch haplot like this:
 ```r
 library(microhaplot)
-app.path <- "~/Shiny/microhaplot"
-runHaplotype(app.path)
+app.path <- file.path(tempdir(), "microhaplot")
+runShinyHaplot(app.path)
 ```
 
-The example data are from a MiSeq run with
-about 100 amplicons sequenced on close to 300 individual fish.  The fish are all from a single population, but, in order
-to demonstrate the "group" attribute, we put half of the fish into the group "pop1" and the other half of the fish into
-the group "pop2".
+### About the example data
+Both `fish1.rds` and `fish2.rds` dataset are generated from a high throughput amplicon based sequence of one containing amplication from 22 locus points of 436 individuals of one population group, and one from 14 locus of 288 individuals from two populations, respectively. The actual run contains more loci but we subsample it in here to make the data protable. The motivation behind supplying two datasets is to show that, despite both are reduced genome representation amplicon reads, there is a wide range difference in sample and loci quality in between runs/species.  
 
 ## The Basics
 
-The first thing you will want to get straight is that there are essentially four different "panels" on the haPLOType viewer that will always stay with you.  From top to bottom they are:
+The first thing you will want to get straight is that there are essentially three different "panels" on the haplot viewer that will always stay with you.  From top to bottom they are:
 
 1. **The interaction tabset:**  These are the three tabs that live at the top of the page with the light
-blue background.  Any one of the three: ">field selection", "+read criteria", and "+locus annotation"
+blue background.  Any one of the three: "> field selection", "+ read criteria", and "+ locus annotation"
 can be selected.  Whichever one is selected determines the content of the panel directly beneath---the
 user input panel, the panel with the light gray background.  
 
-    a. **field Selection tab:** If the "> field selection" is selected, then the user input panel will include dropdown boxes that let you choose a group, locus, or individual(s) that you wish to focus on (this choice affects what is shown in different plots and outputs,
-etc.) It also includes "backwards-and-forwards" buttons, "<" and ">", that let you step individually through loci (the buttons to the right* of "Locus") or through individuals (fish in this case---the buttons to the
-right* of the "Indiv" dropdown box.)    
+    a. **field Selection tab:**
+    <img src="field_selection.png" title="read criteria tab" width="80%" height="70" />
+    
+    If the "> field selection" is selected, then the user input panel will include dropdown boxes that let you choose a group, locus, or individual(s) that you wish to focus on (this choice affects what is shown in different plots and outputs,
+etc.) It also includes "backwards-and-forwards" buttons, "<" and ">", that sits immediate right to the selected field which allows you to roll backward or forward through the content of the selected field. 
 
     These are very useful when you want to work your way through each locus individually and choose those that do (and do not) appear to be reliable enough to include in a
 panel of amplicons. * - Note: the location and relative position of each button might change pending on the width of the viewing window.
 
-    b. **read criteria tab:** In the "+ read criteria" tab, you are given the choice to define the minimal read depth and minimal allelic ratio that microhaplotypes must have to pass through the read depth and allelic ratio filters.
+    b. **read criteria tab:** 
+    <img src="read_criteria_tab.png" title="read criteria tab" width="80%" height="70" />
+    
+    In the "+ read criteria" tab, you are given the choice to define the top $n$ alleles, minimal read depth and minimal allelic ratio that microhaplotypes must have to pass through. It is recommend to adjust your filter based on this particular order, starting with:
+    * `Top n Alleles` defines the upper number of microhaplotypes (in a single individual's locus) to be kept starting from the highest read depth to lowest. Ideally, the top n alleles should match up to ploidy level of the species you study. So for a diploid organism, the *top n alleles* should be set to 2.   
 
-      * _Minimal Read Depth_ defines the minimal number of reads that are observed for a particular microhaplotype in a single individual's locus. It can only take values greater than or equal to 0.
-      * _Allelic ratio_ or _allelic balance_ is defined as the ratio of the observed read depth of a microhaplotype to the read depth of the most common microhaplotype in an individual at a locus.
+      * `Min Total Read Depth` or _Minimal Total Read Depth_ defines the minimal total number of microhaplotype reads that a single individual's locus needs to pass. Importantly, we only add up the read depth of haplotypes that meets the `top n Alleles`. It can only take values greater than or equal to 0.
+      * `Minimal Allelic Ratio` defines the minimal allelic ratio that haplotype needs to pass. Allelic ratio is define as the ratio of the observed read depth of a microhaplotype to the read depth of the most common microhaplotype in an individual at a locus.
 
-        > Ideally, for homozgous individuals, you expect to see the true microhaplotype to have a large read depth and an allelic ratio of one. False or noisy microhaplotypes will have low read depth and allelic ratio close to zero.
+        > Ideally, for homozygous individuals, you expect to see the true microhaplotype to have a large read depth and an allelic ratio of one. False or noisy microhaplotypes will have low read depth and allelic ratio close to zero.
 
         > For an individual that is truly heterozygous, the two true microhaplotypes ideally should have a large and similar number of reads, which means that their allelic ratio should be at or near one. The _Minimal Allelic Ratio_ defines a filter that removes reads from haplotypes with allelic ratio less than the minimum.  It must be between 0 and 1.
 
         Once you set up these two criteria, you  _apply_ them with the "apply" button. You can also save these criteria if you want to visit them in the future by clicking the "save" button.There are other options that located on the right hand side that gives you more ways to define filtering criteria. Details for each of the options are shown if you hover your pointer over it.
 
-    c. **locus annotation:** This tab is for users to keep track of whether a certain locus should be retained based on its quality or other attributes. This is most useful when a particular locus has been chosen under the "field selection" panel. There is also a small textbox that lets you insert any comment regarding the locus group. Remember to press the save button for submission. All of this annotation information can be retreived under the table selection for "locus annotation" under `Output` tab.
+    c. **locus annotation:**
+    <img src="locus_annotation.png" title="read criteria tab" width="80%" height="70" />
+    
+    This tab is for users to keep track of whether a certain locus should be retained based on its quality or other attributes. This is most useful when a particular locus has been chosen under the "field selection" panel. There is also a small textbox that lets you insert any comment regarding the locus group. Remember to press the save button for submission. All of this annotation information can be retreived under the table selection for "locus annotation" under `Output` tab.
 
 1. **The main body panel:** This occupies most of haPLOType's screen real estate.  It is where the actual
 plots, tables, and other results are rendered.  What gets shown here depends on which main body panel
@@ -289,3 +297,19 @@ saves output in CSV files.
 The program can be used to annotate different loci (and assign filtering criteria to them). This
 annotation can be done using the "+locus annotation" interaction tabset, and the results saved
 by downloading the locus annotation data from the *Outputs* panel.
+
+
+
+
+
+### selecting parameters
+Haplot is equipped with three types of filtering criteria to clean out your microhaplotype. We will be describe what each of the criteria does and how is it best to define
+* Top n Alleles: This keeps the first $n$ haplotypes observed in an individual's locus ordering from the highest read depth to lowest.d
+* Min Total Read Depth
+* Min Allelic Ratio:
+There are
+no specific order in
+
+
+### import
+How to use interpret biplot in AR refinement
