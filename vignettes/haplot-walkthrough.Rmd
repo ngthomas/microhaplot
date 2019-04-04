@@ -1,10 +1,10 @@
 ---
-title: "haplot walkthrough"
+title: "microhaplot walkthrough"
 author: "Thomas Ng and Eric C. Anderson"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{haplot walkthrough}
+  %\VignetteIndexEntry{microhaplot walkthrough}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -303,12 +303,6 @@ by downloading the locus annotation data from the *Outputs* panel.
 
 
 ### selecting parameters
-Haplot is equipped with three types of filtering criteria to clean out your microhaplotype. We will be describe what each of the criteria does and how is it best to define
-* Top n Alleles: This keeps the first $n$ haplotypes observed in an individual's locus ordering from the highest read depth to lowest.d
-* Min Total Read Depth
-* Min Allelic Ratio:
-There are
-no specific order in
 
 
 ### import
