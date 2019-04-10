@@ -2,106 +2,160 @@
 title: "microhaplot walkthrough"
 author: "Thomas Ng and Eric C. Anderson"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{microhaplot walkthrough}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-`microhaplot` comes pre-loaded with some real example data to get you started to learn about its functionality.
-This vignette will walk you through a look at the example data and introduce you to many of the features of `microhaplot`.
+`microhaplot` comes pre-loaded with two small, real, example data sets, 
+`fish1.rds` and `fish2.rds`, to get you started learning about its 
+functionality.
+This vignette will walk you through the process of viewing these example data 
+sets and will introduce you to many of the features of `microhaplot`.
+Each data set consists of microhaplotypes derived from
+amplicon sequencing of a marine species, and they represent subsets of
+data that have been previously employed in full analyses.
 
-This package is preloaded with two slim down haplotype data file from actual amplicon based sequence runs of two different marine species - `fish1.rds` and `fish2.rds`.
-The data that we will be exploring will appear in the Shiny app dropdown menu
-after installation following the README on GitHub which tells you to install `microhaplot` like this:
+The data that we will be exploring will be available
+after installation of the R package and the Shiny app. Once the R package
+`microhaplot` is installed, the Shiny app can be installed like this:
 ```r
-devtools::install_github("ngthomas/microhaplot", build_vignettes = TRUE)
-microhaplot::mvShinyHaplot(tempdir()) # provide a directory path to host the microhaplot app
-```  
-and then tells you to launch haplot like this:
+# provide a directory path to host the microhaplot Shiny app
+shiny_dir <- tempdir()
+microhaplot::mvShinyHaplot(shiny_dir)
+``` 
+where `tempdir()` should be replaced by a location on your hard drive where 
+you want the Shiny app installed. 
+
+Once it is installed, the Shiny app is run like this:
 ```r
-library(microhaplot)
-app.path <- file.path(tempdir(), "microhaplot")
-runShinyHaplot(app.path)
+app.path <- file.path(shiny_dir, "microhaplot")
+microhaplot::runShinyHaplot(app.path)
 ```
 
-### About the example data
-Both `fish1.rds` and `fish2.rds` dataset are generated from a high throughput amplicon based sequence of one containing amplication from 22 locus points of 436 individuals of one population group, and one from 14 locus of 288 individuals from two populations, respectively. The actual run contains more loci but we subsample it in here to make the data protable. The motivation behind supplying two datasets is to show that, despite both are reduced genome representation amplicon reads, there is a wide range difference in sample and loci quality in between runs/species.  
+# About the example data
+The data set in `fish1.rds` contains microhaplotypes from 22 amplicons in 436 
+individuals of one population group. `fish2.rds` consists of data from 14
+amplicons in 288 individuals from two populations. The actual sequencing runs 
+that produced the data contained many more loci, but we have subsampled the
+original data sets in order to make the data portable. The motivation behind
+supplying two datasets is to show that, despite both being derived from 
+amplicon-sequencing reads, there is great variation in read depth between the
+two data sets, and this will affect the reliability of called genotypes.  
 
-## The Basics
+# Microhaplot layout
 
 The `microhaplot` shiny viewer is split into three horizontal "panels". From top to bottom, they are:
 
-1. **The interaction tabset:**  These are the three tabs that live at the top of the page with the light
+## **Interaction tabset** (top)  
+These are the three tabs that live at the top of the page with the light
 blue background.  Any one of the three: "> field selection", "+ read criteria", and "+ locus annotation"
 can be selected.  Whichever one is selected determines the content of the panel directly beneath---the
 user input panel, the panel with the light gray background.  
 
-    a. **field Selection tab:**
-    
-    
-    <img src="field_selection.png" title="field selection tab" width="80%" height="70" />
-    
-    If the "> field selection" is selected, then the user input panel will include dropdown boxes that let you choose a group, locus, or individual(s) that you wish to focus on (this choice affects what is shown in different plots and outputs,
-etc.) It also includes "backwards-and-forwards" buttons, "<" and ">", that sits immediate right to the selected field which allows you to roll backward or forward through the content of the selected field. 
-
-    These are very useful when you want to work your way through each locus individually and choose those that do (and do not) appear to be reliable enough to include in a
-panel of amplicons. * - Note: the location and relative position of each button might change pending on the width of the viewing window.
+  a. **Field selection tab:**<br>  
+    <img src="field_selection.png" title="read criteria tab" width="80%" height="70" />
+    <br><br> 
+    If the "> field selection" is selected, then the user input panel will include
+    dropdown boxes that let you choose a group, locus, or individual(s) that you wish
+    to focus on (this choice affects what is shown in different plots and outputs,
+    etc.)<br><br>
+    The top choice in each dropdown box is "ALL" which indicates that results
+    for all (groups, individuals, or loci) are to be portrayed at once. This tab also
+    includes "backwards-and-forwards" buttons, "<" and ">", that sit
+    immediately to right of the **Indiv** and the **Locus** dropdown boxes,
+    and which allow you to step backward or forward through the content
+    of the dropdown boxes. These "backwards-and-forwards" buttons are very
+    useful when you want to work your way through each locus, one at a time,
+    to choose those that do (and do not) appear to be reliable enough to
+    include in a panel of amplicons. (*Note:* the location and relative position
+    of each button might change pending on the width of the viewing window.)
   
-  
-    b. **read criteria tab:** 
+  b. **Read criteria tab:** <br>  
+      <img src="read_criteria_tab.png" title="read criteria tab" width="80%" height="70" />  
+      <br>
+    In the "+ read criteria" tab, you are given the choice to define the top $n$ alleles, minimum read depth and minimum allelic ratio.  These values specify a series of filters that microhaplotypes must satisfy to pass through the analysis. It is recommend that adjust these filters in a particular order, as follows:
+    
+      i. `Top n Alleles` defines the upper number of distinct microhaplotype sequences
+        (in a single individual's locus) to be kept, starting from the highest-read-depth haplotype and proceeding to haplotypes found in lower read depths. Ideally, the top n alleles should match the ploidy
+        of the species you study. So for a diploid organism, the *top n alleles* should be set to 2. For a
+        tetraploid, the *top n alleles* should be set to 4.
+    
+      ii. `Min Total Read Depth` or _Minimum Total Read Depth_ defines the
+        minimal total number of reads from the "Top n alleles" required for a locus to pass filter within
+        an individual.  It can only take values greater than or equal to 0.   
+        <br>For example, if `Top n Alleles` is set to 2, and `Min Total Read Depth` is set to 15, then if Iindividual A's two highest read depth haplotypes at Locus 1 are CCA with 10 reads and GGA with 7 reads, then the two haplotypes retained from Individual A at Locus 1 are CCA and GGA.  
+        <br>By contrast, if Individual B's two highest-read-depth haplotypes at Locus 1 are GTC with 6 reads and GGA with 5 reads, then, because the total number of reads of those two haplotypes is 11, which is less then 15, none of Individual B's haplotypes at Locus 1 will pass this criteria, therefore no genotype will be reported for Individual at Locus 1.
         
-    <img src="read_criteria_tab.png" title="read criteria tab" width="80%" height="70" />
+      iii. `Min Allelic Ratio` or _Minimum Allelic Ratio_ defines the minimum allelic ratio that a haplotype needs to pass filter. It must be between 0 and 1. 
+        For a particular locus, L, of individual I, the allelic ratio of haplotype X is defined as the ratio of the observed read depth of haplotype X at L in I to the read depth of the haplotype with highest read depth at L in I.  
+        <br>The `Min Allelic Ratio` filter removes from consideration those reads of an allele/haplotype that occur in low depth relative to the highest-read-depth allele.
+        It is important to understand that the _allelic ratio_ is a quantity that applies to each distinct haplotype (allele) at a locus within an individual, and it is relative to the haplotype/allele with the highest read depth.
+        Accordingly, the values of allelic ratios you should expect to see in an individual that is truly homozygous or heterozygous are as follows:
+        
+        > In a **homozygous** individual, the highest read depth allele should be the one carried in n copies by the n-ploidy individual.  Therefore you expect that true allele/haplotype to have a large read depth and an allelic ratio of one while other alleles/haplotypes should have low allele-specific read depth and allelic ratio close to zero.  
+        
+        > In a truly **heterozygous** diploid, the two alleles/haplotypes carried by the individual will, ideally, each have a large and similar number of reads, which means that their allelic ratios should be at or near one. The _Minimal Allelic Ratio_ defines a filter that removes reads from haplotypes with allelic ratio less than the minimum.  
+
+        Once you set up these three criteria, you  _apply_ them to see their effects on the
+        currently displayed data visualization with the "apply" button. You can also _save_
+        these criteria if you want the values to "stick", by clicking the "save" button. 
+        
+    iv. Additional options. When selecting "All loci", additional filtering options will be available at the right hand side of the criteria box. Details for each of the options are displayed if you hover your pointer over it:
+        * `overrides only as min baseline`: when selected and _apply_, all of the criteria (top.n.2, min.tot.rd, min.ar) will replace each of the corresponding locus criterion if and only if the `all` loci's criterion is greater than the value of a single locus level. It is useful when you want to set a minimal baseline for every single locus. For example, if minimal total read depth for locus A, B, and `All` loci is set to 5, 11, 10, respectively, the minimal total read depth for locus A will be updated to 10 when this option is selected and _apply_.
+        * `overrides all params`: This option, when selected and _apply_, will set every single locus criteria into the current `All` loci criterion setting. Be wary that there's no way to undo the overwritten process once this option is selected and applied. For example, if minimal total read depth for locus A, B, and `All` loci is set to 5, 11, 10, respectively, the minimal total read depth for locus A and B will both be updated to 10 when this option is selected and _apply_.
+        * `relies on local locus`: Instead of filtering based on the current displayed filter criteria, the microhaplotypes are filtered based on the local parameters that are defined on a locus-by-locus level. For example, if minimal total read depth for locus A, B, and `All` loci is set to 5, 11, 10, respectively, all microhaplotype for locus A and B must pass minimal total read depth of 5 and 11, respectively.
+      
+  c. **Locus annotation:**  
+    <img src="locus_annotation.png" title="read criteria tab" width="80%" height="70" />  
+    This tab is for users to keep track of whether a certain locus should be retained based
+    on its quality or other attributes. This is most useful when a particular locus has
+    been chosen under the "field selection" panel. There is also a small textbox that
+    lets you insert any comment regarding the locus group. You must press the **save button**
+    to submit this information about each locus. All of this locus-annotation information
+    can be retreived under the table selection for "locus annotation" under the `Output` tab (see below).
     
-    
-    In the "+ read criteria" tab, you are given the choice to define the top $n$ alleles, minimal read depth and minimal allelic ratio that microhaplotypes must have to pass through. It is recommend to adjust your filter with this particular order, starting from:
-    * `Top n Alleles` defines the upper number of microhaplotypes (in a single individual's locus) to be kept starting from the highest read depth to lowest. Ideally, the top n alleles should match up to ploidy level of the species you study. So for a diploid organism, the *top n alleles* should be set to 2. 
-
-      * `Min Total Read Depth` or _Minimal Total Read Depth_ defines the minimal total number of microhaplotype reads that a single individual's locus needs to pass. Importantly, we only add up the read depth of haplotypes that meets the `top n Alleles`. It can only take values greater than or equal to 0.
-      * `Minimal Allelic Ratio` defines the minimal _allelic ratio_ that haplotype needs to pass. Allelic ratio or allelic balance is define as the ratio of the observed read depth of a microhaplotype to the read depth of the most common microhaplotype in an individual at a locus.
-
-        > Ideally, for homozygous individuals, you expect to see the true microhaplotype to have a large read depth and an allelic ratio of one. False or noisy microhaplotypes will have low read depth and allelic ratio close to zero.
-
-        > For a diploid individual that is truly heterozygous, the two true microhaplotypes ideally should have a large and similar number of reads, which means that their allelic ratio should be at or near one. The `Minimal Allelic Ratio` defines a filter that removes reads from haplotypes with allelic ratio less than the minimum.  It must be between 0 and 1.
-
-        Once you set up these three criteria, you _apply_ them with the "apply" button. You can also save these criteria if you want to visit them in the future by clicking the "save" button.There are other options that located on the right hand side that gives you more ways to define filtering criteria. Details for each of the options are shown if you hover your pointer over it.
-
-    c. **locus annotation:**
-     
-    <img src="locus_annotation.png" title="locus annotation tab" width="80%" height="70" />
-     
-    This tab is for users to keep track of whether a certain locus should be retained based on its quality or other attributes. This is most useful when a particular locus has been chosen under the "field selection" panel. There is also a small textbox that lets you insert any comment regarding the locus group. Remember to press the save button for submission. All of this annotation information can be retreived under the table selection for "locus annotation" under `Output` tab. 
 
 > **Ways to access saved filter features and annotation in flat format:** All of the saved parameters such as minimal total read and annotation are read and saved as an RDS file in the same directory path as the shiny app. The name of the annotated file carries with a suffix - "_annotate.rds". For example, for fish1.rds data, the annotate file name is fish1_annotate.rds. Another way to retrieve the info is by downloading the "locus annotation" table from `Table` tab at the bottom pane.
-    
-1. **The main body panel:** This occupies most of microhaplot's screen real estate.  It is where the actual
+
+## **Main body panel** (center)
+This panel occupies most of microhaplot's screen real estate.  It is where the actual
 plots, tables, and other results are rendered.  What gets shown here depends on which main body panel
 has been chosen - located right at the bottom.  That choice is made using the *main panel choice tabset* described below.
 
-1. The **main panel choice tabset** is always down at the bottom of the screen, and is a tabset that allows you to choose the contents
-of the main body panel:
-  <img src="main_tab.png" title="main tab" width="60%" height="40" />
-    a. *Panel:* the place where you choose which data set you want to explore.  When you started microhaplot it should have had the dropdown choice for "fish1.rds".
+## **Panel choice tabset** (bottom)
+The tabset is always down at the bottom of the screen, and the choices on this tabset allow you to choose what contents to be displayed in the main body panel:     
+<img src="main_tab.png" title="main tab" width="60%" height="40" />
+<br>
+   
+  a. *Data Set:*  provides a dropdown box in the main panel that you use to choose which data set you want to explore.
+    The choices in the dropdown box are taken from the `.rds` files that are in the `app.path` 
+    directory described above.
+    When you start microhaplot after a clean install, the default dropdown choice is `fish1.rds`, and the
+    other possible choice is `fish2.rds`.      
+  b. *Summary Info: * displays condensed graphical summary of the characteristics of microhaplotype reads by groups, individuals, or loci.  These are particularly useful for overviews when the "ALL" choice is given for individuals and loci in the _field selection tab_.     
+  c. *Criteria Cutoff: * contains:   
+      i. `Global Scope`: This section displays the summary and distribution regarding the read depths and allelic balance ratio to assist the user in setting up an estimate value of each filter cutoff.
+      <br>We present histograms of read depths and allelic balance ratios across one (or ALL) loci. If only a single locus is selected, the histogram of read depths and allelic balance ratios are shown for each allele, as well.    
+      <br>At the bottom, we also provide summary of the number of alleles and the number of individuals with callable genotypes (given the filters) available at different cutoffs for the minimum total read depth and the minimum allelic ratio.
+      ii. `Quality Profiling`: This segment displays individuals or loci that may carry more than expected number of large read depth microhaplotypes, possibly under the event of sample cross-contamination or targeting paralogous or repetitive loci. To highlight those problematic loci or individuals, the minimum read depth filter (per haplotye) is used instead of minimum total read depth.   
+      <br>The upper plot shows the spread of individuals or loci that might bring potential problems in getting exact genotype calls. The details of those items can further examined in the bottom table.
+  d. *Genotype Call: * offers a more intimate look and analysis on how genotype is being called at a single locus level.    
+    i. `AR refinement` displays the read depth relationship between the most common microhaplotype and other non-primary microhaplotype in the form of a biplot. This space also provides you the tools (found on the left) to fine-tune allelic ratio parameters (such as defining the maximum allelic ratio for homozygous individuals and minimum allelic ratio for heterozygous individual) so that individuals with questionable allelic balance ratio will be opt out for genotype call. At the bottom, you will also find the distribution of read depths and the allelic depth ratios of different haplotypes in relation to whether such haplotype is being included in genotype call and final genotype class - homozygous or heterzygous - regarding the individual.
 
-    b. *Summary Info: * displays condensed graphical summary of the characteristics of microhaplotype reads by groups, individuals, or loci.
+    ii. `Summaries` shows haplotype frequencies within each group, and a visual interactive summary of conformance to Hardy-Weinberg proportions of individual loci, and also portrays the position of these variants within the sequence.
 
-    c. *Filter Analysis:* contains
-        1) a tabular summary (the "Broad Summary") of the number of haplotypes observed and individuals called subject to different levels of filtering.
-        2) "Criteria Breakdown" shows the distribution of read depths and the allelic depth ratios of different haplotypes at individual loci
-        3) "Microhap Summaries" shows haplotype frequencies within each group,
-    and a visual interactive summary of conformance to Hardy-Weinberg proportions of individual loci, and also portrays the position of these
-    variants within the sequence.
+  e. *Table: * provides a place to get a number of tabular views of the data that are sortable and searchable.  This can be very useful when you want to dig into the nitty-gritty details of the short read data.  It also allows you to download filtered and called data and genotypes for later analysis.
 
-    e. *Output: * provides a place to get a number of tabular views of the data that are sortable and searchable.  This can
-    be very useful when you want to dig into the nitty-gritty details of the short read data.  It also allows you to download
-    filtered and called data and genotypes for later analysis.
-
-    f. *About:* provides a little background about microhaplot and how to cite it and whom to contact about it.
+  f. *About (microhaplot): * provides a little background about microhaplot and how to cite it and whom to contact about it.
 
 With that background we are ready to start exploring the example data.
 
-## Mission one: An overview of loci
+# Mission one: An overview of loci
 
 The first thing we are going to do is get an overview of the data with no filtering, focusing on
 different loci.  To do this, we choose *Summary Info --> By Locus*.  We also want to
@@ -149,7 +203,7 @@ diploid individual will have at most two distinct haplotypes at a locus, most of
 are spurious, and we can hope that most of them are at very low read depths and will be filtered out.
 We will investigate that now.
 
-### Let's apply some filters
+## Let's apply some filters
 
 Here is the moment we have all been waiting for.  We have been looking at our data in a totally unfiltered state---effectively regarding
 a haplotype with 1 read to be on an equal footing with one having, say, 1000 reads in an individual.  There are two, simple, main
@@ -164,7 +218,7 @@ not sequence well.  For example `tag_id_1511`.  (hint: look for violin plot w/ s
 rows in the left hand figure and then double click those to get a zoomed in view.  To zoom back out, to be able to see all
 the loci, just double click the body of the left figure.  
 
-## Mission Two: An overview of individauls
+# Mission Two: An overview of individauls
 
 We can take those same filters we just applied and get a good overview of our sequencing data on an
 individual basis.  Go ahead of choose *Summary Info-->By Individual*.  from the main panel choice
@@ -198,7 +252,7 @@ groups that the individuals fall into.  This is particularly useful when individ
 populations or species are in your dataset.  In the case of our example data, we have merely
 assigned half of the individuals to be from "pop1" and the other half from "pop2".
 
-### Spotting some dodgy individuals
+## Spotting some dodgy individuals
 
 This overview of all the individuals gives us a good chance to spot a few problem fish
 right off the bat.  Just scanning down the fraction of loci that the individuals might be
@@ -207,7 +261,7 @@ looking at the distribution of read depths across loci.  Perhaps even more intri
 individual s288 that seems to have pretty reasonable read depths, but very poor allelic
 balance.  
 
-### Looking at the raw counts for s288
+## Looking at the raw counts for s288
 
 Another way to look at the data is through the tabular format.  If we want to see tabular data for individual s288, choose "Output" from the main panel choice tabset.   By
 default this will show a few lines of the "Observed variants (unfiltered)" table.
@@ -229,7 +283,7 @@ haplotypes with read depths over 50:  128 reads of CCCTCTG, 100 reads of CCCTCAG
 individual has contaminated DNA or represents two individuals that were barcoded equivalently.
 It probably should be tossed out of the final data set.
 
-### Raw count data for a less dodgy individual?
+## Raw count data for a less dodgy individual?
 
 So, the data for s288 was a little disquieting, but recall that was an individual that
 looked pathological from the very beginning.  So, what if we look at the raw count
@@ -245,7 +299,7 @@ more than two haplotypes at high read depth but there is always at least one hap
 at high read depth.  When two haplotypes are at high read depth, their read depths
 are largely quite similar.  
 
-## Looking over different loci
+# Looking over different loci
 
 When we are interested in assessing how well each locus behaves in reporting microhaplotypes, it is time to turn to the "Filter Analysis" panel choice.
 First, go ahead and choose *Filter Analysis --> Broad Summary*.  This view gives you a tabular
@@ -291,24 +345,16 @@ useful when one is comparing allele frequencies across many different groups.
 Finally, you may need to scroll down to see the final figure in this display.  It is a representation of the
 haplotype sequences, their frequencies, and the positions of the variants within them along each amplicon.
 
-## Output of data
+# Output of data
 
 We have already witnessed how to use the *Output* panel to look at the raw data.  It is also possible to
 download filtered, unfiltered, and processed data from this view using the "Download Data" button. These
 saves output in CSV files.
 
-## Locus annotation
+# Locus annotation
 
 The program can be used to annotate different loci (and assign filtering criteria to them). This
 annotation can be done using the "+locus annotation" interaction tabset, and the results saved
 by downloading the locus annotation data from the *Outputs* panel.
 
-
-
-
-
-### selecting parameters
-
-
-### import
-How to use interpret biplot in AR refinement
+### importing external input data

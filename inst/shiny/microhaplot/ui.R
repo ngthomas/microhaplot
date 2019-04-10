@@ -233,14 +233,14 @@ shinyUI(
     bsAlert("alert"),
     navbarPage(
       "",
-      tabPanel("Panel",
+      tabPanel("Data Set",
                fluidRow(column(
                  12,
                  column(
                    10,
                    selectInput(
                      "selectDB",
-                     label = "Select PANEL:",
+                     label = "Select Data Set:",
                      "",
                      selected = NULL,
                      width = "80%"
@@ -564,22 +564,39 @@ shinyUI(
                  ),
 
                  tabPanel(
-                   h5("Quality Profile"),
+                   h5("Quality Profiling"),
+                   column(12, HTML("The following content disregards the <b>min total read depth</b>. Instead, it will relied on the following filter:")),
+                   column(6,
+                          shinyWidgets::sliderTextInput("rdMin",
+                                                        label = "Min read depth (per haplotype)",
+                                                        choices = c(0:30,50,100,1000,Inf),
+                                                        selected = 2,
+                                                        grid = F),
+                          style = "margin-top:10px;text-align:center; margin-bottom:0px; margin-right:0px; padding-bottom:0px;padding-right:0px", offset=3),
+                   column(2, verticalLayout(actionButton("updateRdMin", label = "update",
+                                                          width="100%",
+                                                          style="text-align:center")),
+                          style = "margin-top:25px;text-align:center; margin-bottom:0px; margin-right:0px; padding-bottom:0px;padding-right:0px;padding-left:0px",
+                          offset=0),
+                   column(6, h4("Individual list:")),
+                   column(6, h4("Loci list:")),
                    # mod to add interactive table, ranks of ranks (based on rank of rd, calleable hap)
-                   column(12, plotOutput("ambigIndivPlot", height = "auto",
+                   column(6, plotOutput("ambigIndivPlot", height = "auto",
                                          dblclick = dblclickOpts(id = "aip_dblclick"),
                                          brush = brushOpts(
                                            id = "aip_Brush",
                                            direction = "x",
                                            resetOnNew = TRUE
                                          ))),
-                   column(12, plotOutput("ambigLociPlot", height = "auto",
+                   column(6, plotOutput("ambigLociPlot", height = "auto",
                                          dblclick = dblclickOpts(id = "alp_dblclick"),
                                          brush = brushOpts(
                                            id = "alp_Brush",
                                            direction = "x",
                                            resetOnNew = TRUE
                                          ))),
+                   column(6, h5("Of loci and individuals that have more than 'Top n' qualified alleles:")),
+                   column(12, DT::dataTableOutput('indivProfileTbl')),
                    fluidRow(
                      div(style = "padding: 20px; border-bottom: 8px solid white; background: white")
                    )
