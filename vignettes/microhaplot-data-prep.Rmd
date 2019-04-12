@@ -4,13 +4,13 @@ author: "Thomas Ng and Eric C. Anderson"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{haplot introduction}
+  %\VignetteIndexEntry{microhaplot data prep}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 This vignette concerns itself with an overview of microhaplot and on 
-preparation of data for input into microhaplot Once your data has been transfered to the appropriate Haplot folder, see the `haplot walkthrough` vignette to learn more about microhaplot's graphical features.
+preparation of data for input into microhaplot Once your data has been transfered to the appropriate Haplot folder, see the `microhaplot walkthrough` vignette to learn more about microhaplot's graphical features.
 
 ## How does microhaplot work?
 

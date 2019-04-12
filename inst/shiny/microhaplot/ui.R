@@ -192,12 +192,12 @@ shinyUI(
                                        choices=c("Accept","Reject","NA"),
                                       selected="NA"),
                            style = "margin-top:-8px; margin-bottom:0px"
-                    ),
-                    column(5,
-                           checkboxInput("rewriteFilter", label = "save crit. cutoff", value = TRUE),
-                           style = "margin-top:10px; margin-bottom:0px",
-                           offset=1
-                    )
+                     )#,
+                    # column(5,
+                    #        checkboxInput("rewriteFilter", label = "save crit. cutoff", value = TRUE),
+                    #        style = "margin-top:10px; margin-bottom:0px",
+                    #        offset=1
+                    # )
                     ),
 
                     column(2,
