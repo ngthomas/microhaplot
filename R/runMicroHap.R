@@ -26,6 +26,8 @@
 #' @param prior.model String. Choose two different prior models: "uniform" - prior set all prior haplotype weight to 1, or "empirical": the prior
 #' alpha values are defined by the number of observed cases under refinement
 #' @param min.read.depth integer. Set minimal read depth. Default as 0, as no minimal.
+#' @keywords internal
+#' @noRd
 #' @examples
 #' # collect.data <- RunSrMicrohap(haplo.sum, "tag_id_1377", 2)
 RunSrMicrohap <- function(haplo.tbl,
