@@ -584,7 +584,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                                choices=list("overrides only as min baseline"=1,
                                             "overrides all params"=2,
                                             "relies on local locus param."=3),
-                              selected = c(3))
+                              selected = c(0))
       filterParam$opts <- input$filterOpts
 
       # output$locusAcceptStatus <- renderText({
@@ -912,13 +912,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     match.indx <- which(annotateTab$tbl$locus == input$selectLocus)
 
-    if(input$rewriteFilter[1]) {
-      annotateTab$tbl$min.rd[match.indx] <-  filterParam$minRD
-      annotateTab$tbl$min.ar[match.indx] <-  filterParam$minAR
-      annotateTab$tbl$n.alleles[match.indx] <-  filterParam$n.alleles
-      #filterParam$max.ar.hm <- ifelse(input$max.ar.hm > filterParam$minAR, filterParam$minAR, input$max.ar.hm)
-      #filterParam$min.ar.hz <- ifelse(input$min.ar.hz < filterParam$minAR, filterParam$minAR, input$min.ar.hz)
-    }
+    # if(input$rewriteFilter[1]) {
+    #   annotateTab$tbl$min.rd[match.indx] <-  filterParam$minRD
+    #   annotateTab$tbl$min.ar[match.indx] <-  filterParam$minAR
+    #   annotateTab$tbl$n.alleles[match.indx] <-  filterParam$n.alleles
+    #   #filterParam$max.ar.hm <- ifelse(input$max.ar.hm > filterParam$minAR, filterParam$minAR, input$max.ar.hm)
+    #   #filterParam$min.ar.hz <- ifelse(input$min.ar.hz < filterParam$minAR, filterParam$minAR, input$min.ar.hz)
+    # }
 
     annotateTab$tbl$status[match.indx] <- input$locusAccept
     annotateTab$tbl$comment[match.indx] <- input$locusComment[1]
