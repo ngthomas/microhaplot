@@ -10,7 +10,7 @@ This software exists as an R package `microhaplot` that includes within it the c
 establish an Rstudio/Shiny server to visualize and manipulate the data.  There are two key steps in 
 the `microhaplot` worflow:
 
-1. The first step is to summarize alignment and variant (SNP) data into a single data frame that is 
+1. The first step is to summarize alignment and vardiant (SNP) data into a single data frame that is 
 easily operated upon.  This is done using the function `microhaplot::prepHaplotFiles`.  You must supply a 
 VCF file that includes variants that you are interested in extracting, and as many SAM files 
 (one for each individual) that you want to extract read information from at each of the variants. 
@@ -19,8 +19,8 @@ to PERL to parse the CIGAR strings in the SAM files to extract the variant infor
 and store this information into a data frame which gets saved with the installed Shiny app (see below)
 for later use.  Depending on the size of the data set, this can take a few minutes.  
 
-2. The second step is to run the haPLOType Shiny app to visualize the sequence information, call genotypes using
-simple read-depth based filtering criteria, and curate the loci. haPLOType is suitable for quick assesement
+2. The second step is to run the microhaplot Shiny app to visualize the sequence information, call genotypes using
+simple read-depth based filtering criteria, and curate the loci. microhaplot is suitable for quick assesement
 and quality control of haplotypes generated from library runs. Plot summaries include read depth, fraction of callable haplotypes, Hardy-Weinberg
 equilibrium plots, and more. 
 
@@ -49,19 +49,19 @@ devtools::install_github("ngthomas/microhaplot", build_vignettes = TRUE)
 Once you have installed the `microhaplot` R package with devtools there you need to use the `microhaplot::mvHaplotype`
 to establish the haPLOType Shiny App in a convenient location on your system. The following line
 creates the directory `Shiny` in my home directory and then within that it creates the 
-directory `haPLOType` and fills it with the Shiny app as well as the example data that go 
+directory `microhaplot` and fills it with the Shiny app as well as the example data that go 
 along with that.  
 
 ```r
-microhaplot::mvShinyHaplot("~/Shiny") # provide a directory path to host the haPLOType app
+microhaplot::mvShinyHaplot("~/Shiny") # provide a directory path to host the microhaplot app
 ```
-To start familiarizing yourself with haPLOType using the provided example data.  We recommend
+To start familiarizing yourself with microhaplot using the provided example data.  We recommend
 going through our first vignette.  Call it up with:
 ```r
-vignette("haPLOType-walkthrough")
+vignette("microhaplot-walkthrough")
 ```
 
-Now, having done that, we can launch haPLOType on the example data:
+Now, having done that, we can launch Shiny microhaplot on the example data:
 ```r
 library(microhaplot)
 app.path <- "~/Shiny/microhaplot"
