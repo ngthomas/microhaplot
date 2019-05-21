@@ -9,6 +9,7 @@ vignette: >
   %\VignetteIndexEntry{microhaplot walkthrough}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  
 ---
 
 `microhaplot` comes pre-loaded with two small, real, example data sets, 
@@ -53,12 +54,12 @@ The `microhaplot` shiny viewer is split into three horizontal "panels". From top
 
 ## **Interaction tabset** (top)  
 These are the three tabs that live at the top of the page with the light
-blue background.  Any one of the three: "> field selection", "+ read criteria", and "+ locus annotation"
+blue background.  Any one of the three: ">&nbsp;field selection", "+&nbsp;read criteria", and "+&nbsp;locus annotation"
 can be selected.  Whichever one is selected determines the content of the panel directly beneath---the
 user input panel, the panel with the light gray background.  
 
   a. **Field selection tab:**<br>  
-    <img src="field_selection.png" title="read criteria tab" width="80%" height="70" />
+    <img src="field_selection.png" title="read criteria tab" width="100%" />
     <br><br> 
     If the "> field selection" is selected, then the user input panel will include
     dropdown boxes that let you choose a group, locus, or individual(s) that you wish
@@ -67,20 +68,20 @@ user input panel, the panel with the light gray background.
     The top choice in each dropdown box is "ALL" which indicates that results
     for all (groups, individuals, or loci) are to be portrayed at once. This tab also
     includes "backwards-and-forwards" buttons, "<" and ">", that sit
-    immediately to right of the **Indiv** and the **Locus** dropdown boxes,
+    immediately to the right of the **Indiv** and the **Locus** dropdown boxes,
     and which allow you to step backward or forward through the content
     of the dropdown boxes. These "backwards-and-forwards" buttons are very
     useful when you want to work your way through each locus, one at a time,
     to choose those that do (and do not) appear to be reliable enough to
     include in a panel of amplicons. (*Note:* the location and relative position
-    of each button might change pending on the width of the viewing window.)
+    of each button might change, depending on the width of the viewing window.)
   
   b. **Read criteria tab:** <br>  
-      <img src="read_criteria_tab.png" title="read criteria tab" width="80%" height="70" />  
+      <img src="read_criteria_tab.png" title="read criteria tab" width="100%" />  
       <br>
-    In the "+ read criteria" tab, you are given the choice to define the top $n$ alleles, minimum read depth and minimum allelic ratio.  These values specify a series of filters that microhaplotypes must satisfy to pass through the analysis. It is recommend that adjust these filters in a particular order, as follows:
+    In the "+ read criteria" tab, you are given the choice to define the top $n$ alleles, minimum read depth and minimum allelic ratio.  These values specify a series of filters that microhaplotypes must satisfy to pass through the analysis. It is recommend to adjust these filters in a particular order, as follows:
     
-      i. `Top n Alleles` defines the upper number of distinct microhaplotype sequences
+      i. `Top n Alleles` defines the maximum number of distinct microhaplotype sequences
         (in a single individual's locus) to be kept, starting from the highest-read-depth haplotype and proceeding to haplotypes found in lower read depths. Ideally, the top n alleles should match the ploidy
         of the species you study. So for a diploid organism, the *top n alleles* should be set to 2. For a
         tetraploid, the *top n alleles* should be set to 4.
@@ -88,39 +89,66 @@ user input panel, the panel with the light gray background.
       ii. `Min Total Read Depth` or _Minimum Total Read Depth_ defines the
         minimal total number of reads from the "Top n alleles" required for a locus to pass filter within
         an individual.  It can only take values greater than or equal to 0.   
-        <br>For example, if `Top n Alleles` is set to 2, and `Min Total Read Depth` is set to 15, then if Iindividual A's two highest read depth haplotypes at Locus 1 are CCA with 10 reads and GGA with 7 reads, then the two haplotypes retained from Individual A at Locus 1 are CCA and GGA.  
-        <br>By contrast, if Individual B's two highest-read-depth haplotypes at Locus 1 are GTC with 6 reads and GGA with 5 reads, then, because the total number of reads of those two haplotypes is 11, which is less then 15, none of Individual B's haplotypes at Locus 1 will pass this criteria, therefore no genotype will be reported for Individual at Locus 1.
+        <br>For example, if `Top n Alleles` is set to 2, and `Min Total Read Depth` is set to 15, then if Individual A's two highest read depth haplotypes at Locus 1 are CCA with 10 reads and GGA with 7 reads, then the two haplotypes retained from Individual A at Locus 1 are CCA and GGA.  
+        <br>By contrast, if Individual B's two highest-read-depth haplotypes at Locus 1 are GTC with 6 reads and GGA with 5 reads, then, because the total number of reads of those two haplotypes is 11, which is less then 15, none of Individual B's haplotypes at Locus 1 will pass this criterion, and, therefore, no genotype will be reported for Individual at Locus 1.
         
       iii. `Min Allelic Ratio` or _Minimum Allelic Ratio_ defines the minimum allelic ratio that a haplotype needs to pass filter. It must be between 0 and 1. 
-        For a particular locus, L, of individual I, the allelic ratio of haplotype X is defined as the ratio of the observed read depth of haplotype X at L in I to the read depth of the haplotype with highest read depth at L in I.  
+        For a particular locus, L, of individual I, the allelic ratio of haplotype/allele X is defined as the ratio of the observed read depth of haplotype/allele X at L in I to the read depth of the haplotype/allele with highest read depth at L in I.  
         <br>The `Min Allelic Ratio` filter removes from consideration those reads of an allele/haplotype that occur in low depth relative to the highest-read-depth allele.
         It is important to understand that the _allelic ratio_ is a quantity that applies to each distinct haplotype (allele) at a locus within an individual, and it is relative to the haplotype/allele with the highest read depth.
         Accordingly, the values of allelic ratios you should expect to see in an individual that is truly homozygous or heterozygous are as follows:
         
         > In a **homozygous** individual, the highest read depth allele should be the one carried in n copies by the n-ploidy individual.  Therefore you expect that true allele/haplotype to have a large read depth and an allelic ratio of one while other alleles/haplotypes should have low allele-specific read depth and allelic ratio close to zero.  
         
-        > In a truly **heterozygous** diploid, the two alleles/haplotypes carried by the individual will, ideally, each have a large and similar number of reads, which means that their allelic ratios should be at or near one. The _Minimal Allelic Ratio_ defines a filter that removes reads from haplotypes with allelic ratio less than the minimum.  
-
+        > In a truly **heterozygous** diploid, the two alleles/haplotypes carried by the individual will, ideally, each have a large and similar number of reads, which means that their allelic ratios should be at or near one. 
+        
         Once you set up these three criteria, you  _apply_ them to see their effects on the
-        currently displayed data visualization with the "apply" button. You can also _save_
+        currently displayed data visualization with the _apply_ button. You can also _save_
         these criteria if you want the values to "stick", by clicking the "save" button. 
         
-    iv. Additional options. When selecting "All loci", additional filtering options will be available at the right hand side of the criteria box. Details for each of the options are displayed if you hover your pointer over it:
-        * `overrides only as min baseline`: when selected and _apply_, all of the criteria (top.n.2, min.tot.rd, min.ar) will replace each of the corresponding locus criterion if and only if the `all` loci's criterion is greater than the value of a single locus level. It is useful when you want to set a minimal baseline for every single locus. For example, if minimal total read depth for locus A, B, and `All` loci is set to 5, 11, 10, respectively, the minimal total read depth for locus A will be updated to 10 when this option is selected and _apply_.
-        * `overrides all params`: This option, when selected and _apply_, will set every single locus criteria into the current `All` loci criterion setting. Be wary that there's no way to undo the overwritten process once this option is selected and applied. For example, if minimal total read depth for locus A, B, and `All` loci is set to 5, 11, 10, respectively, the minimal total read depth for locus A and B will both be updated to 10 when this option is selected and _apply_.
-        * `relies on local locus`: Instead of filtering based on the current displayed filter criteria, the microhaplotypes are filtered based on the local parameters that are defined on a locus-by-locus level. For example, if minimal total read depth for locus A, B, and `All` loci is set to 5, 11, 10, respectively, all microhaplotype for locus A and B must pass minimal total read depth of 5 and 11, respectively.
+        iv. _Additional options for applying and saving_:  When  `ALL` is chosen from the dropdown box in the ">&nbsp;field selection" tab,
+        additional filtering options 
+        will be available at the right hand side of the "+&nbsp;read criteria" tab. Details for each
+        of the options are displayed if you hover your pointer over it:
+            * `overrides only as min baseline`: when selected and _apply_ or _save_ is chosen, the selected values for all
+            three of the aforementioned criteria (`Top n Alleles`, `Min Total Read Depth`, and `Min Allelic Ratio`)
+            will replace the current values of the criteria for every locus in which the saved value is greater than 
+            the currently selected values.  This is useful when you want to set
+            a minimal baseline for every single locus. For example, if minimal total read depth for loci A and B are set
+            set to 5 and 11, respectively, and the value for `ALL` has been set to 10, then the minimal total read
+            depth for locus A will be updated to 10 when this
+            option is selected and _apply_ or _save_ is chosen.
+            * `overrides all params`: This option, when selected and _apply_ of _save_ is chosen,
+            will set `Top n Alleles`, `Min Total Read Depth`, and `Min Allelic Ratio`, to be whatever the currently
+            selected values are. Be wary that there's no way to undo this 
+            process once this option is selected and applied. For example, if minimal total read depth for locus A, B,
+            is set to 5 and 11, and the value for `ALL` has been set to 10, then the minimal total read depth for locus A and B will both
+            be updated to 10 when this option is selected and _apply_ or _save_ is chosen.
+            * `relies on local locus param.`: It is very helfpul to select `ALL` loci for viewing in broad summaries
+            such as those in the _Summary->Global Scope_ panel described below.  When choosing these views,
+            one might want to preserve each locus's specific filtering criteria (as saved using the steps above) rather
+            than the criteria applied to `ALL` loci.  In order to effect this, the `relies on local locus param.` box should
+            be checked and, after that, the _apply_ button should be activated (it is important to hit the _apply_ button 
+            every time you switch back to `ALL` loci.
+            
+        Understanding how these options work can take a little practice.  We recommend that the user spend some time playing
+        around with the various options while viewing the effects on the "locus annotation" output of the Table panel (see the Table
+        section under the Panel Choice Tabset section below.)
       
-  c. **Locus annotation:**  
-    <img src="locus_annotation.png" title="read criteria tab" width="80%" height="70" />  
+  c. **Locus annotation tab:**<br>
+    <br>
+    <img src="locus_annotation.png" title="read criteria tab" width="100%" />  
+    <br>
     This tab is for users to keep track of whether a certain locus should be retained based
     on its quality or other attributes. This is most useful when a particular locus has
-    been chosen under the "field selection" panel. There is also a small textbox that
-    lets you insert any comment regarding the locus group. You must press the **save button**
+    been chosen under the "> field selection" panel. There is also a small textbox that
+    lets you insert any comments you would like to record about a particular locus.
+    You must press the **save button**
     to submit this information about each locus. All of this locus-annotation information
-    can be retreived under the table selection for "locus annotation" under the `Output` tab (see below).
-    
+    can be retreived under the table selection for "locus annotation" under the `Table` tab (see below).
 
-> **Ways to access saved filter features and annotation in flat format:** All of the saved parameters such as minimal total read and annotation are read and saved as an RDS file in the same directory path as the shiny app. The name of the annotated file carries with a suffix - "_annotate.rds". For example, for fish1.rds data, the annotate file name is fish1_annotate.rds. Another way to retrieve the info is by downloading the "locus annotation" table from `Table` tab at the bottom pane.
+
+> **Ways to access saved criteria values and locus annotations in file format:** All of the saved parameters such as `Min Total Read Depth`, as well as the locus annotations, are stored in a data frame in memory and are read in and saved as serialized R objects in an RDS file in the same directory path as the shiny app. The name of this file has the suffix `_annotate.rds`. For example, for `fish1.rds` data, the file name is `fish1_annotate.rds`.  That file can be used to retrieve the data.  A better way to retrieve the data is by downloading the "locus annotation" table from the `Table` tab at the bottom pane. For the courageous, you can set the filters and annotations elsewhere, save those into an RDS file named appropriately (with the `_annotate.rds` suffix) and then insert that file into your microhaplot analysis by copying it to the directory path where the shiny app resides.  This is not recommended for the faint of heart, as bungling the format of the data frame (or the exact locus names) in that RDS file could have unforeseen, unexpected, or even catastropic consequences...
 
 ## **Main body panel** (center)
 This panel occupies most of microhaplot's screen real estate.  It is where the actual
@@ -128,29 +156,94 @@ plots, tables, and other results are rendered.  What gets shown here depends on 
 has been chosen - located right at the bottom.  That choice is made using the *main panel choice tabset* described below.
 
 ## **Panel choice tabset** (bottom)
-The tabset is always down at the bottom of the screen, and the choices on this tabset allow you to choose what contents to be displayed in the main body panel:     
-<img src="main_tab.png" title="main tab" width="60%" height="40" />
+This tabset is always down at the bottom of the screen, and the choices on this tabset allow you to choose the contents to be displayed in the main body panel.
+It looks like this:  
 <br>
-   
+<img src="main_tab.png" title="main tab" width="100%" />
+<br>
+<br>
+In the following, we will describe all these different main panels, but, since they are rather large, we
+will not include any pictures of those panels.  It is recommended that the reader follow along
+with this vignette using the example
+data in microhaplot.  That will help a lot.
+
   a. *Data Set:*  provides a dropdown box in the main panel that you use to choose which data set you want to explore.
     The choices in the dropdown box are taken from the `.rds` files that are in the `app.path` 
     directory described above.
     When you start microhaplot after a clean install, the default dropdown choice is `fish1.rds`, and the
     other possible choice is `fish2.rds`.      
-  b. *Summary Info: * displays condensed graphical summary of the characteristics of microhaplotype reads by groups, individuals, or loci.  These are particularly useful for overviews when the "ALL" choice is given for individuals and loci in the _field selection tab_.     
+  b. *Summary Info: * displays a condensed graphical summary of the characteristics of microhaplotype reads by groups, individuals, or loci.  These are particularly useful for overviews when the "ALL" choice is given for individuals and loci in the "> field selection" tab.     
   c. *Criteria Cutoff: * contains:   
-      i. `Global Scope`: This section displays the summary and distribution regarding the read depths and allelic balance ratio to assist the user in setting up an estimate value of each filter cutoff.
-      <br>We present histograms of read depths and allelic balance ratios across one (or ALL) loci. If only a single locus is selected, the histogram of read depths and allelic balance ratios are shown for each allele, as well.    
-      <br>At the bottom, we also provide summary of the number of alleles and the number of individuals with callable genotypes (given the filters) available at different cutoffs for the minimum total read depth and the minimum allelic ratio.
-      ii. `Quality Profiling`: This segment displays individuals or loci that may carry more than expected number of large read depth microhaplotypes, possibly under the event of sample cross-contamination or targeting paralogous or repetitive loci. To highlight those problematic loci or individuals, the minimum read depth filter (per haplotye) is used instead of minimum total read depth.   
-      <br>The upper plot shows the spread of individuals or loci that might bring potential problems in getting exact genotype calls. The details of those items can further examined in the bottom table.
-  d. *Genotype Call: * offers a more intimate look and analysis on how genotype is being called at a single locus level.    
-    i. `AR refinement` displays the read depth relationship between the most common microhaplotype and other non-primary microhaplotype in the form of a biplot. This space also provides you the tools (found on the left) to fine-tune allelic ratio parameters (such as defining the maximum allelic ratio for homozygous individuals and minimum allelic ratio for heterozygous individual) so that individuals with questionable allelic balance ratio will be opt out for genotype call. At the bottom, you will also find the distribution of read depths and the allelic depth ratios of different haplotypes in relation to whether such haplotype is being included in genotype call and final genotype class - homozygous or heterzygous - regarding the individual.
+      i. `Global Scope`: This section displays summaries of the distributions of read depths and allelic balance ratios to assist the user in
+      setting appropriate values for those filter cutoffs. Histograms of read depths and allelic balance ratios are presented for
+      only one locus, or combined across `ALL` loci, depending on the settings in the "> field selection" tab.
+      If only a single locus is selected, the histogram of read depths and allelic balance ratios are shown for each allele, as well. 
+      Looking at the distribution of allele-specific read depths can be very useful for identifying alleles that are
+      linked to variation that interferes with PCR of the amplicon.
+      At the bottom, beneath the graphical histograms,  we also provide a tabular summary of the number of alleles and the number of individuals
+      with callable genotypes (given the filters) available at different cutoffs for the minimum total read depth and the minimum allelic ratio.   
+      ii. `Quality Profiling`: This segment displays individuals or loci that may carry more alleles with high read depth than
+      expected, possibly indicating that the sample is contaminated, or that the amplicon targets paralogous or repetitive loci.
+      To highlight those problematic loci or individuals, a _per-allele_ minimum read depth filter is used, rather than a
+      minimum _total_ read depth filter.  This per-allele read depth is set using the `Min read depth (per haplotype)` slider input
+      at the top part of the main panel.
+      The upper plot graphically summarizes the individuals or loci that might 
+      have more high-read-depth alleles than expected. The individual list shows a point at 
+      0, 1, 2, ..., where each of those values gives the number of alleles above the "Top n" filter criterion that have
+      read depths that pass the allele-specific read depth filter.  Having a large point at 0 is good.  Points at values greater than
+      0 record the number of individuals with that many loci having extraneous alleles of high read depth. The "Loci List" provides 
+      an analogous summary for loci.  The details of all these items can be further examined in the bottom table.  The Search box
+      at the upper right of the table is 
+      particularly useful for tracking down a specific individual sample or locus in the table output.
+  d. *Genotype Call: * offers a more intimate look and analysis of how genotypes are being called at a single locus, and of the allele specific read-depths
+  within those genotypes.    
+      i. `AR refinement`: This panel displays a scatterplot that shows the relationship between the 
+      allele with the highest read depth and the allele with the second-highest read depth.  It is 
+      most suited to handling data from diploid organisms. This space also provides you the
+      tools (found on the left) to fine-tune allelic ratio parameters (such as defining the maximum
+      allelic ratio for homozygous genotype calls and the minimum allelic ratio for heterozygous genotype calls)
+      so that individuals with questionable allelic balance ratio will not receive called genotypes.   
+      <br> 
+      The lines on the plot are as follows:
+          * <span style="color:purple">Solid Purple Line</span>: This shows the consequence of the `Min Total Read Depth'
+          filter.  It is slanted down and right because it is a criterion on the sum of the read depths of the
+          two highest-read-depth alleles.  Points that fall below and to the left of this line appear as
+          X's because they are no-calls.
+          * <span style="color:orange">Dashed Orange Line</span>: This line shows where the standard `Min Allelic Ratio`
+          filter resides.  It shows that any point below that line will, by default, be considered a heterozygote
+          because the allele with second-highest read depth has an allele balance ratio that is high enough (i.e. its
+          read depth is close enough to that of the highest read depth allele that it is believed to be a true allele.)
+          * <span style="background-color:yellow">Solid Yellow Line</span>: This line shows the Min Allelic Ratio for 
+          Heterozygotes cutoff associated with the `Min AR for Het (yellow)` slider input to the left side of
+          the panel.  In the beginning of an analysis, it will be set the same as the dashed orange line, but
+          can be tailored for specific loci.  For example, some loci might have most heterozygous individuals with
+          an allelic ratio near 1, but a few of them have allelic ratio near 0.6. To exclude those individuals 
+          with low-ish allelic ratio, you could set the `Min AR for Het (yellow)` to 0.7, which will move the
+          yellow line down, and will consider the aberrant heterozygous individuals as no-calls.
+          * <span style="color:aqua">Solid Aqua Line</span>: This shows the Max Allelic Ratio for Homozygotes
+          cutoff associated with the `Max AR for Homoz` slider input.  Changing this allows you to filter out
+          those individuals that are considered to be homozygotes, but those whose second-highest-read-depth
+          allele is concerningly high.   
+          
+          <br>
+          In order to save the Min/Max AR values chosen for heterozygotes or homozygotes, you can choose _save_ from the 
+          "+ read criteria" tab.   
+          <br>
+          Below the scatterplot, you will also find the distribution of read depths and the allelic depth ratios
+          of different haplotype-alleles in relation to whether each alleles was included in a genotype call
+          and whether or not that genotype call was considered homozygous or heterozygous.
+      ii. `Summaries` shows haplotype frequencies within each group, and a visual interactive summary
+      of conformance to Hardy-Weinberg proportions of individual loci, and also portrays the position
+      of these variants within the sequence.
 
-    ii. `Summaries` shows haplotype frequencies within each group, and a visual interactive summary of conformance to Hardy-Weinberg proportions of individual loci, and also portrays the position of these variants within the sequence.
-
-  e. *Table: * provides a place to get a number of tabular views of the data that are sortable and searchable.  This can be very useful when you want to dig into the nitty-gritty details of the short read data.  It also allows you to download filtered and called data and genotypes for later analysis.
-
+  e. *Table: * This panel provides a place to get a number of tabular views (available in the "Select Table:" dropdown box) of the data that are sortable and searchable. 
+  The output of each is self-explanatory with a little exploration. This can be very useful when you want to dig into the nitty-gritty details of the short read data.
+  It also allows you to download filtered and called data and genotypes for later analysis. Note that clicking a column name will sort on that column (purple triangle pointing
+  up or down depending on sort order, which can be changed be clicking it again).  To sort on multiple columns, you can shift-click them.  The rows can be filtered by 
+  those rows matching a certain string but putting that string in the Search box.  For this to be most useful it is recommended that all sample and locus names not 
+  be simply numeric (i.e. call it `Loc_110`, instead of `110`, and `Fish_36`, instead of simply `36`). Note that the `fish1.rds` data set does not adhere to that convention
+  for sample names.
+  
   f. *About (microhaplot): * provides a little background about microhaplot and how to cite it and whom to contact about it.
 
 With that background we are ready to start exploring the example data.
