@@ -43,11 +43,11 @@ install it using  [devtools](https://github.com/hadley/devtools). You can get `d
  
 Once you have `devtools` available in R, you can get `microhaplot` this way:
 ```r
-devtools::install_github("ngthomas/microhaplot", build_vignettes = TRUE)
+devtools::install_github("ngthomas/microhaplot", build_vignettes = TRUE, build_opts = c("--no-resave-data", "--no-manual"))
 ```
 
 Once you have installed the `microhaplot` R package with devtools there you need to use the `microhaplot::mvHaplotype`
-to establish the haPLOType Shiny App in a convenient location on your system. The following line
+to establish the microhaplot Shiny App in a convenient location on your system. The following line
 creates the directory `Shiny` in my home directory and then within that it creates the 
 directory `microhaplot` and fills it with the Shiny app as well as the example data that go 
 along with that.  
@@ -58,8 +58,9 @@ microhaplot::mvShinyHaplot("~/Shiny") # provide a directory path to host the mic
 To start familiarizing yourself with microhaplot using the provided example data.  We recommend
 going through our first vignette.  Call it up with:
 ```r
-vignette("microhaplot-walkthrough")
+browseVignettes("microhaplot")
 ```
+and check out `microhaplot-walkthrough`.
 
 Now, having done that, we can launch Shiny microhaplot on the example data:
 ```r
