@@ -1,12 +1,11 @@
 Package: microhaplot
 Type: Package
-Title: short read variant visualizer
-Version: 0.1.0
+Title: microhaplotype constructor and visualizer
+Version: 1.0.0.9000
 Authors@R: person("Thomas", "Ng", email = "tngthomasng@gmail.com", role = c("aut", "cre"))
-Description: This package has two main functions: 1) to extract microhaplotype from
-    individual-based alignment and variant files, specifically from SAM and VCF files
-    2) to call and curate microhaplotypes with the aid of simple filter criteria and
-    summaries plot found in the Shiny App interface.
+Description: This package 1) constructs microhaplotype from short read sequences, specifically
+    from sequence alignment - SAM and variant call - VCF files, and 
+    2) assists the curation of observed microhaplotypes through Shiny interface.
 Depends:
     R (>= 3.1.2)
 Encoding: UTF-8

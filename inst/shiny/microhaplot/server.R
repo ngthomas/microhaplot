@@ -1082,7 +1082,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     #cat(file=stderr(), "successfull pass on haplo.sum --- ", dim(haplo.sum),"=--\n")
 
-    if (is.null(haplo.sum))
+    if (is.null(haplo.sum) || dim(haplo.sum)[1] ==0)
       return ()
 
     haplo.join.ar <- left_join(haplo.sum,

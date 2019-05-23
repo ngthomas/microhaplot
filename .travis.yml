@@ -5,6 +5,9 @@ sudo: false
 cache: packages
 warnings_are_errors: true
 
+os:
+  - linux
+  - osx
 
 addons:
   apt:
