@@ -421,7 +421,7 @@ if we were dealing with groups that were genetically differentiated, we would no
 conformance to Hardy-Weinberg proportions of a mixture of those different groups!  In such a case
 it is worthwhile to look at one group at a time.
 
-The expected number of different genotypes is shown by the oulines of circles and the observed number by the
+The expected number of different genotypes is shown by the outlines of circles and the observed number by the
 filled, colored circles.  Green are homozygotes, orange are heterozygotes, and it should be relatively
 self-explanatory.  There is not a scale, but if you click in the center of any of the genotypes with
 observed (non-zero) counts, you will be told (in the upper left of the panel) what the expected and
