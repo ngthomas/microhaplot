@@ -8,9 +8,9 @@ MiSeq sequencer.  It should be extensible to sequences from capture arrays, like
 
 This software exists as an R package `microhaplot` that includes within it the code to set up and 
 establish an Rstudio/Shiny server to visualize and manipulate the data.  There are two key steps in 
-the `microhaplot` worflow:
+the `microhaplot` workflow:
 
-1. The first step is to summarize alignment and vardiant (SNP) data into a single data frame that is 
+1. The first step is to summarize alignment and variant (SNP) data into a single data frame that is 
 easily operated upon.  This is done using the function `microhaplot::prepHaplotFiles`.  You must supply a 
 VCF file that includes variants that you are interested in extracting, and as many SAM files 
 (one for each individual) that you want to extract read information from at each of the variants. 
@@ -20,7 +20,7 @@ and store this information into a data frame which gets saved with the installed
 for later use.  Depending on the size of the data set, this can take a few minutes.  
 
 2. The second step is to run the microhaplot Shiny app to visualize the sequence information, call genotypes using
-simple read-depth based filtering criteria, and curate the loci. microhaplot is suitable for quick assesement
+simple read-depth based filtering criteria, and curate the loci. microhaplot is suitable for quick assessment
 and quality control of haplotypes generated from library runs. Plot summaries include read depth, fraction of callable haplotypes, Hardy-Weinberg
 equilibrium plots, and more. 
 
@@ -130,5 +130,4 @@ runShinyHaplot(app.path)
 ### Suggestions
 - SAM files: For pair-ended experiment, both directional reads should be flashed into one.
 
-- VCF: `SrMicroHap` might have trouble infering individual's true haplotype if no reads are aligned to the variant site.
 

@@ -10,7 +10,7 @@ vignette: >
 ---
 
 This vignette concerns itself with an overview of microhaplot and on 
-preparation of data for input into microhaplot Once your data has been transfered to the appropriate Haplot folder, see the `microhaplot walkthrough` vignette to learn more about microhaplot's graphical features.
+preparation of data for input into microhaplot Once your data has been transferred to the appropriate Haplot folder, see the `microhaplot walkthrough` vignette to learn more about microhaplot's graphical features.
 
 ## How does microhaplot work?
 
@@ -79,10 +79,10 @@ haplotypes in the SQL-based viewer, but couldn't figure out how to get at those 
 to properly call microhaplotypes.  Despite being an excellent variant detector, however, when presented
 with situations that were clearly simple microhaplotypes, `freebayes` would fail to call them, or would
 return results in a very difficult to manage "multinucleotide polymorphism" in the VCF.  
-- We thought that [GATK's Unified Haplotype Caller](https://software.broadinstitute.org/gatk/gatkdocs/org_broadinstitute_gatk_tools_walkers_haplotypecaller_HaplotypeCaller.php)
+- We thought that `GATK's Unified Haplotype Caller`
 might deliver us from the bioinformatic hell 
 we were experiencing, but alas, with the super-high read depths at some of the fragments in our amplicon 
-sequencing data, GATK was brought to its kneees and didn't offer a viable solution. It appears that
+sequencing data, GATK was brought to its knees and didn't offer a viable solution. It appears that
 the HaplotypeCaller is trying to solve a much harder problem than just extracting short-read haplotypes.
 
 After a few months of this, we realized that there is no software tailored for the relatively

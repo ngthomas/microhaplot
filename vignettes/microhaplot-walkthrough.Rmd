@@ -145,10 +145,10 @@ user input panel, the panel with the light gray background.
     lets you insert any comments you would like to record about a particular locus.
     You must press the **save button**
     to submit this information about each locus. All of this locus-annotation information
-    can be retreived under the table selection for "locus annotation" under the `Table` tab (see below).
+    can be retrieved under the table selection for "locus annotation" under the `Table` tab (see below).
 
 
-> **Ways to access saved criteria values and locus annotations in file format:** All of the saved parameters such as `Min Total Read Depth`, as well as the locus annotations, are stored in a data frame in memory and are read in and saved as serialized R objects in an RDS file in the same directory path as the shiny app. The name of this file has the suffix `_annotate.rds`. For example, for `fish1.rds` data, the file name is `fish1_annotate.rds`.  That file can be used to retrieve the data.  A better way to retrieve the data is by downloading the "locus annotation" table from the `Table` tab at the bottom pane. For the courageous, you can set the filters and annotations elsewhere, save those into an RDS file named appropriately (with the `_annotate.rds` suffix) and then insert that file into your microhaplot analysis by copying it to the directory path where the shiny app resides.  This is not recommended for the faint of heart, as bungling the format of the data frame (or the exact locus names) in that RDS file could have unforeseen, unexpected, or even catastropic consequences...
+> **Ways to access saved criteria values and locus annotations in file format:** All of the saved parameters such as `Min Total Read Depth`, as well as the locus annotations, are stored in a data frame in memory and are read in and saved as serialized R objects in an RDS file in the same directory path as the shiny app. The name of this file has the suffix `_annotate.rds`. For example, for `fish1.rds` data, the file name is `fish1_annotate.rds`.  That file can be used to retrieve the data.  A better way to retrieve the data is by downloading the "locus annotation" table from the `Table` tab at the bottom pane. For the courageous, you can set the filters and annotations elsewhere, save those into an RDS file named appropriately (with the `_annotate.rds` suffix) and then insert that file into your microhaplot analysis by copying it to the directory path where the shiny app resides.  This is not recommended for the faint of heart, as bungling the format of the data frame (or the exact locus names) in that RDS file could have unforeseen, unexpected, or even catastrophic consequences...
 
 ## **Main body panel** (center)
 This panel occupies most of microhaplot's screen real estate.  It is where the actual
@@ -237,7 +237,7 @@ data in microhaplot.  That will help a lot.
       of these variants within the sequence.
 
   e. *Table: * This panel provides a place to get a number of tabular views (available in the "Select Table:" dropdown box) of the data that are sortable and searchable. 
-  The output of each is self-explanatory with a little exploration. This can be very useful when you want to dig into the nitty-gritty details of the short read data.
+  The output of each is self-explanatory with a little exploration. This can be very useful when you want to dig into the fine details of the short read data.
   It also allows you to download filtered and called data and genotypes for later analysis. Note that clicking a column name will sort on that column (purple triangle pointing
   up or down depending on sort order, which can be changed be clicking it again).  To sort on multiple columns, you can shift-click them.  The rows can be filtered by 
   those rows matching a certain string but putting that string in the Search box.  For this to be most useful it is recommended that all sample and locus names not 
@@ -264,14 +264,14 @@ eternity to have the final plots rendered.)  You can change the number of loci s
 the loci, 15 at a time by choosing which page to go to using the "Page" selector to the right of the
 "Display" selector.  
 
-The four figures shown in this By Locus summary are, from left to right:
+The four figures shown in this `By Locus summary` are, from left to right:
 
-1. The distribution of the number of haplotypes observed per individual.  Recall that these are subject to the
-current filters, of which there are none, so each haplotype, even if it is only observed at a read depth of
+1. The distribution of the number of haplotypes observed per individual.  Recall that these are subject to the current filters, of which there are none, so each haplotype, even if it is only observed at a read depth of
 1 read in an individual is counted as observed.  This plot is a bubble plot that essentially is giving
+
 histogram-like information.  The y-axis has different locus on each line.  The x-axis is the number of unique haplotypes
 and the size and shading of the bubbles indicate how many individuals in the data set had the given
-number of unique haplotypes.    It is particularly revealing to focus on locus `tag_id_1166` (5th locus in main body panel).  Most individuals
+number of unique haplotypes.    It is particularly revealing to focus on locus `tag_id_1166` (fifth locus in main body panel).  Most individuals
 have a large number of different haplotypes, likely occurring at very low read depths.  At any rate, this
 plot makes it clear that there are a lot of low-read-depth sequences that are superfluous and incorrect.
 
@@ -311,7 +311,7 @@ not sequence well.  For example `tag_id_1511`.  (hint: look for violin plot w/ s
 rows in the left hand figure and then double click those to get a zoomed in view.  To zoom back out, to be able to see all
 the loci, just double click the body of the left figure.  
 
-# Mission Two: An overview of individauls
+# Mission Two: An overview of individuals
 
 We can take those same filters we just applied and get a good overview of our sequencing data on an
 individual basis.  Go ahead of choose *Summary Info-->By Individual*.  from the main panel choice
@@ -361,8 +361,7 @@ default this will show a few lines of the "Observed variants (unfiltered)" table
 You can change which table is viewed using the "Select Table" dropdown, but unfiltered
 observed variants is great for now.  
 
-In the search box on the right, enter `s288` and hit return. Note: search box is not case sensitive.  This will filter the table to only
-those rows that include s288.  Once that is done, click on the "locus" column heading to
+In the search box on the right, enter `s288` and hit return. Note: search box is not case sensitive.  This will filter the table to only those rows that include s288.  Once that is done, click on the "locus" column heading to
 sort entries by locus.  Voila! Now you can peruse all the observed variants and their read
 depths at this individual s288.  Where it says "Show 15 entries" on the left hand side just above the table you should change the "15"
 to "All".  This will give you a single scrollable window of all the entries for s288.  Note that
@@ -404,11 +403,11 @@ one locus.
 
 With that in mind, choose the first locus in the dropdown menu: `Plate_1_A01_Sat_GW603857_consensus` under "> field selection"
 and see how that changes the broad summary.  Note that across a broad range of the two filtering
-options (minimum read depth and minimal allelic balance) there are four haplotyes in total discovered.
+options (minimum read depth and minimal allelic balance) there are four haplotypes in total discovered.
 
 For a more detailed view of the information associated with this locus (especially relative to the
 filtering choices) you can select *Filter Analysis --> Criteria Breakdown*.  This view shows
-a histogram of read depths and allele balance ratios for reads assigned to each indiduals, and it shows
+a histogram of read depths and allele balance ratios for reads assigned to each individuals, and it shows
 these when broken down by haplotype.  The filtering choices in effect appear as dashed red lines.
 
 To see how the inferred haplotypes look in terms of haplotype frequencies, and also how the genotypes
