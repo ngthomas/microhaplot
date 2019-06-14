@@ -1,0 +1,263 @@
+{
+   "abstract" : "tiny, yet Moo(se)-compatible type constraint",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142690, CPAN::Meta::Converter version 2.133380",
+   "keywords" : [
+      "Argument Checking",
+      "Argument Validation",
+      "Moo",
+      "Moose",
+      "Mouse",
+      "Parameter Checking",
+      "Parameter Validation",
+      "Schema",
+      "Type Coercion",
+      "Type Constraint",
+      "Type Library",
+      "Validation"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Type-Tiny",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "recommends" : {
+            "CPAN::Meta::Requirements" : "2.000"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "suggests" : {
+            "Dist::Inkt::Profile::TOBYINK" : "0"
+         }
+      },
+      "runtime" : {
+         "conflicts" : {
+            "Kavorka" : "<= 0.013",
+            "Types::ReadOnly" : "<= 0.001"
+         },
+         "recommends" : {
+            "Devel::LexAlias" : "0.05",
+            "Devel::StackTrace" : "0",
+            "Sub::Name" : "0",
+            "Type::Tie" : "0",
+            "Type::Tiny::XS" : "0.010",
+            "perl" : "5.010001"
+         },
+         "requires" : {
+            "Exporter::Tiny" : "0.026",
+            "perl" : "5.006001"
+         },
+         "suggests" : {
+            "Moo" : "1.000000",
+            "Moose" : "2.0400",
+            "Mouse" : "1.00",
+            "Reply" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Tester" : "0.109",
+            "Test::Warnings" : "0"
+         },
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::TypeTiny::Perl56Compat" : {
+         "file" : "lib/Devel/TypeTiny/Perl56Compat.pm",
+         "version" : "1.000005"
+      },
+      "Devel::TypeTiny::Perl58Compat" : {
+         "file" : "lib/Devel/TypeTiny/Perl58Compat.pm",
+         "version" : "1.000005"
+      },
+      "Error::TypeTiny" : {
+         "file" : "lib/Error/TypeTiny.pm",
+         "version" : "1.000005"
+      },
+      "Error::TypeTiny::Assertion" : {
+         "file" : "lib/Error/TypeTiny/Assertion.pm",
+         "version" : "1.000005"
+      },
+      "Error::TypeTiny::Compilation" : {
+         "file" : "lib/Error/TypeTiny/Compilation.pm",
+         "version" : "1.000005"
+      },
+      "Error::TypeTiny::WrongNumberOfParameters" : {
+         "file" : "lib/Error/TypeTiny/WrongNumberOfParameters.pm",
+         "version" : "1.000005"
+      },
+      "Eval::TypeTiny" : {
+         "file" : "lib/Eval/TypeTiny.pm",
+         "version" : "1.000005"
+      },
+      "Reply::Plugin::TypeTiny" : {
+         "file" : "lib/Reply/Plugin/TypeTiny.pm",
+         "version" : "1.000005"
+      },
+      "Test::TypeTiny" : {
+         "file" : "lib/Test/TypeTiny.pm",
+         "version" : "1.000005"
+      },
+      "Type::Coercion" : {
+         "file" : "lib/Type/Coercion.pm",
+         "version" : "1.000005"
+      },
+      "Type::Coercion::FromMoose" : {
+         "file" : "lib/Type/Coercion/FromMoose.pm",
+         "version" : "1.000005"
+      },
+      "Type::Coercion::Union" : {
+         "file" : "lib/Type/Coercion/Union.pm",
+         "version" : "1.000005"
+      },
+      "Type::Library" : {
+         "file" : "lib/Type/Library.pm",
+         "version" : "1.000005"
+      },
+      "Type::Params" : {
+         "file" : "lib/Type/Params.pm",
+         "version" : "1.000005"
+      },
+      "Type::Parser" : {
+         "file" : "lib/Type/Parser.pm",
+         "version" : "1.000005"
+      },
+      "Type::Registry" : {
+         "file" : "lib/Type/Registry.pm",
+         "version" : "1.000005"
+      },
+      "Type::Tiny" : {
+         "file" : "lib/Type/Tiny.pm",
+         "version" : "1.000005"
+      },
+      "Type::Tiny::Class" : {
+         "file" : "lib/Type/Tiny/Class.pm",
+         "version" : "1.000005"
+      },
+      "Type::Tiny::Duck" : {
+         "file" : "lib/Type/Tiny/Duck.pm",
+         "version" : "1.000005"
+      },
+      "Type::Tiny::Enum" : {
+         "file" : "lib/Type/Tiny/Enum.pm",
+         "version" : "1.000005"
+      },
+      "Type::Tiny::Intersection" : {
+         "file" : "lib/Type/Tiny/Intersection.pm",
+         "version" : "1.000005"
+      },
+      "Type::Tiny::Role" : {
+         "file" : "lib/Type/Tiny/Role.pm",
+         "version" : "1.000005"
+      },
+      "Type::Tiny::Union" : {
+         "file" : "lib/Type/Tiny/Union.pm",
+         "version" : "1.000005"
+      },
+      "Type::Utils" : {
+         "file" : "lib/Type/Utils.pm",
+         "version" : "1.000005"
+      },
+      "Types::Common::Numeric" : {
+         "file" : "lib/Types/Common/Numeric.pm",
+         "version" : "1.000005"
+      },
+      "Types::Common::String" : {
+         "file" : "lib/Types/Common/String.pm",
+         "version" : "1.000005"
+      },
+      "Types::Standard" : {
+         "file" : "lib/Types/Standard.pm",
+         "version" : "1.000005"
+      },
+      "Types::Standard::ArrayRef" : {
+         "file" : "lib/Types/Standard/ArrayRef.pm",
+         "version" : "1.000005"
+      },
+      "Types::Standard::Dict" : {
+         "file" : "lib/Types/Standard/Dict.pm",
+         "version" : "1.000005"
+      },
+      "Types::Standard::HashRef" : {
+         "file" : "lib/Types/Standard/HashRef.pm",
+         "version" : "1.000005"
+      },
+      "Types::Standard::Map" : {
+         "file" : "lib/Types/Standard/Map.pm",
+         "version" : "1.000005"
+      },
+      "Types::Standard::ScalarRef" : {
+         "file" : "lib/Types/Standard/ScalarRef.pm",
+         "version" : "1.000005"
+      },
+      "Types::Standard::Tuple" : {
+         "file" : "lib/Types/Standard/Tuple.pm",
+         "version" : "1.000005"
+      },
+      "Types::TypeTiny" : {
+         "file" : "lib/Types/TypeTiny.pm",
+         "version" : "1.000005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny"
+      },
+      "homepage" : "https://metacpan.org/release/Type-Tiny",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-type-tiny.git",
+         "web" : "https://github.com/tobyink/p5-type-tiny"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Type-Tiny/project"
+   },
+   "version" : "1.000005",
+   "x_breaks" : {
+      "Kavorka" : "<= 0.013",
+      "Types::ReadOnly" : "<= 0.001"
+   },
+   "x_contributors" : [
+      "Diab Jerius (DJERIUS) <djerius@cpan.org>",
+      "Vyacheslav Matyukhin (MMCLERIC) <mmcleric@cpan.org>",
+      "Peter Flanigan (PJFL) <pjfl@cpan.org>",
+      "Pierre Masci",
+      "Mark Stosberg (MARKSTOS) <markstos@cpan.org>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "Samuel Kaufman (SKAUFMAN) <skaufman@cpan.org>",
+      "Graham Knop (HAARG) <haarg@cpan.org>",
+      "Peter Karman (KARMAN) <karman@cpan.org>",
+      "Alexander Hartmaier (ABRAXXA) <abraxxa@cpan.org>",
+      "Dagfinn Ilmari Mannsåker (ILMARI) <ilmari@cpan.org>",
+      "Gianni Ceccarelli (DAKKAR) <dakkar@cpan.org>"
+   ]
+}

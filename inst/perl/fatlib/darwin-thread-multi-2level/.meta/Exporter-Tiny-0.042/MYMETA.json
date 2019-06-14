@@ -1,0 +1,78 @@
+{
+   "abstract" : "an exporter with the features of Sub::Exporter but only core dependencies",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640, CPAN::Meta::Converter version 2.133380",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Exporter-Tiny",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006001"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Fatal" : "0",
+            "Test::Warnings" : "0"
+         },
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "provides" : {
+      "Exporter::Shiny" : {
+         "file" : "lib/Exporter/Shiny.pm",
+         "version" : "0.042"
+      },
+      "Exporter::Tiny" : {
+         "file" : "lib/Exporter/Tiny.pm",
+         "version" : "0.042"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Exporter-Tiny"
+      },
+      "homepage" : "https://metacpan.org/release/Exporter-Tiny",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-exporter-tiny.git",
+         "web" : "https://github.com/tobyink/p5-exporter-tiny"
+      },
+      "x_IRC" : "irc://irc.perl.org/#moops",
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/project"
+   },
+   "version" : "0.042"
+}

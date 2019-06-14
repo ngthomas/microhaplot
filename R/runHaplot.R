@@ -93,12 +93,15 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
   tryCatch({system("perl -v", intern=T); message("Perl is found in system")},
            error= function(d) {
              if(.Platform$OS.type == "windows") {
-               message("Perl is not found in system. Recommend installation from strawberryperl. Be sure to install version >5.014")
+               message("Perl is not found in system. Recommend installation from strawberryperl. Be sure to install version >=5.014")
              }else {
-               message("Perl is not found in system. Recommend Installation from perl.org. Be sure to install version >5.014")
+               message("Perl is not found in system. Recommend Installation from perl.org. Be sure to install version >=5.014")
              }
            })
 
+  # ensure that the perl's version is at least 5.014
+  perl.version <- system("perl -e 'print $];'", intern=T) %>% as.numeric
+  if(perl.version < 5.014) stop ("The version Perl found in your current system is old-dated/incompatible. Microhaplot requires Perl v. >=5.014.")
 
   # the perl script hapture should display any warning if the label field contains any missing or invalid elements
 

@@ -1,0 +1,71 @@
+{
+   "abstract" : "Parse CIGAR strings and translate coordinates to/from reference/query",
+   "author" : [
+      "Thomas Sibley <trsibley@uw.edu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-Cigar",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.8",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "List::Util" : "0",
+            "Moo" : "0",
+            "Types::Standard" : "1.000005",
+            "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/MullinsLab/Bio-Cigar/issues"
+      },
+      "homepage" : "https://github.com/MullinsLab/Bio-Cigar",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/MullinsLab/Bio-Cigar.git",
+         "web" : "https://github.com/MullinsLab/Bio-Cigar"
+      }
+   },
+   "version" : "1.01"
+}

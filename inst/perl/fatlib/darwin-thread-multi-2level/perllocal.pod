@@ -1,0 +1,66 @@
+=head2 Wed Mar  2 14:35:24 2016: C<Module> L<Exporter::Tiny|Exporter::Tiny>
+
+=over 4
+
+=item *
+
+C<installed into: /Users/tng/perl5/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.042>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Wed Mar  2 14:35:49 2016: C<Module> L<Type::Tiny|Type::Tiny>
+
+=over 4
+
+=item *
+
+C<installed into: /Users/tng/perl5/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.000005>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Wed Mar  2 14:35:51 2016: C<Module> L<Bio::Cigar|Bio::Cigar>
+
+=over 4
+
+=item *
+
+C<installed into: /Users/tng/perl5/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

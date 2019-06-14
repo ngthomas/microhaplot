@@ -28,6 +28,5 @@ BugReports: https://github.com/ngthomas/microhaplot/issues
 RoxygenNote: 6.1.1
 Suggests: 
     knitr,
-    rmarkdown,
-    testthat
+    rmarkdown
 VignetteBuilder: knitr
