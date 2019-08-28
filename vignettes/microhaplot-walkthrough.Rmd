@@ -356,7 +356,7 @@ balance.
 
 ## Looking at the raw counts for s288
 
-Another way to look at the data is through the tabular format.  If we want to see tabular data for individual s288, choose "Output" from the main panel choice tabset.   By
+Another way to look at the data is through the tabular format.  If we want to see tabular data for individual s288, choose "Table" from the main panel choice tabset.   By
 default this will show a few lines of the "Observed variants (unfiltered)" table.
 You can change which table is viewed using the "Select Table" dropdown, but unfiltered
 observed variants is great for now.  
@@ -393,25 +393,32 @@ are largely quite similar.
 
 # Looking over different loci
 
+## Summaries
+
 When we are interested in assessing how well each locus behaves in reporting microhaplotypes, it is time to turn to the "Filter Analysis" panel choice.
-First, go ahead and choose *Filter Analysis --> Broad Summary*.  This view gives you a tabular
+First, go ahead and choose *Criteria Cutoff --> Global Scope*.  This view gives you histograms of the
+read depths and allele balance ratios (the filtering choices in effect appear as dashed red lines), and, below that, a tabular
 perspective on the outcome of different filtering choices on the total number of haplotypes
 recorded in the data set.  The field selection choices that are present are applied here. So,
-if ALL loci are selected, then it counts up the total number of haplotypes typed and the total
+if ALL loci are selected, then the histograms include reads from all the haplotypes at all the loci, and the
+tabular summary counts up the total number of haplotypes typed and the total
 number of individuals typed at all loci.  If you select just one locus, the results reflect that
-one locus.
+one locus, and the histogram results are further broken down by different haplotypes within that locus.
 
-With that in mind, choose the first locus in the dropdown menu: `Plate_1_A01_Sat_GW603857_consensus` under "> field selection"
+With that in mind, choose the first locus in the dropdown menu: `Plate_1_A11_Sat_GE820299_consensus` under "> field selection"
 and see how that changes the broad summary.  Note that across a broad range of the two filtering
-options (minimum read depth and minimal allelic balance) there are four haplotypes in total discovered.
+options (minimum read depth and minimal allelic balance) there are eight haplotypes in total discovered.
 
-For a more detailed view of the information associated with this locus (especially relative to the
-filtering choices) you can select *Filter Analysis --> Criteria Breakdown*.  This view shows
-a histogram of read depths and allele balance ratios for reads assigned to each individuals, and it shows
-these when broken down by haplotype.  The filtering choices in effect appear as dashed red lines.
+In order to search for individuals or loci that have more high-read-depth alleles that one would want, you
+can choose *Criteria Cutoff --> Quality Profiling*.  This view shows individuals or loci that have
+more than $n$ alleles that pass the filters.  For example, if you are dealing with diploids, then you would
+set $n$ to 2 (in the "+read criteria: Top n Alleles" option).  Then any individuals or loci that had more than
+2 alleles that satisfied the minimum read depth and allele balance criteria would be noted here. This is good
+way to look out for contaminated samples or loci that amplify paralogous regions.
+
 
 To see how the inferred haplotypes look in terms of haplotype frequencies, and also how the genotypes
-look in terms of Hardy-Weinberg equilibrium, you can choose *Filter Analysis --> Microhap Summaries*.
+look in terms of Hardy-Weinberg equilibrium, you can choose *Genotype Call --> Summaries*.
 This view consists of four figures.  The first, in the upper left simply shows the frequencies (and the total read depth) of
 different haplotypes.  The plot in the upper right shows the relationship between the
 observed frequency of different genotypes and the expected frequencies under Hardy-Weinberg equilibrium.
@@ -437,10 +444,23 @@ useful when one is comparing allele frequencies across many different groups.
 Finally, you may need to scroll down to see the final figure in this display.  It is a representation of the
 haplotype sequences, their frequencies, and the positions of the variants within them along each amplicon.
 
+## Allele Biplots
+
+Choosing *Genotype Call --> AR Refinement* takes you to a very informative screen.  It is described above
+in the vignette.  Read through the section that describes it and then try playing with the sliders to
+move the four different lines around the plot and see the effect on whether genotypes get called or not.
+
+Note that you can use the blue lasso tool (upper right corner of the scatter plot) to select a lot of
+points, whose values will then be revealed in a table below.  The red lasso can be used to de-select points
+and you can check the box "keeps pt selection between loci" to maintain focus on those points as you
+move from locus to locus.  This can be very useful for identifying individuals that show aberrant read depths
+across multiple loci.
+
+
 # Output of data
 
-We have already witnessed how to use the *Output* panel to look at the raw data.  It is also possible to
-download filtered, unfiltered, and processed data from this view using the "Download Data" button. These
+We have already witnessed how to use the *Table* panel to look at the raw data.  It is also possible to
+download filtered, unfiltered, and processed data from this view using the "Download Data" button. This
 saves output in CSV files.
 
 # Locus annotation
