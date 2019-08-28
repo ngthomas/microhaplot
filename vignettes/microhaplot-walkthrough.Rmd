@@ -268,7 +268,6 @@ The four figures shown in this `By Locus summary` are, from left to right:
 
 1. The distribution of the number of haplotypes observed per individual.  Recall that these are subject to the current filters, of which there are none, so each haplotype, even if it is only observed at a read depth of
 1 read in an individual is counted as observed.  This plot is a bubble plot that essentially is giving
-
 histogram-like information.  The y-axis has different locus on each line.  The x-axis is the number of unique haplotypes
 and the size and shading of the bubbles indicate how many individuals in the data set had the given
 number of unique haplotypes.    It is particularly revealing to focus on locus `tag_id_1166` (fifth locus in main body panel).  Most individuals
