@@ -1131,7 +1131,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
              n.alleles = filterParam$n.alleles)
 
     haplo.join.ar <- haplo.join.ar %>% ungroup() %>%
-      filter(#allele.balance >= min.ar,
+      filter(allele.balance >= min.ar,
              rank <= n.alleles) %>%
       group_by(group, id, locus) %>%
       mutate(tot.depth = sum(depth)) %>%
