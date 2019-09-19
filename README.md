@@ -87,12 +87,13 @@ s14.sam s14     kelp
 s18.sam s18     gold
 ``` 
 
-Once you have the label file in place, you can run `runHaplot`, a R function that generates tables of microhaplotype, by providing the following:
+Once you have the label file in place, you can run `prepHaplotFiles`, a R function that generates tables of microhaplotype, by providing the following:
  * a label to display in haPLOType
  * path to the directory with all SAM files 
  * path to the `label` file you just created
  * path to the VCF file  
-
+ * optional number of threads (for non-Windows user)
+ 
 ```R
 library(microhaplot)
 
