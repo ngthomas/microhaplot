@@ -50,6 +50,7 @@ mvShinyHaplot <- function(path) {
 #' @param out.path string. Optional. If not specified, the intermediate files are created under \code{TEMPDIR}, with the assumption that directory is granted for written permission.
 #' @param add.filter boolean. Optional. If true, this removes any haplotype with unknown and deletion alignment characters i.e. "*" and "_", removes any locus with large number of haplotypes ( # > 40) , and remove any locus with fewer than half of the total individuals.
 #' @param app.path string. Path to shiny haPLOType app. Optional. If not specified, the path is default to \code{TEMPDIR}.
+#' @param n.jobs positive integer. Number of SAM files to be parallel processed. Optional. This multithread is only available for non Window OS. Recommend two times the number of processors/core.
 #' @export
 #' @examples
 #'
@@ -68,16 +69,24 @@ mvShinyHaplot <- function(path) {
 #' mvShinyHaplot(tempdir())
 #' app.path <- file.path(tempdir(), "microhaplot")
 #'
+#' # retrieve system Perl version number
+#' perl.version <- as.numeric(system('perl -e "print $];"', intern=TRUE))
+#'
+#' if (perl.version >= 5.014) {
 #' haplo.read.tbl <- prepHaplotFiles(run.label = run.label,
 #'                             sam.path = sam.path,
 #'                             out.path = tempdir(),
 #'                             label.path = label.path,
 #'                             vcf.path = vcf.path,
 #'                             app.path = app.path)
+#' }else {
+#' message("Perl version is outdated. Must >= 5.014.")}
+#'
 prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
   out.path=tempdir(),
   add.filter=FALSE,
-  app.path=tempdir()){
+  app.path=tempdir(),
+  n.jobs = 1){
 
   run.label <- gsub(" +","_",run.label)
   haptureDir <- system.file("perl", "hapture", package = "microhaplot")
@@ -88,6 +97,13 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
   if (!file.exists(vcf.path)) stop("the path for 'vcf.path' - ", vcf.path, " does not exist")
   if (!file.exists(out.path)) stop("the path for 'out.path' - ", out.path, " does not exist")
   if (!file.exists(app.path)) stop("the path for 'app.path' - ", out.path, " does not exist; try to run mvShinyHaplot()")
+
+  # check for numeric state
+
+  if(!is.numeric(n.jobs)) stop("the n.jobs sepcificed is expected to be numeric")
+
+  n.jobs <- round(n.jobs)
+  if(n.jobs<=0) stop("the n.jobs is expected to be positive integer")
 
   # check whether perl is installed
   tryCatch({system("perl -v", intern=T); message("Perl is found in system")},
@@ -100,7 +116,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
            })
 
   # ensure that the perl's version is at least 5.014
-  perl.version <- system("perl -e 'print $];'", intern=T) %>% as.numeric
+  perl.version <- system('perl -e "print $];"', intern=T) %>% as.numeric
   if(perl.version < 5.014) stop ("The version Perl found in your current system is old-dated/incompatible. Microhaplot requires Perl v. >=5.014.")
 
   # the perl script hapture should display any warning if the label field contains any missing or invalid elements
@@ -119,7 +135,6 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
   summary.path <- file.path(out.path, "intermed", "all.summary")
 
   if(file.exists(summary.path)) file.remove(summary.path)
-
 
   # catch any problem in label file
   read.label <- tryCatch(read.table(label.path,sep = "\t",stringsAsFactors = F), error = function(c) {
@@ -141,7 +156,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
                                 " -g ", line[3], " > ",
                                 out.path, "\\intermed\\", run.label, "_", line[2],"_",i,".summary")
     } else {
-      wait.ln <- ifelse(i %% 10 == 0," wait;"," ")
+      wait.ln <- ifelse(i %% n.jobs == 0," wait;"," ")
       run.perl.script <- paste0("perl ", haptureDir,
                                 " -v ", vcf.path, " ",
                                 " -s ", sam.path, "/", line[1],

@@ -5,7 +5,8 @@
 \title{Extracts haplotype from alignment reads.}
 \usage{
 prepHaplotFiles(run.label, sam.path, label.path, vcf.path,
-  out.path = tempdir(), add.filter = FALSE, app.path = tempdir())
+  out.path = tempdir(), add.filter = FALSE, app.path = tempdir(),
+  n.jobs = 1)
 }
 \arguments{
 \item{run.label}{character vector. Run label to be used to display in haPLOType. Required}
@@ -21,6 +22,8 @@ prepHaplotFiles(run.label, sam.path, label.path, vcf.path,
 \item{add.filter}{boolean. Optional. If true, this removes any haplotype with unknown and deletion alignment characters i.e. "*" and "_", removes any locus with large number of haplotypes ( # > 40) , and remove any locus with fewer than half of the total individuals.}
 
 \item{app.path}{string. Path to shiny haPLOType app. Optional. If not specified, the path is default to \code{TEMPDIR}.}
+
+\item{n.jobs}{positive integer. Number of SAM files to be parallel processed. Optional. This multithread is only available for non Window OS. Recommend two times the number of processors/core.}
 }
 \description{
 The function \code{microhaplot} extracts haplotype from sequence alignment files through perl script \code{hapture} and returns a summary table of the read depth and read quality associate with haplotype.
@@ -42,10 +45,17 @@ vcf.path <- file.path(sam.path, "sebastes.vcf")
 mvShinyHaplot(tempdir())
 app.path <- file.path(tempdir(), "microhaplot")
 
+# retrieve system Perl version number
+perl.version <- as.numeric(system('perl -e "print $];"', intern=TRUE))
+
+if (perl.version >= 5.014) {
 haplo.read.tbl <- prepHaplotFiles(run.label = run.label,
                             sam.path = sam.path,
                             out.path = tempdir(),
                             label.path = label.path,
                             vcf.path = vcf.path,
                             app.path = app.path)
+}else {
+message("Perl version is outdated. Must >= 5.014.")}
+
 }
