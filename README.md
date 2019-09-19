@@ -92,7 +92,7 @@ Once you have the label file in place, you can run `prepHaplotFiles`, a R functi
  * path to the directory with all SAM files 
  * path to the `label` file you just created
  * path to the VCF file  
- * optional number of threads (for non-Windows user)
+ * optional number of threads (for non-Windows user); recommend 2 * # of processors 
  
 ```R
 library(microhaplot)
@@ -122,7 +122,9 @@ haplo.read.tbl <- prepHaplotFiles(run.label = run.label,
                             out.path = out.path,
                             label.path = label.path,
                             vcf.path = vcf.path,
-                            app.path = app.path)
+                            app.path = app.path,
+                            n.jobs = 4) # assume running on dual core
+                            
 
 runShinyHaplot(app.path)
 ```
