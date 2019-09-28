@@ -9,11 +9,14 @@ mvShinyHaplot(path)
 \arguments{
 \item{path}{string. directory path. Required}
 }
+\value{
+a logical value of whether \code{file.copy} is successfully transferred Shiny app to its new directory
+}
 \description{
 Moves shiny microhaplot app to a different directory
 }
 \examples{
-\dontrun{
+
 mvShinyHaplot(tempdir())
-}
+
 }

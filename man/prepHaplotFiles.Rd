@@ -25,6 +25,9 @@ prepHaplotFiles(run.label, sam.path, label.path, vcf.path,
 
 \item{n.jobs}{positive integer. Number of SAM files to be parallel processed. Optional. This multithread is only available for non Window OS. Recommend two times the number of processors/core.}
 }
+\value{
+This function returns a dataframe of 9 columns i.e group, id, locus, haplotype, depth, sum of Phred score, max of Phred score, allele balance and haplotype rank from highest to lowest read depth. This dataframe will also be saved in \code{out.path}.
+}
 \description{
 The function \code{microhaplot} extracts haplotype from sequence alignment files through perl script \code{hapture} and returns a summary table of the read depth and read quality associate with haplotype.
 }

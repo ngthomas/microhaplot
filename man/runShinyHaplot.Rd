@@ -10,12 +10,14 @@ runShinyHaplot(path = system.file("shiny", "microhaplot", package =
 \arguments{
 \item{path}{Path to shiny microhaplot app. Optional. If not specified, the path is default to local app path.}
 }
+\value{
+Runs shiny microhaplot application via \code{shiny::runApp} which typically doesn't return; interrupt R to stop the application (usually by pressing Ctrl+C or Esc).
+}
 \description{
 Run shiny microhaplot app
 }
 \examples{
-# this starts a shiny session, so should not be run during R CMD CHECK, etc.
-\dontrun{
+if(interactive()){
 runShinyHaplot()
 }
 }
