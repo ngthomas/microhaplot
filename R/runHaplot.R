@@ -2,10 +2,10 @@
 #'
 #' Run shiny microhaplot app
 #' @param path Path to shiny microhaplot app. Optional. If not specified, the path is default to local app path.
+#' @return Runs shiny microhaplot application via \code{shiny::runApp} which typically doesn't return; interrupt R to stop the application (usually by pressing Ctrl+C or Esc).
 #' @export
 #' @examples
-#' # this starts a shiny session, so should not be run during R CMD CHECK, etc.
-#' \dontrun{
+#' if(interactive()){
 #' runShinyHaplot()
 #' }
 runShinyHaplot <- function(path = system.file("shiny", "microhaplot", package = "microhaplot")) {
@@ -20,11 +20,12 @@ runShinyHaplot <- function(path = system.file("shiny", "microhaplot", package = 
 #'
 #' Moves shiny microhaplot app to a different directory
 #' @param path string. directory path. Required
+#' @return a logical value of whether \code{file.copy} is successfully transferred Shiny app to its new directory
 #' @export
 #' @examples
-#' \dontrun{
+#'
 #' mvShinyHaplot(tempdir())
-#' }
+#'
 mvShinyHaplot <- function(path) {
   app.dir <- system.file("shiny", "microhaplot", package = "microhaplot")
   if (app.dir == "") {
@@ -33,7 +34,7 @@ mvShinyHaplot <- function(path) {
 
   if (!file.exists(paste0(path))) dir.create(path)
 
-  file.copy(app.dir, path, recursive = T)
+  file.copy(app.dir, path, recursive = TRUE)
 }
 
 
@@ -51,6 +52,7 @@ mvShinyHaplot <- function(path) {
 #' @param add.filter boolean. Optional. If true, this removes any haplotype with unknown and deletion alignment characters i.e. "*" and "_", removes any locus with large number of haplotypes ( # > 40) , and remove any locus with fewer than half of the total individuals.
 #' @param app.path string. Path to shiny haPLOType app. Optional. If not specified, the path is default to \code{TEMPDIR}.
 #' @param n.jobs positive integer. Number of SAM files to be parallel processed. Optional. This multithread is only available for non Window OS. Recommend two times the number of processors/core.
+#' @return This function returns a dataframe of 9 columns i.e group, id, locus, haplotype, depth, sum of Phred score, max of Phred score, allele balance and haplotype rank from highest to lowest read depth. This dataframe will also be saved in \code{out.path}.
 #' @export
 #' @examples
 #'
@@ -96,7 +98,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
   if (!file.exists(label.path)) stop("the path for 'label.path' - ", label.path, " does not exist")
   if (!file.exists(vcf.path)) stop("the path for 'vcf.path' - ", vcf.path, " does not exist")
   if (!file.exists(out.path)) stop("the path for 'out.path' - ", out.path, " does not exist")
-  if (!file.exists(app.path)) stop("the path for 'app.path' - ", out.path, " does not exist; try to run mvShinyHaplot()")
+  if (!file.exists(app.path)) stop("the path for 'app.path' - ", app.path, " does not exist; try to run mvShinyHaplot()")
 
   # check for numeric state
 
@@ -106,7 +108,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
   if(n.jobs<=0) stop("the n.jobs is expected to be positive integer")
 
   # check whether perl is installed
-  tryCatch({system("perl -v", intern=T); message("Perl is found in system")},
+  tryCatch({system("perl -v", intern=TRUE); message("Perl is found in system")},
            error= function(d) {
              if(.Platform$OS.type == "windows") {
                message("Perl is not found in system. Recommend installation from strawberryperl. Be sure to install version >=5.014")
@@ -116,7 +118,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
            })
 
   # ensure that the perl's version is at least 5.014
-  perl.version <- system('perl -e "print $];"', intern=T) %>% as.numeric
+  perl.version <- system('perl -e "print $];"', intern=TRUE) %>% as.numeric
   if(perl.version < 5.014) stop ("The version Perl found in your current system is old-dated/incompatible. Microhaplot requires Perl v. >=5.014.")
 
   # the perl script hapture should display any warning if the label field contains any missing or invalid elements
@@ -128,7 +130,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
   if (file.exists(file.path(out.path,"intermed"))) file.remove(
     list.files(file.path(out.path, "intermed"),
                #pattern = paste0(run.label, "_*.summary"),
-               full.names=T))
+               full.names=TRUE))
 
   if (!file.exists(file.path(out.path,"intermed"))) dir.create(file.path(out.path,"intermed"))
 
@@ -137,7 +139,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
   if(file.exists(summary.path)) file.remove(summary.path)
 
   # catch any problem in label file
-  read.label <- tryCatch(read.table(label.path,sep = "\t",stringsAsFactors = F), error = function(c) {
+  read.label <- tryCatch(read.table(label.path,sep = "\t",stringsAsFactors = FALSE), error = function(c) {
     c$message <- paste0(c$message, " (in ", label.path , ")")
     stop(c)
   })
@@ -168,7 +170,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
 
     write(run.perl.script,
       file = file.path(out.path, runHap.name),
-      append = T)
+      append = TRUE)
   })
 
   message("...running Hapture.pl to extract haplotype information (takes a while)...")
@@ -177,7 +179,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
 
     write(paste0("wait;"),
     file = file.path(out.path, runHap.name),
-    append = T)
+    append = TRUE)
 
     concat.cmd <- paste0("cat ",out.path, "/intermed/", run.label, "_", "*.summary"," > ",summary.path)
 
@@ -189,7 +191,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
 
     write(concat.cmd,
           file = file.path(out.path, runHap.name),
-          append = T)
+          append = TRUE)
 
     system(paste0("bash ",out.path,"/runHapture.sh"))
   } else {
@@ -197,7 +199,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
 
     write(concat.cmd,
           file = file.path(out.path, runHap.name),
-          append = T)
+          append = TRUE)
 
 
     system(file.path(out.path, runHap.name))

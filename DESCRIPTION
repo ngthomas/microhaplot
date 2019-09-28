@@ -1,7 +1,7 @@
 Package: microhaplot
 Type: Package
 Title: Microhaplotype Constructor and Visualizer
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: person("Thomas", "Ng", email = "tngthomasng@gmail.com", role = c("aut", "cre"))
 Description: A downstream bioinformatics tool to construct and assist 
     curation of microhaplotypes from short read sequences.
