@@ -104,8 +104,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     pos.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_posinfo.rds")
     if (!file.exists(pos.file)) return ()
-    readRDS(pos.file)
-
+    readRDS(pos.file) %>% dplyr::as_tibble(stringsAsFactors=F)
   })
 
   # the format structure for the annotate file: contains locus ID (also contains ALL), min read depth, min allelic ratio,
@@ -2967,7 +2966,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     pos.file <- extract.pos.file()
     if(is.null(pos.file)) return()
     colnames(pos.file) <- c("locus", "pos")
-    pos.str <- pos.file %>% filter(locus==input$selectLocus) %>% select(pos) %>% unlist
+    pos.str <- pos.file %>% filter(locus==input$selectLocus) %>% select(pos) %>% unlist %>% as.character()
     position <- strsplit(pos.str, ",") %>% unlist %>% as.numeric
 
     if (is.null(haplo.filter) || nrow(haplo.filter) == 0) return()
@@ -3470,7 +3469,22 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       }
 
       if (isolate(input$selectTbl) == "SNP report") {
+        if (is.null(haplo.summaryTbl())) return()
         haplo.summaryTable <- haplo.summaryTbl()
+
+        pos.file <- extract.pos.file()
+        if(is.null(pos.file)) return()
+        colnames(pos.file) <- c("locus", "pos")
+        pos.file$pos <- as.character(pos.file$pos)
+
+        pos.str <- pos.file %>% group_by(locus) %>%
+          mutate(pos = strsplit(pos, ",")) %>%
+          unnest(pos) %>%
+          mutate(pos = as.numeric(pos)) %>%
+          arrange(pos) %>%
+          group_by(locus) %>%
+          mutate(snp.id = row_number())
+
         n.base <- nchar(haplo.summaryTable$haplotype.1)
         haplo.all <-
           haplo.summaryTable[rep(seq(1, nrow(haplo.summaryTable)), n.base),] %>%
@@ -3484,7 +3498,10 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
           select(-haplotype.1,-haplotype.2,-read.depth.1,-read.depth.2) %>%
           rename("indiv.ID" = id)
 
-        write.csv(haplo.all, file)
+        haplo.all <- left_join(haplo.all, pos.str, by=c("locus", "snp.id")) %>%
+          select(group, locus, indiv.ID,  pos, snp, ar)
+
+        write.csv(haplo.all, file, row.names=FALSE)
 
       }
       if (isolate(input$selectTbl) ==  "locus annotation") {
@@ -3555,9 +3572,21 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     if (input$selectTbl == "SNP report") {
       if (is.null(haplo.summaryTbl())) return()
-
-
       haplo.summaryTable <- haplo.summaryTbl()
+
+      pos.file <- extract.pos.file()
+      if(is.null(pos.file)) return()
+      colnames(pos.file) <- c("locus", "pos")
+      pos.file$pos <- as.character(pos.file$pos)
+
+      pos.str <- pos.file %>% group_by(locus) %>%
+        mutate(pos = strsplit(pos, ",")) %>%
+        unnest(pos) %>%
+        mutate(pos = as.numeric(pos)) %>%
+        arrange(pos) %>%
+        group_by(locus) %>%
+        mutate(snp.id = row_number())
+
       n.base <- nchar(haplo.summaryTable$haplotype.1)
       haplo.all <-
         haplo.summaryTable[rep(seq(1, nrow(haplo.summaryTable)), n.base),] %>%
@@ -3570,6 +3599,9 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                )) %>%
         select(-haplotype.1,-haplotype.2,-read.depth.1,-read.depth.2) %>%
         rename("indiv.ID" = id)
+
+      haplo.all <- left_join(haplo.all, pos.str, by=c("locus", "snp.id")) %>%
+        select(group, locus, indiv.ID,  pos, snp, ar)
     }
 
     if (isolate(input$selectTbl) ==  "locus annotation") {
