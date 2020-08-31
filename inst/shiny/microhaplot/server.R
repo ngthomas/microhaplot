@@ -1245,10 +1245,12 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
 
     uniqH.perI.tbl <-
-      right_join(haplo.tot.tbl, panelParam$locus.label.tbl, by = "locus")
+      right_join(haplo.tot.tbl, panelParam$locus.label.tbl, by = "locus") %>%
+      replace_na(list(tot.hapl=0, frac=0))
+
     if (is.null(uniqH.perI.tbl))
       return()
-    uniqH.perI.tbl[is.na(uniqH.perI.tbl)] <- 0
+    #uniqH.perI.tbl[is.na(uniqH.perI.tbl)] <- 0
 
     #message( "is it moving :_ _----\n")
 
@@ -1316,11 +1318,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       ))))
 
     frac.calleable <-
-      right_join(frac.calleable, panelParam$locus.label.tbl, by = "locus")
+      right_join(frac.calleable, panelParam$locus.label.tbl, by = "locus") %>%
+      replace_na(list(n=0))
+
     if (is.null(frac.calleable))
       return()
 
-    frac.calleable[is.na(frac.calleable)] <- 0
+    #frac.calleable[is.na(frac.calleable)] <- 0
 
     if (input$selectLocus != "ALL") {
       frac.calleable <-
@@ -1377,11 +1381,12 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     frac.calleable <-
       haplo.summaryTbl() %>% group_by(locus) %>% summarise(f = n() / nIndiv)
     frac.calleable <-
-      right_join(frac.calleable, panelParam$locus.label.tbl, by = "locus")
+      right_join(frac.calleable, panelParam$locus.label.tbl, by = "locus") %>%
+      replace_na(list(f=0))
     if (is.null(frac.calleable))
       return()
 
-    frac.calleable[is.na(frac.calleable)] <- 0
+    #frac.calleable[is.na(frac.calleable)] <- 0
 
     if (input$selectLocus != "ALL") {
       frac.calleable <-
@@ -1438,10 +1443,12 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       return()
 
     readDepth.perI.tbl <-
-      right_join(Get.tbl.by.locus(), panelParam$locus.label.tbl, by = "locus")
+      right_join(Get.tbl.by.locus(), panelParam$locus.label.tbl, by = "locus") %>%
+      replace_na(list(tot.depth=0))
+
     if (is.null(readDepth.perI.tbl))
       return()
-    readDepth.perI.tbl[is.na(readDepth.perI.tbl)] <- 0
+    #readDepth.perI.tbl[is.na(readDepth.perI.tbl)] <- 0
 
     if (input$selectLocus != "ALL") {
       readDepth.perI.tbl <-
@@ -1593,11 +1600,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
 
     tot.hap.per.indiv <-
-      right_join(filter.haplo, panelParam$indiv.label.tbl, by = "id")
+      right_join(filter.haplo, panelParam$indiv.label.tbl, by = "id") %>%
+      replace_na(list(n.locus=0, n.hap.locus=0))
+
     if (is.null(tot.hap.per.indiv))
       return()
 
-    tot.hap.per.indiv[is.na(tot.hap.per.indiv)] <- 0
+    #tot.hap.per.indiv[is.na(tot.hap.per.indiv)] <- 0
 
     max.locus <- max(tot.hap.per.indiv$n.hap.locus)
 
@@ -1650,11 +1659,12 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     if (dim(panelParam$indiv.label.tbl)[1] == 0)
       return()
     haplo.filter <-
-      right_join(haplo.filter, panelParam$indiv.label.tbl, by = "id")
+      right_join(haplo.filter, panelParam$indiv.label.tbl, by = "id") %>%
+      replace_na(list(f=0))
     if (is.null(haplo.filter))
       return()
 
-    haplo.filter[is.na(haplo.filter)] <- 0
+    #haplo.filter[is.na(haplo.filter)] <- 0
 
     #if (input$selectIndiv != "ALL") {
     #  haplo.filter <- haplo.filter %>% filter(id == input$selectIndiv)
