@@ -1,9 +1,6 @@
 library("shiny")
 library("shinyBS")
-library("ggplot2")
-library("plyr")
-library("dplyr")
-library("tidyr")
+library("tidyverse")
 library("DT")
 library("grid")
 library("scales")
@@ -97,7 +94,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     if ("sum.Phred.C" %in% colnames(table.out)) {
       table.out <- table.out %>% select(-sum.Phred.C, -max.Phred.C)}
 
-    table.out
+    data.frame(table.out, stringsAsFactors = F)
   })
 
   extract.pos.file <- reactive({
@@ -305,26 +302,28 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       haplo.sum <-
       cbind.data.frame("group" = "unlabel",
                        haplo.sum,
-                       stringsAsFactors = FALSE) %>% tbl_df
+                       stringsAsFactors = FALSE)
+
 
     panelParam$n.locus <- length(unique(haplo.sum$locus))
     panelParam$n.indiv <- length(unique(haplo.sum$id))
 
     locus.sorted <- sort(unique(haplo.sum$locus))
     panelParam$locus.label.tbl <-
-      data.frame(locus = locus.sorted, stringsAsFactors = FALSE) %>% tbl_df()
+      data.frame(locus = locus.sorted, stringsAsFactors = FALSE)
+
     panelParam$locus.label <- c("ALL", locus.sorted)
     panelParam$locus.label.bare <- locus.sorted
 
     indiv.sorted <- sort(unique(haplo.sum$id))
     panelParam$indiv.label.tbl <-
-      data.frame(id = indiv.sorted, stringsAsFactors = FALSE) %>% tbl_df()
+      data.frame(id = indiv.sorted, stringsAsFactors = FALSE)
     panelParam$indiv.label <- c("ALL", indiv.sorted)
     panelParam$indiv.label.bare <- indiv.sorted
 
     group.sorted <- sort(unique(haplo.sum$group))
     panelParam$group.label.tbl <-
-      data.frame(id = group.sorted, stringsAsFactors = FALSE) %>% tbl_df()
+      data.frame(id = group.sorted, stringsAsFactors = FALSE)
     panelParam$group.label <- c("ALL", group.sorted)
     panelParam$group.label.bare <- group.sorted
     panelParam$n.group <- length(group.sorted)
@@ -483,7 +482,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     indiv.sorted <- sort(unique(haplo.sum$id))
     panelParam$indiv.label.tbl <-
-      data.frame(id = indiv.sorted, stringsAsFactors = FALSE) %>% tbl_df()
+      data.frame(id = indiv.sorted, stringsAsFactors = FALSE)
 
     panelParam$indiv.label <- c("ALL", indiv.sorted)
     panelParam$indiv.label.bare <- indiv.sorted
@@ -1514,10 +1513,14 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     #message( "should be safe \n")
 
     haplo.filter <-
-      right_join(haplo.filter, panelParam$indiv.label.tbl, by = "id")
+      right_join(haplo.filter, panelParam$indiv.label.tbl, by = "id") %>%
+      replace_na(list(allele.balance=0))
     if (is.null(haplo.filter))
       return()
-    haplo.filter[is.na(haplo.filter)] <- 0
+
+    #message(paste0(c("type of right now:", is_tibble(haplo.filter))))
+
+    #haplo.filter[is.na(haplo.filter)] <- "0"
 
     #if (input$selectIndiv != "ALL") {
     #  haplo.filter <- haplo.filter %>% filter(id == input$selectIndiv)
@@ -1748,10 +1751,11 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     haplo.filter <-
       right_join(Filter.haplo.sum() %>%
-                   filter(allele.balance >= min.ar) %>% ungroup(), panelParam$indiv.label.tbl, by = "id")
+                   filter(allele.balance >= min.ar) %>% ungroup(), panelParam$indiv.label.tbl, by = "id") %>%
+      replace_na(list(depth=0))
     if (is.null(haplo.filter))
       return()
-    haplo.filter[is.na(haplo.filter)] <- 0
+    #haplo.filter[is.na(haplo.filter)] <- 0
 
     haplo.filter <-
       haplo.filter %>% group_by(id) %>% mutate(mean.depth = mean(depth))
@@ -2988,8 +2992,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
           c(i, j, char.split[[1]][j], haplo.profile.frac[i,]$frac))
       }) %>%
       matrix(., ncol = 4, byrow = TRUE) %>%
-      as.data.frame(stringsAsFactors = FALSE) %>%
-      tbl_df()
+      as.data.frame(stringsAsFactors = FALSE)
 
     colnames(haplo.split.profile) <-
       c("group", "pos", "seq", "frac")
