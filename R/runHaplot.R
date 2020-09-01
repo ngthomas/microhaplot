@@ -34,7 +34,7 @@ mvShinyHaplot <- function(path) {
 
   if (!file.exists(paste0(path))) dir.create(path)
 
-  file.copy(app.dir, path, recursive = TRUE)
+  file.copy(app.dir, path, overwrite = TRUE, recursive = TRUE)
 }
 
 

@@ -94,7 +94,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     if ("sum.Phred.C" %in% colnames(table.out)) {
       table.out <- table.out %>% select(-sum.Phred.C, -max.Phred.C)}
 
-    data.frame(table.out, stringsAsFactors = F)
+    table.out %>% as.tibble()
+    #data.frame(table.out, stringsAsFactors = F)
   })
 
   extract.pos.file <- reactive({
@@ -352,6 +353,11 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     indivPg$i <- panelParam$indiv.label.bare[1:end.indx]
     ranges$y <- c(0, length(indivPg$i) + 1)
 
+    updateSelectInput(session, "indivPerDisplay", selected = 15)
+    updateNumericInput(session, "indivPage", value =1)
+    updateSelectInput(session, "locusPerDisplay", selected = 15)
+    updateNumericInput(session, "locusPage", value =1)
+
     session$sendCustomMessage(type = 'biplot_set', message = character(0))
 
     extract.annotate.file()
@@ -491,9 +497,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                       selected = "ALL",
                       choices = panelParam$indiv.label)
 
+    updateSelectInput(session, "indivPerDisplay", selected = 15)
+    updateNumericInput(session, "indivPage", value =1)
+
     end.indx <- min(15, panelParam$n.indiv)
     indivPg$i <- panelParam$indiv.label.bare[1:end.indx]
     ranges$y <- c(0, length(indivPg$i) + 1)
+
 
     Min.filter.haplo()
 
@@ -677,8 +687,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         #message( "haha_", as.numeric(panelParam$n.locus)/as.numeric(input$locusPerDisplay), "_----\n")
         updateNumericInput(session, "locusPage", max = ceiling(
           as.numeric(panelParam$n.locus)
-          / as.numeric(input$locusPerDisplay)
-        ))
+          / as.numeric(input$locusPerDisplay)), value = 1)
 
         end.indx <-
           min(as.numeric(panelParam$n.locus) ,
@@ -807,10 +816,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
           as.numeric(panelParam$n.indiv) /
             as.numeric(input$indivPerDisplay)
         )
-        updateNumericInput(session, "indivPage", max = ceiling(
-          as.numeric(panelParam$n.indiv)
-          / as.numeric(input$indivPerDisplay)
-        ))
+        updateNumericInput(session, "indivPage", value =1, max = indivPg$maxPg)
 
         end.indx <-
           min(as.numeric(panelParam$n.indiv) ,
@@ -833,7 +839,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     }
 
     if (input$selectIndiv == "ALL") {
-      if (input$indivPerDisplay == 100) {
+      if (input$indivPerDisplay == 100) { # 100 = "ALL" in this case
         indivPg$i <- panelParam$indiv.label.bare
         ranges$y <- c(0, length(indivPg$i) + 1)
 
@@ -953,6 +959,9 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
 
   haplo.summaryTbl <- reactive({
+
+    if (is.null(Filter.haplo.sum()))
+      return()
     haplo.sum <- Filter.haplo.sum() %>% ungroup() %>% filter(rank <=2)
     if (is.null(haplo.sum))
       return ()
@@ -1245,7 +1254,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
 
     uniqH.perI.tbl <-
-      right_join(haplo.tot.tbl, panelParam$locus.label.tbl, by = "locus") %>%
+      right_join(haplo.tot.tbl, panelParam$locus.label.tbl %>% filter(locus %in% locusPg$l), by = "locus") %>%
       replace_na(list(tot.hapl=0, frac=0))
 
     if (is.null(uniqH.perI.tbl))
@@ -1318,7 +1327,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       ))))
 
     frac.calleable <-
-      right_join(frac.calleable, panelParam$locus.label.tbl, by = "locus") %>%
+      right_join(frac.calleable, panelParam$locus.label.tbl %>% filter(locus %in% locusPg$l), by = "locus") %>%
       replace_na(list(n=0))
 
     if (is.null(frac.calleable))
@@ -1381,7 +1390,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     frac.calleable <-
       haplo.summaryTbl() %>% group_by(locus) %>% summarise(f = n() / nIndiv)
     frac.calleable <-
-      right_join(frac.calleable, panelParam$locus.label.tbl, by = "locus") %>%
+      right_join(frac.calleable, panelParam$locus.label.tbl %>% filter(locus %in% locusPg$l), by = "locus") %>%
       replace_na(list(f=0))
     if (is.null(frac.calleable))
       return()
@@ -1443,7 +1452,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       return()
 
     readDepth.perI.tbl <-
-      right_join(Get.tbl.by.locus(), panelParam$locus.label.tbl, by = "locus") %>%
+      right_join(Get.tbl.by.locus(), panelParam$locus.label.tbl %>% filter(locus %in% locusPg$l), by = "locus") %>%
       replace_na(list(tot.depth=0))
 
     if (is.null(readDepth.perI.tbl))
@@ -1458,10 +1467,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     readDepth.perI.tbl <-
       readDepth.perI.tbl %>% group_by(locus) %>% mutate(mean.depth = mean(tot.depth))
 
-    ggplot(readDepth.perI.tbl, aes(x = locus, y = tot.depth)) +
+    g<- ggplot(readDepth.perI.tbl, aes(x = locus, y = tot.depth)) +
       xlab("") +
-      ylab("tot read depth \n(per indiv)") +
-      geom_violin() +
+      ylab("tot read depth \n(per indiv)")
+
+    if (nrow(readDepth.perI.tbl) >5)  g <- g + geom_violin(na.rm=T)
+
+    g +
       geom_point(aes(x = locus, y = mean.depth),
                  cex = 3,
                  pch = 3) +
@@ -1499,11 +1511,12 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   output$AlleleRatioByIndiv <- renderPlot({
     if (is.null(input$selectLocus) ||
         is.null(input$selectIndiv) ||
-        input$selectDB == "" ||
+        input$selectDB == "" || is.null(Filter.haplo.sum()) ||
         is.null(input$selectDB) || is.null(locusPg$l))
       return ()
 
-    haplo.filter <- Filter.haplo.sum() %>%
+
+    haplo.filter <- Filter.haplo.sum() %>% #filter(id %in% indivPg$i) %>%
       filter(allele.balance >= min.ar) %>% ungroup()
 
 
@@ -1520,7 +1533,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     #message( "should be safe \n")
 
     haplo.filter <-
-      right_join(haplo.filter, panelParam$indiv.label.tbl, by = "id") %>%
+      right_join(haplo.filter, panelParam$indiv.label.tbl %>% filter(id %in% indivPg$i), by = "id") %>%
       replace_na(list(allele.balance=0))
     if (is.null(haplo.filter))
       return()
@@ -1590,7 +1603,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     if(is.null(Filter.haplo.sum())) return()
 
-    filter.haplo <- Filter.haplo.sum() %>%
+    filter.haplo <- Filter.haplo.sum()  %>%
       filter(allele.balance >= min.ar) %>% ungroup() %>%
       group_by(id, locus) %>%
       summarise(n.hap.locus = n()) %>%
@@ -1600,7 +1613,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
 
     tot.hap.per.indiv <-
-      right_join(filter.haplo, panelParam$indiv.label.tbl, by = "id") %>%
+      right_join(filter.haplo, panelParam$indiv.label.tbl %>% filter(id %in% indivPg$i), by = "id") %>%
       replace_na(list(n.locus=0, n.hap.locus=0))
 
     if (is.null(tot.hap.per.indiv))
@@ -1644,22 +1657,20 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   output$fracHaploPlot <- renderPlot({
     if (is.null(input$selectLocus) ||
         is.null(input$selectIndiv) ||
-        input$selectDB == "" ||
+        input$selectDB == "" || is.null(haplo.summaryTbl()) ||
         is.null(input$selectDB) || is.null(locusPg$l))
       return ()
-    if (is.null(haplo.summaryTbl())) {
-      return()
-    }
+
 
     nLocus <-
       ifelse(input$selectLocus == "ALL", panelParam$n.locus, 1)
 
-    haplo.filter <-
-      haplo.summaryTbl() %>% group_by(id) %>% summarise(f = n() / nLocus)
+    haplo.filter <- haplo.summaryTbl() %>%  #filter(id %in% indivPg$i) %>%
+      group_by(id) %>% summarise(f = n() / nLocus)
     if (dim(panelParam$indiv.label.tbl)[1] == 0)
       return()
     haplo.filter <-
-      right_join(haplo.filter, panelParam$indiv.label.tbl, by = "id") %>%
+      right_join(haplo.filter, panelParam$indiv.label.tbl %>% filter(id %in% indivPg$i), by = "id") %>%
       replace_na(list(f=0))
     if (is.null(haplo.filter))
       return()
@@ -1761,8 +1772,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     haplo.filter <-
       right_join(Filter.haplo.sum() %>%
-                   filter(allele.balance >= min.ar) %>% ungroup(), panelParam$indiv.label.tbl, by = "id") %>%
-      replace_na(list(depth=0))
+                   filter(allele.balance >= min.ar) %>% ungroup(), panelParam$indiv.label.tbl %>% filter(id %in% indivPg$i), by = "id") #%>%
+      #replace_na(list(depth=0))
     if (is.null(haplo.filter))
       return()
     #haplo.filter[is.na(haplo.filter)] <- 0
@@ -1774,11 +1785,14 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     #    haplo.filter <- haplo.filter %>% filter(id == input$selectIndiv)
     #  }
 
-    ggplot(haplo.filter, aes(x = id, y = depth, group = id)) +
+    g <- ggplot(haplo.filter, aes(x = id, y = depth, group = id)) +
       xlab("") +
-      ylab("haplotype read depth\n(per locus)") +
-      geom_violin() +
-      geom_point() +
+      ylab("haplotype read depth\n(per locus)")
+
+    if (nrow(haplo.filter) >5)  g <- g + geom_violin(na.rm=T)
+
+
+      g + geom_point(na.rm=T) +
       #geom_point(aes(x=id, y=mean.depth),pch=3, cex=3)+
       theme_bw() +
       theme(
@@ -1952,7 +1966,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
   # })
 
   output$fIndivByGroupPlot <- renderPlot({
-    if (is.null(input$selectLocus) ||
+    if (is.null(input$selectLocus) || is.null(Filter.haplo.sum()) ||
         is.null(input$selectIndiv) || input$selectDB == "")
       return ()
 
@@ -2044,7 +2058,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
   output$fLociByGroupPlot <- renderPlot({
     if (is.null(input$selectLocus) ||
-        is.null(input$selectIndiv) ||
+        is.null(input$selectIndiv) || is.null(Filter.haplo.sum()) ||
         input$selectDB == "" || is.null(locusPg$l))
       return ()
 
@@ -2300,7 +2314,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       summarise(top.2 = ifelse(rank.rel == 2, 0, -0.2) - 0.05*(categ[1]=="Het"),
                 rank.mod = rank.rel,
                 depth = rd.2[1], geno.class = categ[1],
-                is.incl = 1*(finalCall[1]=="call" & categ == "Het"))
+                is.incl = 1*(finalCall[1]=="call" & categ[1] == "Het"))
 
     haplo.match.rep <- bind_rows(haplo.match.rep.1, haplo.match.rep.2)
     if (nrow(haplo.match.rep)==0) return()
@@ -2364,7 +2378,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       summarise(top.2 = ifelse(rank.rel == 2, 0, -0.2) - 0.05*(categ[1]=="Het"),
                 rank.mod = rank.rel,
                 ar = rd.2/rd.1, geno.class = categ[1],
-                is.incl = 1*(finalCall[1]=="call" & categ == "Het"))
+                is.incl = 1*(finalCall[1]=="call" & categ[1] == "Het"))
 
     haplo.match.rep <- bind_rows(haplo.match.rep.1, haplo.match.rep.2)
     if (nrow(haplo.match.rep)==0) return()
@@ -2412,8 +2426,12 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     haplo.filter <- Min.filter.haplo()
     if(is.null(Min.filter.haplo)) return()
 
-    h <- haplo.filter %>%
-      filter(rank <= filterParam$n.alleles) %>%
+    filter.h <- haplo.filter %>%
+      filter(rank <= filterParam$n.alleles)
+
+    if (is.null(filter.h) || dim(filter.h)[1] == 0) return()
+
+    h<- filter.h %>%
       arrange(group, id, locus, rank) %>%
       group_by(group, id, locus) %>%
       summarise(categ = ifelse(length(rank) >1 &&
@@ -2437,6 +2455,13 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
                 drop.haplo = ifelse(length(rank)>1 & categ == "Homoz",haplo[2], "-"))
 
     if (filterParam$n.alleles > 2) {
+
+
+      h.test <- haplo.filter %>%
+        filter(rank <= filterParam$n.alleles, rank > 2)
+
+      if (is.null(h.test) || dim(h.test)[1] == 0) return()
+
 
       h.2 <- left_join( haplo.filter %>%
                           filter(rank <= filterParam$n.alleles, rank > 2),
@@ -2619,7 +2644,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     #            size = 4, stroke=0.7, shape=4) +
     g <- g + geom_vline(xintercept = 0, colour = "black", size = 0.8) +
       geom_hline(yintercept = 0, colour = "black", size = 0.8) +
-      scale_shape_manual("category",values = rep(c(23, 21)),"") +
+      scale_shape_manual("category",values = c(23, 21),"") +
       guides(fill=FALSE)+
       scale_fill_discrete("", labels=NULL)
 
@@ -3037,7 +3062,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     }
 
 
-    g + scale_size_continuous(guide = FALSE) +
+    g + #scale_size_continuous(guide = FALSE) +
       scale_color_discrete(guide = FALSE) +
       theme_bw() +
       theme(legend.position = "bottom",panel.border = element_rect(size = 0,colour = "white"),
@@ -3118,6 +3143,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       return()
     }
 
+
     ggplot(allelic.freq.tbl, aes(
       y = hap.label.w.num,
       x = f,
@@ -3188,6 +3214,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       return()
     }
 
+
     haplo.filter <- haplo.summaryTbl()
 
 
@@ -3252,8 +3279,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
       ) +
       scale_color_discrete(guide = FALSE) +
       scale_size_continuous(range = c(3, 20), guide = FALSE) +
-      scale_x_discrete(limits=1:length(all.hap))+
-      scale_y_discrete(limits=1:length(all.hap))+
+      scale_x_discrete(limits=factor(1:length(all.hap)))+
+      scale_y_discrete(limits=factor(1:length(all.hap)))+
       theme_bw()+
       theme(axis.text.y = element_blank(),
             axis.ticks.y = element_blank(),

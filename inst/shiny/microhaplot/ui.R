@@ -249,7 +249,7 @@ shinyUI(
                            label = NULL,
                            value = 1,
                            min = 1,
-                           step = 1
+                           step = .5
                          ),
                          offset = 1
                        ),
