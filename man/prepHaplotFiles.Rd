@@ -4,9 +4,16 @@
 \alias{prepHaplotFiles}
 \title{Extracts haplotype from alignment reads.}
 \usage{
-prepHaplotFiles(run.label, sam.path, label.path, vcf.path,
-  out.path = tempdir(), add.filter = FALSE, app.path = tempdir(),
-  n.jobs = 1)
+prepHaplotFiles(
+  run.label,
+  sam.path,
+  label.path,
+  vcf.path,
+  out.path = tempdir(),
+  add.filter = FALSE,
+  app.path = tempdir(),
+  n.jobs = 1
+)
 }
 \arguments{
 \item{run.label}{character vector. Run label to be used to display in haPLOType. Required}

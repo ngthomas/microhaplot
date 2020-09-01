@@ -4,8 +4,9 @@
 \alias{runShinyHaplot}
 \title{Run shiny microhaplot}
 \usage{
-runShinyHaplot(path = system.file("shiny", "microhaplot", package =
-  "microhaplot"))
+runShinyHaplot(
+  path = system.file("shiny", "microhaplot", package = "microhaplot")
+)
 }
 \arguments{
 \item{path}{Path to shiny microhaplot app. Optional. If not specified, the path is default to local app path.}
