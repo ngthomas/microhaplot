@@ -2644,7 +2644,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     #            size = 4, stroke=0.7, shape=4) +
     g <- g + geom_vline(xintercept = 0, colour = "black", size = 0.8) +
       geom_hline(yintercept = 0, colour = "black", size = 0.8) +
-      scale_shape_manual("category",values = c(23, 21),"") +
+      scale_shape_manual("Category",values = c(23, 21),c("Het", "Homoz")) +
       guides(fill=FALSE)+
       scale_fill_discrete("", labels=NULL)
 
