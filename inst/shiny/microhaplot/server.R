@@ -94,7 +94,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
     if ("sum.Phred.C" %in% colnames(table.out)) {
       table.out <- table.out %>% select(-sum.Phred.C, -max.Phred.C)}
 
-    table.out %>% as.tibble()
+    table.out %>% tibble::as_tibble()
     #data.frame(table.out, stringsAsFactors = F)
   })
 
@@ -102,7 +102,7 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
 
     pos.file <- strsplit(input$selectDB, split=".rds") %>% unlist %>% paste0(.,"_posinfo.rds")
     if (!file.exists(pos.file)) return ()
-    readRDS(pos.file) %>% dplyr::as_tibble(stringsAsFactors=F)
+    readRDS(pos.file) %>% tibble::as_tibble(stringsAsFactors=F)
   })
 
   # the format structure for the annotate file: contains locus ID (also contains ALL), min read depth, min allelic ratio,
