@@ -1,0 +1,9 @@
+pandoc: 2.7.3
+pkgdown: 1.6.1
+pkgdown_sha: ~
+articles:
+  microhaplot-data-prep: microhaplot-data-prep.html
+  microhaplot-walkthrough: microhaplot-walkthrough.html
+  troubleshoot: troubleshoot.html
+last_built: 2021-01-15T21:53Z
+
