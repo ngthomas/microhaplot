@@ -1,0 +1,6 @@
+url: https://ngthomas.github.io/microhaplot
+
+template:
+  params:
+    bootswatch: cosmo
+
