@@ -5,5 +5,8 @@ articles:
   microhaplot-data-prep: microhaplot-data-prep.html
   microhaplot-walkthrough: microhaplot-walkthrough.html
   troubleshoot: troubleshoot.html
-last_built: 2021-01-15T21:53Z
+last_built: 2021-01-15T21:58Z
+urls:
+  reference: https://ngthomas.github.io/microhaplot/reference
+  article: https://ngthomas.github.io/microhaplot/articles
 
