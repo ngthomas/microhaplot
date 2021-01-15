@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://ngthomas.github.io/microhaplot/index.html</loc>
+  </url>
+  <url>
+    <loc>https://ngthomas.github.io/microhaplot/reference/mvShinyHaplot.html</loc>
+  </url>
+  <url>
+    <loc>https://ngthomas.github.io/microhaplot/reference/prepHaplotFiles.html</loc>
+  </url>
+  <url>
+    <loc>https://ngthomas.github.io/microhaplot/reference/runShinyHaplot.html</loc>
+  </url>
+  <url>
+    <loc>https://ngthomas.github.io/microhaplot/articles/microhaplot-data-prep.html</loc>
+  </url>
+  <url>
+    <loc>https://ngthomas.github.io/microhaplot/articles/microhaplot-walkthrough.html</loc>
+  </url>
+  <url>
+    <loc>https://ngthomas.github.io/microhaplot/articles/troubleshoot.html</loc>
+  </url>
+</urlset>
