@@ -88,9 +88,12 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="microhaplot" class="section level1">
+<div id="microhaplot-" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#microhaplot" class="anchor"></a>microhaplot</h1></div>
+<a href="#microhaplot-" class="anchor"></a>microhaplot <img src="reference/figures/microhaplot-sticker.png" align="right" width="200">
+</h1></div>
+<!-- badges: start -->
+
 <p><code>microhaplot</code> generates visual summaries of microhaplotypes found in short read alignments. All you need are alignment SAM files and a variant call VCF file. (The latter tells <code>microhaplot</code> which SNPs to include into microhaplotypes). It was designed for extracting and visualized haplotypes from high-quality amplicon sequencing data. We have used it extensively to process amplicon sequencing data (with 100 to 500 amplicons) from rockfish and Chinook salmon, generated on an Illumina MiSeq sequencer. It should be extensible to sequences from capture arrays, like RAPTURE data.</p>
 <p>This software exists as an R package <code>microhaplot</code> that includes within it the code to set up and establish an Rstudio/Shiny server to visualize and manipulate the data. There are two key steps in the <code>microhaplot</code> workflow:</p>
 <ol>
@@ -98,12 +101,12 @@
 <li><p>The second step is to run the microhaplot Shiny app to visualize the sequence information, call genotypes using simple read-depth based filtering criteria, and curate the loci. microhaplot is suitable for quick assessment and quality control of haplotypes generated from library runs. Plot summaries include read depth, fraction of callable haplotypes, Hardy-Weinberg equilibrium plots, and more.</p></li>
 </ol>
 <p>See the <strong>Example Data</strong> section to learn about how to run each of these steps on the example data that are provided with the package.</p>
-<div id="installation-and-quick-start" class="section level3">
+<div id="installation-and-quick-start" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation-and-quick-start" class="anchor"></a>Installation and Quick Start</h2>
+<div id="required-perl-dependencies" class="section level3">
 <h3 class="hasAnchor">
-<a href="#installation-and-quick-start" class="anchor"></a>Installation and Quick Start</h3>
-<div id="required-perl-dependencies" class="section level4">
-<h4 class="hasAnchor">
-<a href="#required-perl-dependencies" class="anchor"></a>required Perl dependencies:</h4>
+<a href="#required-perl-dependencies" class="anchor"></a>required Perl dependencies:</h3>
 <p>You need to have Perl (version &gt;5.014) installed in your OS in order to run Microhaplot.<br>
 For Window users, we recommend install it via <a href="http://strawberryperl.com/" class="uri">http://strawberryperl.com/</a>.<br>
 For Mac and Linux users, Perl can be downloaded from <a href="https://www.perl.org/get.html" class="uri">https://www.perl.org/get.html</a></p>
@@ -126,9 +129,9 @@ For Mac and Linux users, Perl can be downloaded from <a href="https://www.perl.o
 <span class="fu"><a href="reference/runShinyHaplot.html">runShinyHaplot</a></span><span class="op">(</span><span class="va">app.path</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
-<div id="quick-guide-to-use-microhaplot-to-parse-out-sam-and-vcf-files" class="section level3">
-<h3 class="hasAnchor">
-<a href="#quick-guide-to-use-microhaplot-to-parse-out-sam-and-vcf-files" class="anchor"></a>Quick Guide to use microhaplot to parse out SAM and VCF files</h3>
+<div id="quick-guide-to-use-microhaplot-to-parse-out-sam-and-vcf-files" class="section level2">
+<h2 class="hasAnchor">
+<a href="#quick-guide-to-use-microhaplot-to-parse-out-sam-and-vcf-files" class="anchor"></a>Quick Guide to use microhaplot to parse out SAM and VCF files</h2>
 <p>This microhaplot package comes with a small customized sample data drawn from an actual run of short read sequencing run on Rockfish species. The sample data contains sequences of eight genomic loci for four populations of five individuals each, with a total of twenty individuals.</p>
 <p>First you need to create a tab-separate <strong>label</strong> file with 3 info columns: path to SAM file name, individual ID, and group label (in this particular order). If you do not want assign any group label for the individuals, you can just leave it as “NA”. It is recommended that you have all of the SAM files under one directory to make this labeling task easier.</p>
 <p>The <code>label</code> file looks like this:</p>
@@ -137,15 +140,8 @@ For Mac and Linux users, Perl can be downloaded from <a href="https://www.perl.o
 <span id="cb5-3"><a href="#cb5-3"></a>s13.sam s13     gold</span>
 <span id="cb5-4"><a href="#cb5-4"></a>s14.sam s14     kelp</span>
 <span id="cb5-5"><a href="#cb5-5"></a>s18.sam s18     gold</span></code></pre></div>
-<p>Once you have the label file in place, you can run <code>prepHaplotFiles</code>, a R function that generates tables of microhaplotype, by providing the following:</p>
-<ul>
-<li>a label to display in haPLOType</li>
-<li>path to the directory with all SAM files</li>
-<li>path to the <code>label</code> file you just created</li>
-<li>path to the VCF file<br>
-</li>
-<li>optional number of threads (for non-Windows user); recommend 2 * # of processors</li>
-</ul>
+<p>Once you have the label file in place, you can run <code>prepHaplotFiles</code>, a R function that generates tables of microhaplotype, by providing the following: * a label to display in haPLOType * path to the directory with all SAM files * path to the <code>label</code> file you just created * path to the VCF file<br>
+* optional number of threads (for non-Windows user); recommend 2 * # of processors</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ngthomas/microhaplot">microhaplot</a></span><span class="op">)</span>
 
@@ -180,9 +176,9 @@ For Mac and Linux users, Perl can be downloaded from <a href="https://www.perl.o
 
 <span class="fu"><a href="reference/runShinyHaplot.html">runShinyHaplot</a></span><span class="op">(</span><span class="va">app.path</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="suggestions" class="section level3">
-<h3 class="hasAnchor">
-<a href="#suggestions" class="anchor"></a>Suggestions</h3>
+<div id="suggestions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#suggestions" class="anchor"></a>Suggestions</h2>
 <ul>
 <li>SAM files: For pair-ended experiment, both directional reads should be flashed into one.</li>
 </ul>
@@ -216,7 +212,13 @@ For Mac and Linux users, Perl can be downloaded from <a href="https://www.perl.o
 </ul>
 </div>
 
-  </div>
+  <div class="dev-status">
+<h2>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://CRAN.R-project.org/package=microhaplot"><img src="https://www.r-pkg.org/badges/version/microhaplot" alt="CRAN status"></a></li>
+</ul>
+</div>
+</div>
 </div>
 
 
