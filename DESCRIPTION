@@ -25,7 +25,7 @@ Imports:
     ggiraph (>= 0.6.0)
 URL: https://github.com/ngthomas/microhaplot
 BugReports: https://github.com/ngthomas/microhaplot/issues
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Suggests: 
     knitr,
     rmarkdown

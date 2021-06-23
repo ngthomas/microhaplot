@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -71,7 +71,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/ngthomas/microhaplot/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -85,13 +85,13 @@
 
       
 
-      </header><div class="row">
+      </header><script src="microhaplot-walkthrough_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>microhaplot walkthrough</h1>
                         <h4 class="author">Thomas Ng and Eric C. Anderson</h4>
             
-            <h4 class="date">2021-01-15</h4>
+            <h4 class="date">2021-06-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ngthomas/microhaplot/blob/master/vignettes/microhaplot-walkthrough.Rmd"><code>vignettes/microhaplot-walkthrough.Rmd</code></a></small>
       <div class="hidden name"><code>microhaplot-walkthrough.Rmd</code></div>
@@ -171,14 +171,10 @@
 <a href="#panel-choice-tabset-bottom" class="anchor"></a><strong>Panel choice tabset</strong> (bottom)</h2>
 <p>This tabset is always down at the bottom of the screen, and the choices on this tabset allow you to choose the contents to be displayed in the main body panel. It looks like this:<br><br><img src="main_tab.png" title="main tab" width="100%"><br><br> In the following, we will describe all these different main panels, but, since they are rather large, we will not include any pictures of those panels. It is recommended that the reader follow along with this vignette using the example data in microhaplot. That will help a lot.</p>
 <ol style="list-style-type: lower-alpha">
+<li><p><em>Data Set:</em> provides a dropdown box in the main panel that you use to choose which data set you want to explore. The choices in the dropdown box are taken from the <code>.rds</code> files that are in the <code>app.path</code> directory described above. When you start microhaplot after a clean install, the default dropdown choice is <code>fish1.rds</code>, and the other possible choice is <code>fish2.rds</code>.<br></p></li>
+<li><p><em>Summary Info: </em> displays a condensed graphical summary of the characteristics of microhaplotype reads by groups, individuals, or loci. These are particularly useful for overviews when the “ALL” choice is given for individuals and loci in the “&gt; field selection” tab.<br></p></li>
 <li>
-<em>Data Set:</em> provides a dropdown box in the main panel that you use to choose which data set you want to explore. The choices in the dropdown box are taken from the <code>.rds</code> files that are in the <code>app.path</code> directory described above. When you start microhaplot after a clean install, the default dropdown choice is <code>fish1.rds</code>, and the other possible choice is <code>fish2.rds</code>.<br>
-</li>
-<li>
-<em>Summary Info: </em> displays a condensed graphical summary of the characteristics of microhaplotype reads by groups, individuals, or loci. These are particularly useful for overviews when the “ALL” choice is given for individuals and loci in the “&gt; field selection” tab.<br>
-</li>
-<li>
-<em>Criteria Cutoff: </em> contains:
+<p><em>Criteria Cutoff: </em> contains:</p>
 <ol style="list-style-type: lower-roman">
 <li>
 <code>Global Scope</code>: This section displays summaries of the distributions of read depths and allelic balance ratios to assist the user in setting appropriate values for those filter cutoffs. Histograms of read depths and allelic balance ratios are presented for only one locus, or combined across <code>ALL</code> loci, depending on the settings in the “&gt; field selection” tab. If only a single locus is selected, the histogram of read depths and allelic balance ratios are shown for each allele, as well. Looking at the distribution of allele-specific read depths can be very useful for identifying alleles that are linked to variation that interferes with PCR of the amplicon. At the bottom, beneath the graphical histograms, we also provide a tabular summary of the number of alleles and the number of individuals with callable genotypes (given the filters) available at different cutoffs for the minimum total read depth and the minimum allelic ratio.<br>
@@ -188,7 +184,7 @@
 </ol>
 </li>
 <li>
-<em>Genotype Call: </em> offers a more intimate look and analysis of how genotypes are being called at a single locus, and of the allele specific read-depths within those genotypes.
+<p><em>Genotype Call: </em> offers a more intimate look and analysis of how genotypes are being called at a single locus, and of the allele specific read-depths within those genotypes.</p>
 <ol style="list-style-type: lower-roman">
 <li>
 <code>AR refinement</code>: This panel displays a scatterplot that shows the relationship between the allele with the highest read depth and the allele with the second-highest read depth. It is most suited to handling data from diploid organisms. This space also provides you the tools (found on the left) to fine-tune allelic ratio parameters (such as defining the maximum allelic ratio for homozygous genotype calls and the minimum allelic ratio for heterozygous genotype calls) so that individuals with questionable allelic balance ratio will not receive called genotypes.<br><br> The lines on the plot are as follows:
