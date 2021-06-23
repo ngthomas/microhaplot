@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -71,7 +71,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/ngthomas/microhaplot/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -85,13 +85,13 @@
 
       
 
-      </header><div class="row">
+      </header><script src="microhaplot-data-prep_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>An Introduction to microhaplot data preparation</h1>
                         <h4 class="author">Thomas Ng and Eric C. Anderson</h4>
             
-            <h4 class="date">2021-01-15</h4>
+            <h4 class="date">2021-06-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ngthomas/microhaplot/blob/master/vignettes/microhaplot-data-prep.Rmd"><code>vignettes/microhaplot-data-prep.Rmd</code></a></small>
       <div class="hidden name"><code>microhaplot-data-prep.Rmd</code></div>
@@ -158,105 +158,105 @@
 <h3 class="hasAnchor">
 <a href="#starting-state" class="anchor"></a>Starting state</h3>
 <p>Out description starts at the point where we have copied all of our fastq.gz files from the sequencer into a directory called <code>rawdata</code>. Next to that directory we have made two more directories, <code>flash</code> and <code>map</code>, in which we will be creating files and doing work. We have named all the Illumina files so that a directory listing of <code>rawdata</code> looks like this:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="ex">/rawdata/--%</span> ll <span class="kw">|</span> <span class="fu">head</span></a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="ex">total</span> 3517864</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="ex">drwxrwxr-x</span> 2 biopipe biopipe  122880 Aug 18 11:57 ./</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="ex">drwxrwxr-x</span> 5 biopipe biopipe    4096 Aug 18 11:31 ../</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="ex">-rw-r--r--</span> 1 biopipe biopipe  672293 Aug 18 11:53 satro_S100_L001_I1_001.fastq.gz</a>
-<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="ex">-rw-r--r--</span> 1 biopipe biopipe  725385 Aug 18 11:53 satro_S100_L001_I2_001.fastq.gz</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="ex">-rw-r--r--</span> 1 biopipe biopipe 4656145 Aug 18 11:53 satro_S100_L001_R1_001.fastq.gz</a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="ex">-rw-r--r--</span> 1 biopipe biopipe 4749637 Aug 18 11:53 satro_S100_L001_R2_001.fastq.gz</a>
-<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="ex">-rw-r--r--</span> 1 biopipe biopipe  635863 Aug 18 11:53 satro_S101_L001_I1_001.fastq.gz</a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="ex">-rw-r--r--</span> 1 biopipe biopipe  711534 Aug 18 11:53 satro_S101_L001_I2_001.fastq.gz</a>
-<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="ex">-rw-r--r--</span> 1 biopipe biopipe 4410826 Aug 18 11:53 satro_S101_L001_R1_001.fastq.gz</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="ex">/rawdata/--%</span> ll <span class="kw">|</span> <span class="fu">head</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="ex">total</span> 3517864</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="ex">drwxrwxr-x</span> 2 biopipe biopipe  122880 Aug 18 11:57 ./</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="ex">drwxrwxr-x</span> 5 biopipe biopipe    4096 Aug 18 11:31 ../</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="ex">-rw-r--r--</span> 1 biopipe biopipe  672293 Aug 18 11:53 satro_S100_L001_I1_001.fastq.gz</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="ex">-rw-r--r--</span> 1 biopipe biopipe  725385 Aug 18 11:53 satro_S100_L001_I2_001.fastq.gz</span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="ex">-rw-r--r--</span> 1 biopipe biopipe 4656145 Aug 18 11:53 satro_S100_L001_R1_001.fastq.gz</span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="ex">-rw-r--r--</span> 1 biopipe biopipe 4749637 Aug 18 11:53 satro_S100_L001_R2_001.fastq.gz</span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="ex">-rw-r--r--</span> 1 biopipe biopipe  635863 Aug 18 11:53 satro_S101_L001_I1_001.fastq.gz</span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="ex">-rw-r--r--</span> 1 biopipe biopipe  711534 Aug 18 11:53 satro_S101_L001_I2_001.fastq.gz</span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="ex">-rw-r--r--</span> 1 biopipe biopipe 4410826 Aug 18 11:53 satro_S101_L001_R1_001.fastq.gz</span></code></pre></div>
 <p>In this case, there are 384 such sets of files. The number after the capital S in the filename gives the ID number of each individual fish.</p>
 </div>
 <div id="flashing-the-reads-together" class="section level3">
 <h3 class="hasAnchor">
 <a href="#flashing-the-reads-together" class="anchor"></a>Flashing the reads together</h3>
 <p>Our data are paired end reads of fragments that are short enough that the primary reads and the paired-end reads overlap. Rather than treat them as two separate reads, we combine them together into a single read using <a href="https://ccb.jhu.edu/software/FLASH/">flash</a>. Here is the command we use to cycle over all the files and flash them, run from the <code>flash</code> directory which is at the same level as the <code>rawdata</code> directory. (Note that the <code>/flash/--%</code> in the following code fragment is just the command prompt—it tells you which directory we are in…)</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="ex">/flash/--%</span> for i in <span class="dt">{1..384}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">flash</span> -m 10 -M 100 -z --output-prefix=S<span class="va">${i}</span> ../rawdata/satro_S<span class="va">${i}</span>_L001_R1_001.fastq.gz ../rawdata/satro_S<span class="va">${i}</span>_L001_R2_001.fastq.gz<span class="kw">;</span> <span class="kw">done</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="ex">/flash/--%</span> for i in <span class="dt">{1..384}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">flash</span> -m 10 -M 100 -z --output-prefix=S<span class="va">${i}</span> ../rawdata/satro_S<span class="va">${i}</span>_L001_R1_001.fastq.gz ../rawdata/satro_S<span class="va">${i}</span>_L001_R2_001.fastq.gz<span class="kw">;</span> <span class="kw">done</span></span></code></pre></div>
 <p>The output that <code>flash</code> spits out to stdout looks like this:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" data-line-number="1">[<span class="ex">FLASH</span>] Starting FLASH v1.2.11</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">[<span class="ex">FLASH</span>] Fast Length Adjustment of SHort reads</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3">[<span class="ex">FLASH</span>]</a>
-<a class="sourceLine" id="cb3-4" data-line-number="4">[<span class="ex">FLASH</span>] Input files:</a>
-<a class="sourceLine" id="cb3-5" data-line-number="5">[<span class="ex">FLASH</span>]     ../rawdata/satro_S1_L001_R1_001.fastq.gz</a>
-<a class="sourceLine" id="cb3-6" data-line-number="6">[<span class="ex">FLASH</span>]     ../rawdata/satro_S1_L001_R2_001.fastq.gz</a>
-<a class="sourceLine" id="cb3-7" data-line-number="7">[<span class="ex">FLASH</span>]</a>
-<a class="sourceLine" id="cb3-8" data-line-number="8">[<span class="ex">FLASH</span>] Output files:</a>
-<a class="sourceLine" id="cb3-9" data-line-number="9">[<span class="ex">FLASH</span>]     ./S1.extendedFrags.fastq.gz</a>
-<a class="sourceLine" id="cb3-10" data-line-number="10">[<span class="ex">FLASH</span>]     ./S1.notCombined_1.fastq.gz</a>
-<a class="sourceLine" id="cb3-11" data-line-number="11">[<span class="ex">FLASH</span>]     ./S1.notCombined_2.fastq.gz</a>
-<a class="sourceLine" id="cb3-12" data-line-number="12">[<span class="ex">FLASH</span>]     ./S1.hist</a>
-<a class="sourceLine" id="cb3-13" data-line-number="13">[<span class="ex">FLASH</span>]     ./S1.histogram</a>
-<a class="sourceLine" id="cb3-14" data-line-number="14">[<span class="ex">FLASH</span>]</a>
-<a class="sourceLine" id="cb3-15" data-line-number="15">[<span class="ex">FLASH</span>] Parameters:</a>
-<a class="sourceLine" id="cb3-16" data-line-number="16">[<span class="ex">FLASH</span>]     Min overlap:           10</a>
-<a class="sourceLine" id="cb3-17" data-line-number="17">[<span class="ex">FLASH</span>]     Max overlap:           100</a>
-<a class="sourceLine" id="cb3-18" data-line-number="18">[<span class="ex">FLASH</span>]     Max mismatch density:  0.250000</a>
-<a class="sourceLine" id="cb3-19" data-line-number="19">[<span class="ex">FLASH</span>]     Allow <span class="st">"outie"</span> pairs:   false</a>
-<a class="sourceLine" id="cb3-20" data-line-number="20">[<span class="ex">FLASH</span>]     Cap mismatch quals:    false</a>
-<a class="sourceLine" id="cb3-21" data-line-number="21">[<span class="ex">FLASH</span>]     Combiner threads:      12</a>
-<a class="sourceLine" id="cb3-22" data-line-number="22">[<span class="ex">FLASH</span>]     Input format:          FASTQ, phred_offset=33</a>
-<a class="sourceLine" id="cb3-23" data-line-number="23">[<span class="ex">FLASH</span>]     Output format:         FASTQ, phred_offset=33, gzip</a>
-<a class="sourceLine" id="cb3-24" data-line-number="24">[<span class="ex">FLASH</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a>[<span class="ex">FLASH</span>] Starting FLASH v1.2.11</span>
+<span id="cb3-2"><a href="#cb3-2"></a>[<span class="ex">FLASH</span>] Fast Length Adjustment of SHort reads</span>
+<span id="cb3-3"><a href="#cb3-3"></a>[<span class="ex">FLASH</span>]</span>
+<span id="cb3-4"><a href="#cb3-4"></a>[<span class="ex">FLASH</span>] Input files:</span>
+<span id="cb3-5"><a href="#cb3-5"></a>[<span class="ex">FLASH</span>]     ../rawdata/satro_S1_L001_R1_001.fastq.gz</span>
+<span id="cb3-6"><a href="#cb3-6"></a>[<span class="ex">FLASH</span>]     ../rawdata/satro_S1_L001_R2_001.fastq.gz</span>
+<span id="cb3-7"><a href="#cb3-7"></a>[<span class="ex">FLASH</span>]</span>
+<span id="cb3-8"><a href="#cb3-8"></a>[<span class="ex">FLASH</span>] Output files:</span>
+<span id="cb3-9"><a href="#cb3-9"></a>[<span class="ex">FLASH</span>]     ./S1.extendedFrags.fastq.gz</span>
+<span id="cb3-10"><a href="#cb3-10"></a>[<span class="ex">FLASH</span>]     ./S1.notCombined_1.fastq.gz</span>
+<span id="cb3-11"><a href="#cb3-11"></a>[<span class="ex">FLASH</span>]     ./S1.notCombined_2.fastq.gz</span>
+<span id="cb3-12"><a href="#cb3-12"></a>[<span class="ex">FLASH</span>]     ./S1.hist</span>
+<span id="cb3-13"><a href="#cb3-13"></a>[<span class="ex">FLASH</span>]     ./S1.histogram</span>
+<span id="cb3-14"><a href="#cb3-14"></a>[<span class="ex">FLASH</span>]</span>
+<span id="cb3-15"><a href="#cb3-15"></a>[<span class="ex">FLASH</span>] Parameters:</span>
+<span id="cb3-16"><a href="#cb3-16"></a>[<span class="ex">FLASH</span>]     Min overlap:           10</span>
+<span id="cb3-17"><a href="#cb3-17"></a>[<span class="ex">FLASH</span>]     Max overlap:           100</span>
+<span id="cb3-18"><a href="#cb3-18"></a>[<span class="ex">FLASH</span>]     Max mismatch density:  0.250000</span>
+<span id="cb3-19"><a href="#cb3-19"></a>[<span class="ex">FLASH</span>]     Allow <span class="st">"outie"</span> pairs:   false</span>
+<span id="cb3-20"><a href="#cb3-20"></a>[<span class="ex">FLASH</span>]     Cap mismatch quals:    false</span>
+<span id="cb3-21"><a href="#cb3-21"></a>[<span class="ex">FLASH</span>]     Combiner threads:      12</span>
+<span id="cb3-22"><a href="#cb3-22"></a>[<span class="ex">FLASH</span>]     Input format:          FASTQ, phred_offset=33</span>
+<span id="cb3-23"><a href="#cb3-23"></a>[<span class="ex">FLASH</span>]     Output format:         FASTQ, phred_offset=33, gzip</span>
+<span id="cb3-24"><a href="#cb3-24"></a>[<span class="ex">FLASH</span>]</span></code></pre></div>
 <p>This has created a series of files named like <code>S${i}.extendedFrags.fastq.gz</code> in which the <code>${i}</code> is replaced by a number between 1 and 384. These files are gzipped fastq files that hold the flashed reads.</p>
 </div>
 <div id="mappingaligning-the-reads" class="section level3">
 <h3 class="hasAnchor">
 <a href="#mappingaligning-the-reads" class="anchor"></a>Mapping/Aligning the Reads</h3>
 <p>The reference sequences we will use to align to are in a fasta file called <code>gtseq15_loci.fasta</code>. We put that in the <code>map</code> directory and then commence mapping the flashed reads as follows:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># index the reference. Output will be prefixed with "gtseq15_loci"</span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="ex">/map/--%</span> bwa index -p gtseq15_loci -a is gtseq15_loci.fasta</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co"># here is what comes by on stdout </span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5">[<span class="ex">bwa_index</span>] Pack FASTA... 0.00 sec</a>
-<a class="sourceLine" id="cb4-6" data-line-number="6">[<span class="ex">bwa_index</span>] Construct BWT for the packed sequence...</a>
-<a class="sourceLine" id="cb4-7" data-line-number="7">[<span class="ex">bwa_index</span>] 0.00 seconds elapse.</a>
-<a class="sourceLine" id="cb4-8" data-line-number="8">[<span class="ex">bwa_index</span>] Update BWT... 0.00 sec</a>
-<a class="sourceLine" id="cb4-9" data-line-number="9">[<span class="ex">bwa_index</span>] Pack forward-only FASTA... 0.00 sec</a>
-<a class="sourceLine" id="cb4-10" data-line-number="10">[<span class="ex">bwa_index</span>] Construct SA from BWT and Occ... 0.00 sec</a>
-<a class="sourceLine" id="cb4-11" data-line-number="11">[<span class="ex">main</span>] Version: 0.7.5a-r405</a>
-<a class="sourceLine" id="cb4-12" data-line-number="12">[<span class="ex">main</span>] CMD: bwa index -p gtseq15_loci -a is gtseq15_loci.fasta</a>
-<a class="sourceLine" id="cb4-13" data-line-number="13">[<span class="ex">main</span>] Real time: 0.061 sec<span class="kw">;</span> <span class="ex">CPU</span>: 0.007 sec</a>
-<a class="sourceLine" id="cb4-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb4-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co"># map reads. for each input file, the output is named satro_flashed_s${i}_aln.sam</span></a>
-<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co"># Note the -R to insert appropriate read group header lines</span></a>
-<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="ex">/map/--%</span> for i in <span class="dt">{1..384}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">bwa</span> mem -aM -v 3 -t 10 -R <span class="st">"@RG\tID:s</span><span class="va">${i}</span><span class="st">\tLB:amplicon\tPL:ILLUMINA\tSM:satro</span><span class="va">${i}</span><span class="st">"</span> ./gtseq15_loci ../flash/S<span class="va">${i}</span>.extendedFrags.fastq.gz  <span class="op">&gt;</span> ./satro_flashed_s<span class="va">${i}</span>_aln.sam<span class="kw">;</span> <span class="kw">done</span></a>
-<a class="sourceLine" id="cb4-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb4-20" data-line-number="20"></a>
-<a class="sourceLine" id="cb4-21" data-line-number="21"><span class="co"># convert the SAMs to BAMs </span></a>
-<a class="sourceLine" id="cb4-22" data-line-number="22"><span class="ex">/map/--%</span> for i in <span class="dt">{1..384}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">samtools</span> view -bhS satro_flashed_s<span class="va">${i}</span>_aln.sam <span class="op">&gt;</span> satro_flashed_s<span class="va">${i}</span>.bam<span class="kw">;</span> <span class="kw">done</span></a>
-<a class="sourceLine" id="cb4-23" data-line-number="23"></a>
-<a class="sourceLine" id="cb4-24" data-line-number="24"></a>
-<a class="sourceLine" id="cb4-25" data-line-number="25"><span class="co"># Sort the BAMs</span></a>
-<a class="sourceLine" id="cb4-26" data-line-number="26"><span class="ex">/map/--%</span> for i in <span class="dt">{1..384}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">samtools</span> sort satro_flashed_s<span class="va">${i}</span>.bam -o satro_flashed_s<span class="va">${i}</span>_sorted.bam<span class="kw">;</span> <span class="kw">done</span></a>
-<a class="sourceLine" id="cb4-27" data-line-number="27"></a>
-<a class="sourceLine" id="cb4-28" data-line-number="28"></a>
-<a class="sourceLine" id="cb4-29" data-line-number="29"><span class="co"># Index the BAMs</span></a>
-<a class="sourceLine" id="cb4-30" data-line-number="30"><span class="ex">/map/--%</span> for i in <span class="dt">{1..384}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">samtools</span> index satro_flashed_s<span class="va">${i}</span>_sorted.bam<span class="kw">;</span> <span class="kw">done</span></a>
-<a class="sourceLine" id="cb4-31" data-line-number="31"></a>
-<a class="sourceLine" id="cb4-32" data-line-number="32"></a>
-<a class="sourceLine" id="cb4-33" data-line-number="33"><span class="co"># Make a text-file list of the BAMs</span></a>
-<a class="sourceLine" id="cb4-34" data-line-number="34"><span class="ex">/map/--%</span> ls -1 *sorted.bam <span class="op">&gt;</span> bamlist.txt</a>
-<a class="sourceLine" id="cb4-35" data-line-number="35"></a>
-<a class="sourceLine" id="cb4-36" data-line-number="36"></a>
-<a class="sourceLine" id="cb4-37" data-line-number="37"><span class="co"># generate idx stats and put them in a directory called gtseq17_idx</span></a>
-<a class="sourceLine" id="cb4-38" data-line-number="38"><span class="ex">/map/--%</span> mkdir gtseq17_idx</a>
-<a class="sourceLine" id="cb4-39" data-line-number="39"><span class="ex">/map/--%</span> for i in <span class="dt">{1..384}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">samtools</span> idxstats satro_flashed_s<span class="va">${i}</span>_sorted.bam <span class="op">&gt;</span> ./gtseq17_idx/s<span class="va">${i}</span>_idxstats.txt<span class="kw">;</span> <span class="kw">done</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># index the reference. Output will be prefixed with "gtseq15_loci"</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="ex">/map/--%</span> bwa index -p gtseq15_loci -a is gtseq15_loci.fasta</span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co"># here is what comes by on stdout </span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>[<span class="ex">bwa_index</span>] Pack FASTA... 0.00 sec</span>
+<span id="cb4-6"><a href="#cb4-6"></a>[<span class="ex">bwa_index</span>] Construct BWT for the packed sequence...</span>
+<span id="cb4-7"><a href="#cb4-7"></a>[<span class="ex">bwa_index</span>] 0.00 seconds elapse.</span>
+<span id="cb4-8"><a href="#cb4-8"></a>[<span class="ex">bwa_index</span>] Update BWT... 0.00 sec</span>
+<span id="cb4-9"><a href="#cb4-9"></a>[<span class="ex">bwa_index</span>] Pack forward-only FASTA... 0.00 sec</span>
+<span id="cb4-10"><a href="#cb4-10"></a>[<span class="ex">bwa_index</span>] Construct SA from BWT and Occ... 0.00 sec</span>
+<span id="cb4-11"><a href="#cb4-11"></a>[<span class="ex">main</span>] Version: 0.7.5a-r405</span>
+<span id="cb4-12"><a href="#cb4-12"></a>[<span class="ex">main</span>] CMD: bwa index -p gtseq15_loci -a is gtseq15_loci.fasta</span>
+<span id="cb4-13"><a href="#cb4-13"></a>[<span class="ex">main</span>] Real time: 0.061 sec<span class="kw">;</span> <span class="ex">CPU</span>: 0.007 sec</span>
+<span id="cb4-14"><a href="#cb4-14"></a></span>
+<span id="cb4-15"><a href="#cb4-15"></a></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co"># map reads. for each input file, the output is named satro_flashed_s${i}_aln.sam</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a><span class="co"># Note the -R to insert appropriate read group header lines</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="ex">/map/--%</span> for i in <span class="dt">{1..384}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">bwa</span> mem -aM -v 3 -t 10 -R <span class="st">"@RG\tID:s</span><span class="va">${i}</span><span class="st">\tLB:amplicon\tPL:ILLUMINA\tSM:satro</span><span class="va">${i}</span><span class="st">"</span> ./gtseq15_loci ../flash/S<span class="va">${i}</span>.extendedFrags.fastq.gz  <span class="op">&gt;</span> ./satro_flashed_s<span class="va">${i}</span>_aln.sam<span class="kw">;</span> <span class="kw">done</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a></span>
+<span id="cb4-20"><a href="#cb4-20"></a></span>
+<span id="cb4-21"><a href="#cb4-21"></a><span class="co"># convert the SAMs to BAMs </span></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="ex">/map/--%</span> for i in <span class="dt">{1..384}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">samtools</span> view -bhS satro_flashed_s<span class="va">${i}</span>_aln.sam <span class="op">&gt;</span> satro_flashed_s<span class="va">${i}</span>.bam<span class="kw">;</span> <span class="kw">done</span></span>
+<span id="cb4-23"><a href="#cb4-23"></a></span>
+<span id="cb4-24"><a href="#cb4-24"></a></span>
+<span id="cb4-25"><a href="#cb4-25"></a><span class="co"># Sort the BAMs</span></span>
+<span id="cb4-26"><a href="#cb4-26"></a><span class="ex">/map/--%</span> for i in <span class="dt">{1..384}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">samtools</span> sort satro_flashed_s<span class="va">${i}</span>.bam -o satro_flashed_s<span class="va">${i}</span>_sorted.bam<span class="kw">;</span> <span class="kw">done</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a></span>
+<span id="cb4-28"><a href="#cb4-28"></a></span>
+<span id="cb4-29"><a href="#cb4-29"></a><span class="co"># Index the BAMs</span></span>
+<span id="cb4-30"><a href="#cb4-30"></a><span class="ex">/map/--%</span> for i in <span class="dt">{1..384}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">samtools</span> index satro_flashed_s<span class="va">${i}</span>_sorted.bam<span class="kw">;</span> <span class="kw">done</span></span>
+<span id="cb4-31"><a href="#cb4-31"></a></span>
+<span id="cb4-32"><a href="#cb4-32"></a></span>
+<span id="cb4-33"><a href="#cb4-33"></a><span class="co"># Make a text-file list of the BAMs</span></span>
+<span id="cb4-34"><a href="#cb4-34"></a><span class="ex">/map/--%</span> ls -1 *sorted.bam <span class="op">&gt;</span> bamlist.txt</span>
+<span id="cb4-35"><a href="#cb4-35"></a></span>
+<span id="cb4-36"><a href="#cb4-36"></a></span>
+<span id="cb4-37"><a href="#cb4-37"></a><span class="co"># generate idx stats and put them in a directory called gtseq17_idx</span></span>
+<span id="cb4-38"><a href="#cb4-38"></a><span class="ex">/map/--%</span> mkdir gtseq17_idx</span>
+<span id="cb4-39"><a href="#cb4-39"></a><span class="ex">/map/--%</span> for i in <span class="dt">{1..384}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">samtools</span> idxstats satro_flashed_s<span class="va">${i}</span>_sorted.bam <span class="op">&gt;</span> ./gtseq17_idx/s<span class="va">${i}</span>_idxstats.txt<span class="kw">;</span> <span class="kw">done</span></span></code></pre></div>
 </div>
 <div id="variant-detection" class="section level3">
 <h3 class="hasAnchor">
 <a href="#variant-detection" class="anchor"></a>Variant detection</h3>
 <p>We are now set up to detect variants using freebayes. We show how we do that here, but emphasize that if you have already chosen a set of variants that form your microhaplotypes, you could just specify those with a pre-existing VCF file. You <em>don’t</em> need to do new variant detection if you don’t want to. (Of course, if it doesn’t take too long, you may as well do variant detection with every individual you have sequenced at the amplicons, so as to get as many variants as possible.)</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># index fasta reference file</span></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="ex">/map/--%</span> samtools faidx gtseq15_loci.fasta</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"> </a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"> </a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co"># call variants, instructing freebayes to NOT return MNPs or other complex variants</span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="fu">nohup</span> freebayes-parallel <span class="op">&lt;(</span><span class="ex">fasta_generate_regions.py</span> gtseq15_loci.fasta.fai 150<span class="op">)</span> 10 -f gtseq15_loci.fasta -L bamlist.txt --haplotype-length 0 -kwVa --no-mnps --no-complex <span class="op">&gt;</span> satro384_noMNP_noComplex_noPriors.vcf</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># index fasta reference file</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="ex">/map/--%</span> samtools faidx gtseq15_loci.fasta</span>
+<span id="cb5-3"><a href="#cb5-3"></a> </span>
+<span id="cb5-4"><a href="#cb5-4"></a> </span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co"># call variants, instructing freebayes to NOT return MNPs or other complex variants</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="fu">nohup</span> freebayes-parallel <span class="op">&lt;(</span><span class="ex">fasta_generate_regions.py</span> gtseq15_loci.fasta.fai 150<span class="op">)</span> 10 -f gtseq15_loci.fasta -L bamlist.txt --haplotype-length 0 -kwVa --no-mnps --no-complex <span class="op">&gt;</span> satro384_noMNP_noComplex_noPriors.vcf</span></code></pre></div>
 </div>
 <div id="runhaplot" class="section level3">
 <h3 class="hasAnchor">
