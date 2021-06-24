@@ -9,3 +9,8 @@
 ^LICENSE\.md$
 ^inst/perl/fatlib/*$
 ^inst/perl/fatpacker\.trace$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
+^README.Rmd
