@@ -1,5 +1,5 @@
 
-# microhaplot <img src="man/figures/microhaplot-sticker.png" align="right" width="200"/>
+# microhaplot <img src="https://i.ibb.co/68M0tpT/microhaplot-logo.png" align="right" width="200"/>
 
 <!-- badges: start -->
 
@@ -40,6 +40,12 @@ workflow:
     quick assessment and quality control of haplotypes generated from
     library runs. Plot summaries include read depth, fraction of
     callable haplotypes, Hardy-Weinberg equilibrium plots, and more.
+
+<center>
+
+<img src="https://i.ibb.co/F5JtHj1/microhaplot-demo-1.gif" align="center" width="500"/>
+
+</center>
 
 See the **Example Data** section to learn about how to run each of these
 steps on the example data that are provided with the package.
