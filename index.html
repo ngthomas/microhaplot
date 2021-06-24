@@ -90,7 +90,7 @@
   <div class="contents col-md-9">
 <div id="microhaplot-" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#microhaplot-" class="anchor"></a>microhaplot <img src="reference/figures/microhaplot-sticker.png" align="right" width="200">
+<a href="#microhaplot-" class="anchor"></a>microhaplot <img src="https://i.ibb.co/68M0tpT/microhaplot-logo.png" align="right" width="200">
 </h1></div>
 <!-- badges: start -->
 
@@ -100,6 +100,9 @@
 <li><p>The first step is to summarize alignment and variant (SNP) data into a single data frame that is easily operated upon. This is done using the function <code><a href="reference/prepHaplotFiles.html">microhaplot::prepHaplotFiles</a></code>. You must supply a VCF file that includes variants that you are interested in extracting, and as many SAM files (one for each individual) that you want to extract read information from at each of the variants. The function <code><a href="reference/prepHaplotFiles.html">microhaplot::prepHaplotFiles</a></code> makes a call to PERL to parse the CIGAR strings in the SAM files to extract the variant information at each read and store this information into a data frame which gets saved with the installed Shiny app (see below) for later use. Depending on the size of the data set, this can take a few minutes.</p></li>
 <li><p>The second step is to run the microhaplot Shiny app to visualize the sequence information, call genotypes using simple read-depth based filtering criteria, and curate the loci. microhaplot is suitable for quick assessment and quality control of haplotypes generated from library runs. Plot summaries include read depth, fraction of callable haplotypes, Hardy-Weinberg equilibrium plots, and more.</p></li>
 </ol>
+<center>
+<p><img src="https://i.ibb.co/F5JtHj1/microhaplot-demo-1.gif" align="center" width="500"></p>
+</center>
 <p>See the <strong>Example Data</strong> section to learn about how to run each of these steps on the example data that are provided with the package.</p>
 <div id="installation-and-quick-start" class="section level2">
 <h2 class="hasAnchor">
