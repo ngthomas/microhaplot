@@ -1561,14 +1561,16 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         limits = levels(panelParam$group.label.bare)
       ) +
       theme_bw() +
-      ylab("individual ID") +
-      xlab ("allelic balance ratio") +
+      ylab("Individual ID") +
+      xlab ("allelic balance\nratio") +
       theme(
         legend.position = "bottom",
         panel.spacing = unit(0, 'mm'),
         panel.border = element_rect(size = 0, colour = "white"),
         axis.line.y = element_line(color="grey", size = 0.5),
-        plot.margin = unit(c(0, 2, 0, 0), "mm")
+        plot.margin = unit(c(0, 2, 0, 0), "mm"),
+        axis.title.x =element_text(size=16),
+        axis.title.y =element_text(size=20)
       ) +
       xlim(c(0, 1)) +
       ylim(indivPg$i) +
@@ -1634,7 +1636,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         axis.ticks.y = element_blank(),
         panel.spacing = unit(c(0,0,0,0), 'mm'),
         panel.border = element_rect(size = 0,colour = "white"),
-        plot.margin = unit(c(0, 3, 0, 0), "mm")
+        plot.margin = unit(c(0, 3, 0, 0), "mm"),
+        axis.title.x =element_text(size=16)
       ) +
       ylim(indivPg$i) +
       scale_x_continuous(limits=c(0,max.locus+1),breaks=round(seq(1,max.locus, length.out=4)))+
@@ -1695,7 +1698,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         axis.ticks.y = element_blank(),
         panel.spacing = unit(0, 'mm'),
         panel.border = element_rect(size = 0,colour = "white"),
-        plot.margin = unit(c(0,4, 0, 0), "mm")
+        plot.margin = unit(c(0,4, 0, 0), "mm"),
+        axis.title.x =element_text(size=16)
       ) +
       #plot.margin = unit(c(0, 0, 0, 0), "mm"))+
       ylim(indivPg$i) +
@@ -1800,7 +1804,8 @@ while the bottom panel hosts a wide selection of tables and graphical summaries.
         axis.ticks.y = element_blank(),
         panel.spacing = unit(0, 'mm'),
         panel.border = element_rect(size = 0,colour = "white"),
-        plot.margin = unit(c(0, 2, 0, 0), "mm")
+        plot.margin = unit(c(0, 2, 0, 0), "mm"),
+        axis.title.x =element_text(size=16)
       ) +
       #plot.margin = unit(c(0, 0, 0, 0), "mm"))+
       scale_y_log10()+
